@@ -27,9 +27,9 @@ async function initLights(){const el=document.getElementById('lightc');
     GL.amb=new PIXI.Sprite(GL.tex.amb);app.stage.addChild(GL.amb);
     GL.world=new PIXI.Container();app.stage.addChild(GL.world);
     GL.baked=new PIXI.Container();GL.dyn=new PIXI.Container();GL.world.addChild(GL.baked,GL.dyn);
-    GL.ok=true;el.style.display='block';lightsResize();
+    GL.ok=true;lightsResize();
   }catch(e){GL.ok=false;el.style.display='none';console.warn('WebGL-licht niet beschikbaar, canvas-terugval',e);}}
-function lightsResize(){if(!GL.ok)return;GL.app.renderer.resize(CW,CH);GL.amb.width=CW;GL.amb.height=CH;}
+function lightsResize(){if(!GL.ok)return;GL.app.renderer.resize(CW,CH);GL.amb.width=CW;GL.amb.height=CH;GL.shown=false;document.getElementById('lightc').style.display='none';}
 
 // ---- gebakken lantaarnlicht + neon per kaartvak (met schaduwen tegen gebouwen)
 function bakeChunk(ci,cj){const S=Math.ceil(LCS*LBAKE),c=document.createElement('canvas');c.width=c.height=S;const g=c.getContext('2d');
@@ -73,7 +73,7 @@ function lightsRender(vx0,vy0,vx1,vy1){if(!GL.ok)return;const w=GL.world;
   if(MIS.on&&!MIS.done&&iv(MIS.x,MIS.y,100)){const p=1+.2*Math.sin(frameN*.12);dynLight(RAD,MIS.x,MIS.y,1.5*p,1.5*p,0,0xffd166,.9);}
   if(!P.car&&!P.dead)dynLight(RAD,P.x,P.y,1.1,1.1,0,0xffe6c8,.35); // zacht 'speler-licht' zodat je jezelf altijd ziet
   for(let i=GL.used;i<GL.pool.length;i++)GL.pool[i].visible=false;
-  GL.app.render();}
+  GL.app.render();if(!GL.shown){GL.shown=true;document.getElementById('lightc').style.display='block';}}
 
 // ---- gloed op de bovenste laag (wordt niet verdonkerd): lampkernen, neon, koplamp-flares
 function drawGlows(vx0,vy0,vx1,vy1){const iv=(x,y,m)=>x>vx0-m&&x<vx1+m&&y>vy0-m&&y<vy1+m;ctx.save();ctx.globalCompositeOperation='lighter';

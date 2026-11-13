@@ -2,7 +2,7 @@
 let pickIdx=0;
 function buildPick(){const cards=document.getElementById('cards'),dots=document.getElementById('pickDots');cards.innerHTML='';dots.innerHTML='';
   CHARS.forEach((ch,i)=>{const el=document.createElement('div');el.className='card';el.style.setProperty('--c',ch.c);
-    el.innerHTML=`<div class="art">${portraitSVG(ch,i)}<div class="nm"><b>${ch.name}</b></div></div>
+    el.innerHTML=`<div class="art"${ch.img?` style="background:radial-gradient(circle at 70% 30%,#fff3c4 0,#ffd166 12%,rgba(255,122,77,0) 30%),linear-gradient(180deg,${ch.bg[2]},${ch.bg[1]} 55%,${ch.bg[0]})"`:''}>${ch.img?`<img src="${ch.img}" alt="${ch.name}" decoding="async">`:portraitSVG(ch,i)}<div class="nm"><b>${ch.name}</b></div></div>
       <button class="kies" data-i="${i}">KIES ${ch.name}</button>`;cards.appendChild(el);const d=document.createElement('i');dots.appendChild(d);});
   cards.querySelectorAll('.kies').forEach(b=>b.addEventListener('click',()=>choose(+b.dataset.i)));
   cards.addEventListener('scroll',updPick,{passive:true});setTimeout(()=>{scrollToCard(0,false);updPick();},30);}

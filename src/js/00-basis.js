@@ -3,7 +3,7 @@
 const cv=document.getElementById('c'),wctx=cv.getContext('2d'),fxc=document.getElementById('fxc'),fctx=fxc.getContext('2d');let ctx=wctx;
 const IS_TOUCH=('ontouchstart' in window)||navigator.maxTouchPoints>0;
 let CW=800,CH=600,DPR=1;
-function resize(){DPR=Math.min(window.devicePixelRatio||1,IS_TOUCH?2:2);CW=window.innerWidth;CH=window.innerHeight;cv.width=Math.round(CW*DPR);cv.height=Math.round(CH*DPR);cv.style.width=CW+'px';cv.style.height=CH+'px';fxc.width=cv.width;fxc.height=cv.height;fxc.style.width=CW+'px';fxc.style.height=CH+'px';if(typeof lightsResize==='function')lightsResize();placeTopBtns();}
+function resize(){DPR=Math.min(window.devicePixelRatio||1,IS_TOUCH?2:2);CW=window.innerWidth;CH=window.innerHeight;cv.width=Math.round(CW*DPR);cv.height=Math.round(CH*DPR);cv.style.width=CW+'px';cv.style.height=CH+'px';fxc.width=cv.width;fxc.height=cv.height;fxc.style.width=CW+'px';fxc.style.height=CH+'px';if(typeof lightsResize==='function')lightsResize();placeTopBtns();if(typeof MODE!=='undefined'&&MODE==='play'&&typeof renderWorld==='function'){try{renderWorld();}catch(e){}}}
 window.addEventListener('resize',resize);
 const TAU=Math.PI*2,clamp=(v,a,b)=>v<a?a:v>b?b:v,wrap=a=>{while(a>Math.PI)a-=TAU;while(a<-Math.PI)a+=TAU;return a;};
 const rr=(a,b)=>a+Math.random()*(b-a),rpick=a=>a[Math.random()*a.length|0];
