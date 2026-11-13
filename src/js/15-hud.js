@@ -1,0 +1,51 @@
+// ====================== HUD ======================
+function star(x,y,r,fill){ctx.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,q=i%2?r*.45:r;ctx.lineTo(x+Math.cos(a)*q,y+Math.sin(a)*q);}ctx.closePath();ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.stroke();}
+function txt(t,x,y,size,col,align,font){ctx.font=`${size}px ${font||'Anton, Impact, sans-serif'}`;ctx.textAlign=align||'left';ctx.textBaseline='top';ctx.fillStyle='rgba(0,0,0,.8)';ctx.fillText(t,x+2,y+2);ctx.fillStyle=col;ctx.fillText(t,x,y);}
+let MINI_S=170,MM={x:0,y:0,r:0};
+function uiTop(){const r=document.getElementById('mus').getBoundingClientRect();return{top:r.top||10,bottom:(r.bottom||50)};}
+function hud(){
+  ctx.setTransform(DPR,0,0,DPR,0,0);const U=clamp(Math.min(CW,CH)/560,.75,1.25),sm=CW<640,ut=uiTop(),L0=14;let y=ut.top;
+  // sterren, gezondheid, naam
+  for(let i=0;i<5;i++){const on=i<stars,fl=on&&copNear(500)&&(frameN>>4)&1;star(L0+11*U+i*25*U,y+11*U,9.5*U,on?(fl?'#4d8dff':'#ffd166'):'rgba(255,255,255,.16)');}
+  y+=27*U;ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(L0,y,128*U,9*U);ctx.fillStyle=P.hp>P.maxhp*.35?(P.ch?P.ch.c:'#ff2e88'):'#e8433a';ctx.fillRect(L0+2,y+2,(128*U-4)*P.hp/P.maxhp,9*U-4);
+  y+=14*U;txt(`${P.ch?P.ch.name:''}  💧${P.stats.nat}  🤕${P.stats.omver}  🚗${P.stats.gejat}`,L0,y,11.5*U,'#fff','left','Inter, sans-serif');
+  {const mf=P.moneyF>0?1+.35*Math.sin(P.moneyF/20*Math.PI):1;if(P.moneyF>0)P.moneyF--;ctx.save();const mxp=L0+(P.ch?150:120)*U;ctx.translate(mxp,y+7*U);ctx.scale(mf,mf);txt('€ '+P.money.toFixed(2).replace('.',','),0,-7*U,13*U,P.moneyF>0?'#7dff6a':'#9fffb0','left','Anton, Impact, sans-serif');ctx.restore();}
+  y+=19*U;ctx.save();const pn=placeName||'';ctx.font=`italic ${15*U}px Anton, Impact, sans-serif`;const maxW=CW-L0-(MINI_S+40);let t2=pn;while(t2.length>4&&ctx.measureText(t2).width>maxW)t2=t2.slice(0,-2);if(t2!==pn)t2+='…';ctx.restore();
+  txt(t2,L0,y,15*U,'#ffd166','left','Anton, Impact, sans-serif');
+  if(P.car){y+=20*U;txt(P.car.t.n+(P.car.boer?' · boer uit '+P.car.boer:'')+(P.car.state==='burning'?' — BRANDT!':''),L0,y,11.5*U,P.car.state==='burning'?'#ff6b3d':'#e8dcf5','left','Inter, sans-serif');}
+  if(MIS.on&&!MIS.done){y+=(P.car?18:20)*U;const dm=Math.round(Math.hypot(MIS.x-me().x,MIS.y-me().y)/9);if(!MG.on)txt(MIS_TXT[MIS.stage]+' · '+dm+' m',L0,y,11.5*U,'#ffd166','left','Inter, sans-serif');
+    const Z0=viewZ(),sx=CW/2+(MIS.x-camX)*Z0,sy=CH/2+(MIS.y-camY)*Z0,mg=34;if(!MG.on&&(sx<mg||sx>CW-mg||sy<mg+60||sy>CH-mg)){const a=Math.atan2(sy-CH/2,sx-CW/2),ex=clamp(CW/2+Math.cos(a)*CW,mg,CW-mg),ey=clamp(CH/2+Math.sin(a)*CH,mg+60,CH-mg-(IS_TOUCH?260:0));
+      ctx.save();ctx.translate(ex,ey);ctx.rotate(a);ctx.fillStyle='#ffd166';ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(16,0);ctx.lineTo(-8,-11);ctx.lineTo(-3,0);ctx.lineTo(-8,11);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();}}
+  // minikaart (rond, GTA-stijl) onder de knoppen rechtsboven
+  const S=MINI_S=Math.round(clamp(Math.min(CW,CH)*.28,100,180)),mx=CW-S-12,my=ut.bottom+8,o=me(),span=S*18;MM={x:mx+S/2,y:my+S/2,r:S/2};
+  ctx.save();ctx.beginPath();ctx.arc(mx+S/2,my+S/2,S/2,0,TAU);ctx.fillStyle='#4f86b0';ctx.fill();ctx.clip();
+  if(MAPC)ctx.drawImage(MAPC,(o.x-span/2)*MAPS,(o.y-span/2)*MAPS,span*MAPS,span*MAPS,mx,my,S,S);
+  const mp=(x,y)=>[mx+S/2+(x-o.x)*S/span,my+S/2+(y-o.y)*S/span];
+  if(MIS.on&&!MIS.done){let [x,y]=mp(MIS.x,MIS.y);const dx=x-(mx+S/2),dy=y-(my+S/2),dd=Math.hypot(dx,dy);if(dd>S/2-7){x=mx+S/2+dx/dd*(S/2-7);y=my+S/2+dy/dd*(S/2-7);}ctx.fillStyle='#ffd166';ctx.beginPath();ctx.arc(x,y,5.5,0,TAU);ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=1.5;ctx.stroke();}
+  for(const c of cars)if(c.driver==='cop'){const [x,y]=mp(c.x,c.y);ctx.fillStyle=(frameN>>3)&1?'#ff3b30':'#4d8dff';ctx.beginPath();ctx.arc(x,y,3,0,TAU);ctx.fill();}
+  ctx.save();ctx.translate(mx+S/2,my+S/2);ctx.rotate(P.car?P.car.a:P.a);ctx.fillStyle='#fff';ctx.beginPath();ctx.moveTo(8,0);ctx.lineTo(-5,-6);ctx.lineTo(-2,0);ctx.lineTo(-5,6);ctx.closePath();ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=1.5;ctx.stroke();ctx.restore();
+  ctx.restore();ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=3;ctx.beginPath();ctx.arc(mx+S/2,my+S/2,S/2,0,TAU);ctx.stroke();txt('N',mx+S/2,my+3,10,'#fff','center','Inter, sans-serif');
+  // hint
+  let hint='';if(!P.dead){if(P.car)hint=IS_TOUCH?'':'E: uitstappen · Spatie: handrem · S: remmen';else if(carNear())hint=IS_TOUCH?'Tik IN STAP om in te stappen':'E: instappen';else if(swimming())hint='Je zwemt! Zoek de kant op';else if(frameN<1500)hint=IS_TOUCH?'💧 = waterballon gooien':'Spatie: waterballon gooien';}
+  if(hint)txt(hint,CW/2,CH-(IS_TOUCH?175:40),13.5*U,'#fff','center','Inter, sans-serif');
+  msgs.forEach(m=>{const a=clamp(Math.min(m.life/25,(m.ml-m.life)/8+.2),0,1);ctx.globalAlpha=a;const big=Math.min((sm?36:56)*U,CW*.11);txt(m.t,CW/2,CH*.3,big,m.col,'center');if(m.sub)txt(m.sub,CW/2,CH*.3+big+6,(sm?13:16)*U,'#fff','center','Inter, sans-serif');ctx.globalAlpha=1;});
+  if(!IS_TOUCH)txt('E in/uit · Spatie gooien/handrem · J springen · M kaart · muiswiel zoom · P pauze',16,CH-24,12,'rgba(255,255,255,.55)','left','Inter, sans-serif');
+  if(P.hurtF>0){const a=P.hurtF/18,g3=ctx.createRadialGradient(CW/2,CH/2,Math.min(CW,CH)*.3,CW/2,CH/2,Math.max(CW,CH)*.75);g3.addColorStop(0,'rgba(255,0,40,0)');g3.addColorStop(1,`rgba(255,0,40,${.55*a})`);ctx.fillStyle=g3;ctx.fillRect(0,0,CW,CH);}
+  if(P.car&&speedOf(P.car)>5.2&&!MG.on){const k=clamp((speedOf(P.car)-5.2)/3,0,1);ctx.strokeStyle=`rgba(255,255,255,${.25*k})`;ctx.lineWidth=1.5;for(let i=0;i<14;i++){const a=(i*2.399+frameN*.07)%TAU,r0=Math.max(CW,CH)*(.42+((i*37+frameN*3)%40)/100);ctx.beginPath();ctx.moveTo(CW/2+Math.cos(a)*r0,CH/2+Math.sin(a)*r0);ctx.lineTo(CW/2+Math.cos(a)*(r0+60*k),CH/2+Math.sin(a)*(r0+60*k));ctx.stroke();}}
+  if(bigMap)drawBigMap();
+  if(paused){ctx.fillStyle='rgba(10,0,25,.65)';ctx.fillRect(0,0,CW,CH);txt('PAUZE',CW/2,CH/2-50,60,'#ffd166','center');txt(IS_TOUCH?'Tik op ▶ om verder te spelen':'Druk op P om verder te spelen',CW/2,CH/2+26,16,'#fff','center','Inter, sans-serif');}
+  if(IS_TOUCH&&frameN%6===0)updTouchUI();
+  if(MG.on)drawMinigame();
+}
+function drawBigMap(){ctx.fillStyle='rgba(8,4,20,.88)';ctx.fillRect(0,0,CW,CH);
+  const bx0=FORTBB[0]-250,by0=FORTBB[1]-250,bw=FORTBB[2]-FORTBB[0]+500,bh=FORTBB[3]-FORTBB[1]+500,top=uiTop().bottom+34;
+  const s=Math.min((CW-20)/bw,(CH-top-30)/bh),w=bw*s,h=bh*s,x0=(CW-w)/2,y0=top+(CH-top-30-h)/2;
+  if(MAPC){ctx.imageSmoothingQuality='high';ctx.drawImage(MAPC,bx0*MAPS,by0*MAPS,bw*MAPS,bh*MAPS,x0,y0,w,h);}ctx.strokeStyle='rgba(255,255,255,.8)';ctx.lineWidth=2;ctx.strokeRect(x0,y0,w,h);
+  const mp=(x,y)=>[x0+(x-bx0)*s,y0+(y-by0)*s],fs=clamp(w/95,8.5,12);ctx.font=`700 ${fs}px Inter, sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+  const placed=[];
+  for(const l of LANDMARKS.slice().sort((a,b)=>(a.shop?1:0)-(b.shop?1:0))){const [x,y]=mp(l.x,l.y);ctx.fillStyle=l.shop?(l.c||'#fff'):'#ffd166';ctx.beginPath();ctx.arc(x,y,l.shop?3:4.5,0,TAU);ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=1;ctx.stroke();
+    const tw=ctx.measureText(l.n).width;let ly=y-fs;if(placed.some(q=>Math.abs(q[0]-x)<(q[2]+tw)/2+2&&Math.abs(q[1]-ly)<fs+1))ly=y+fs;if(placed.some(q=>Math.abs(q[0]-x)<(q[2]+tw)/2+2&&Math.abs(q[1]-ly)<fs+1))continue;placed.push([x,ly,tw]);
+    ctx.lineWidth=3;ctx.strokeStyle='rgba(0,0,0,.75)';ctx.strokeText(l.n,x,ly);ctx.fillStyle='#fff';ctx.fillText(l.n,x,ly);}
+  if(MIS.on&&!MIS.done){const [qx,qy]=mp(MIS.x,MIS.y),r=9+3*Math.sin(frameN*.15);ctx.strokeStyle='#ffd166';ctx.lineWidth=3;ctx.beginPath();ctx.arc(qx,qy,r,0,TAU);ctx.stroke();ctx.lineWidth=3;ctx.strokeStyle='rgba(0,0,0,.8)';ctx.strokeText('MISSIE',qx,qy-r-8);ctx.fillStyle='#ffd166';ctx.fillText('MISSIE',qx,qy-r-8);}
+  const [px,py]=mp(me().x,me().y);ctx.fillStyle=(frameN>>4)&1?'#fff':'#ff2e88';ctx.beginPath();ctx.arc(px,py,7,0,TAU);ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.stroke();
+  txt('KAART · VESTING ZALTBOMMEL',CW/2,top-30,clamp(CW/22,16,22),'#ffd166','center');txt('tik ergens om te sluiten',CW/2,top-10,11,'rgba(255,255,255,.7)','center','Inter, sans-serif');txt('Kaartdata © OpenStreetMap-bijdragers',x0+w,y0+h+4,10,'rgba(255,255,255,.6)','right','Inter, sans-serif');}

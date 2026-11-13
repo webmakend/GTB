@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#14062e">
+<title>GTB Bommel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+/*CSS*/
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<canvas id="lightc"></canvas>
+<canvas id="fxc"></canvas>
+<div id="intro">
+  <div id="slides"></div>
+  <img id="introLogo" src="assets/logo.png" alt="GTB Bommel">
+  <div id="loadBox"><div id="loadTip"></div><div id="loadRow"><div id="loadSpin"></div><div id="loadBar"><div id="loadFill"></div></div><div id="loadPct">0%</div></div></div>
+  <button id="play">SPELEN</button>
+  <div id="dots"></div>
+</div>
+<div id="pick">
+  <svg class="leaves" viewBox="0 0 400 800" preserveAspectRatio="none"><g fill="#1a0a2c"><path d="M-20 80 C60 120 90 60 160 90 C100 100 60 140 -20 150Z M-20 200 C40 220 70 180 120 210 C70 215 30 250 -20 260Z M420 620 C340 600 310 660 240 640 C300 620 340 580 420 560Z M420 720 C350 700 320 760 250 740 C310 730 350 690 420 680Z M420 120 C360 140 340 100 280 130 C330 135 370 170 420 180Z M-20 640 C50 650 80 610 140 640 C80 650 40 690 -20 700Z"/></g></svg><div id="pickHead"><p>WIE GAAT ER BOMMEL IN?</p></div>
+  <div id="cards"></div>
+  <div id="pickNav"><button id="pPrev" aria-label="Vorige">‹</button><div id="pickDots"></div><button id="pNext" aria-label="Volgende">›</button></div>
+</div>
+<div id="lets"><b id="letsT"></b></div>
+<div id="snd">🔊 Tik voor geluid</div>
+<div id="mus" aria-label="Muziek aan/uit"></div>
+<div id="touch">
+  <div id="joyZone"><div id="joyBase"><div id="joyKnob"></div></div></div>
+  <div id="joyHint">sleep hier<br>om te lopen<br>&amp; sturen</div>
+  <div class="tb" id="bCar">IN<br>STAP</div>
+  <div class="tb" id="bAct">💧<br>GOOI</div>
+  <div class="tb" id="bJump">⤒<br>SPRING</div>
+</div>
+<div id="topBtns"><div class="sb" id="bPause">❚❚</div><div class="sb" id="bRestart">⟲</div></div>
+<div id="sideBtns"><div class="sb" id="bMap">🗺</div></div>
+<script type="application/json" id="wdata">__WORLD__</script>
+<script>
+/*GAME*/
+</script>
+</body>
+</html>
