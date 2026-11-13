@@ -3,6 +3,14 @@ function star(x,y,r,fill){ctx.beginPath();for(let i=0;i<10;i++){const a=-Math.PI
 function txt(t,x,y,size,col,align,font){ctx.font=`${size}px ${font||'Anton, Impact, sans-serif'}`;ctx.textAlign=align||'left';ctx.textBaseline='top';ctx.fillStyle='rgba(0,0,0,.8)';ctx.fillText(t,x+2,y+2);ctx.fillStyle=col;ctx.fillText(t,x,y);}
 let MINI_S=170,MM={x:0,y:0,r:0};
 function uiTop(){const r=document.getElementById('mus').getBoundingClientRect();return{top:r.top||10,bottom:(r.bottom||50)};}
+// ---- missie-melding: groot kaartje in beeld met titel en duidelijke opdracht
+let MBAN=null;
+function missionBanner(title,text,col,life){MBAN={title,text,col:col||'#ffd166',life:life||330,ml:life||330};sfx('reward');buzz(25);}
+function wrapLines(t,maxW){const out=[];let cur='';for(const w of String(t).split(' ')){const tr=cur?cur+' '+w:w;if(ctx.measureText(tr).width>maxW&&cur){out.push(cur);cur=w;}else cur=tr;}if(cur)out.push(cur);return out;}
+function drawMissionBanner(){if(!MBAN||MG.on)return;if(--MBAN.life<=0){MBAN=null;return;}const a=clamp(Math.min(MBAN.life/25,(MBAN.ml-MBAN.life)/10),0,1),U=clamp(Math.min(CW,CH)/560,.8,1.2);
+  const w=Math.min(CW-28,440*U),x=(CW-w)/2,y=CH*.2+(1-a)*-20;ctx.font=`600 ${16*U}px Inter, sans-serif`;const lines=wrapLines(MBAN.text,w-44*U),h=(62+lines.length*22)*U;
+  ctx.globalAlpha=a;ctx.fillStyle='rgba(10,4,24,.9)';rrect(ctx,x,y,w,h,14*U);ctx.fill();ctx.fillStyle=MBAN.col;rrect(ctx,x,y,7*U,h,4);ctx.fill();ctx.strokeStyle=MBAN.col;ctx.lineWidth=2;rrect(ctx,x,y,w,h,14*U);ctx.stroke();
+  txt(MBAN.title,x+22*U,y+12*U,24*U,MBAN.col,'left','Anton, Impact, sans-serif');ctx.font=`600 ${16*U}px Inter, sans-serif`;ctx.fillStyle='#fff';ctx.textAlign='left';ctx.textBaseline='top';lines.forEach((l,i)=>ctx.fillText(l,x+22*U,y+(48+i*22)*U));ctx.globalAlpha=1;}
 function hud(){
   ctx.setTransform(DPR,0,0,DPR,0,0);const U=clamp(Math.min(CW,CH)/560,.75,1.25),sm=CW<640,ut=uiTop(),L0=14;let y=ut.top;
   // sterren, gezondheid, naam
@@ -13,7 +21,10 @@ function hud(){
   y+=19*U;ctx.save();const pn=placeName||'';ctx.font=`italic ${15*U}px Anton, Impact, sans-serif`;const maxW=CW-L0-(MINI_S+40);let t2=pn;while(t2.length>4&&ctx.measureText(t2).width>maxW)t2=t2.slice(0,-2);if(t2!==pn)t2+='…';ctx.restore();
   txt(t2,L0,y,15*U,'#ffd166','left','Anton, Impact, sans-serif');
   if(P.car){y+=20*U;txt(P.car.t.n+(P.car.boer?' · boer uit '+P.car.boer:'')+(P.car.state==='burning'?' — BRANDT!':''),L0,y,11.5*U,P.car.state==='burning'?'#ff6b3d':'#e8dcf5','left','Inter, sans-serif');}
-  if(MIS.on&&!MIS.done){y+=(P.car?18:20)*U;const dm=Math.round(Math.hypot(MIS.x-me().x,MIS.y-me().y)/9);if(!MG.on)txt(MIS_TXT[MIS.stage]+' · '+dm+' m',L0,y,11.5*U,'#ffd166','left','Inter, sans-serif');
+  if(MIS.on&&!MIS.done){y+=(P.car?20:22)*U;const dm=Math.round(Math.hypot(MIS.x-me().x,MIS.y-me().y)/9);
+    if(!MG.on){const cw=Math.min(CW-MINI_S-40,300*U);ctx.font=`700 ${12.5*U}px Inter, sans-serif`;const ls=wrapLines(MIS_DO[MIS.stage]||'',cw-20*U),ch=(26+ls.length*16)*U,pu=.55+.45*Math.abs(Math.sin(frameN*.05));
+      ctx.fillStyle='rgba(10,4,24,.78)';rrect(ctx,L0,y,cw,ch,9*U);ctx.fill();ctx.fillStyle=`rgba(255,209,102,${pu})`;rrect(ctx,L0,y,5*U,ch,3);ctx.fill();
+      txt((MIS_TXT[MIS.stage]||'').split(':')[0]+'  ·  '+dm+' m',L0+13*U,y+6*U,11*U,'#ffd166','left','Inter, sans-serif');ctx.font=`700 ${12.5*U}px Inter, sans-serif`;ctx.fillStyle='#fff';ctx.textAlign='left';ctx.textBaseline='top';ls.forEach((l,i)=>ctx.fillText(l,L0+13*U,y+(22+i*16)*U));y+=ch-14*U;}
     const Z0=viewZ(),sx=CW/2+(MIS.x-camX)*Z0,sy=CH/2+(MIS.y-camY)*Z0,mg=34;if(!MG.on&&(sx<mg||sx>CW-mg||sy<mg+60||sy>CH-mg)){const a=Math.atan2(sy-CH/2,sx-CW/2),ex=clamp(CW/2+Math.cos(a)*CW,mg,CW-mg),ey=clamp(CH/2+Math.sin(a)*CH,mg+60,CH-mg-(IS_TOUCH?260:0));
       ctx.save();ctx.translate(ex,ey);ctx.rotate(a);ctx.fillStyle='#ffd166';ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(16,0);ctx.lineTo(-8,-11);ctx.lineTo(-3,0);ctx.lineTo(-8,11);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();}}
   // minikaart (rond, GTA-stijl) onder de knoppen rechtsboven
@@ -32,6 +43,7 @@ function hud(){
   if(!IS_TOUCH)txt('E in/uit · Spatie gooien/handrem · J springen · M kaart · muiswiel zoom · P pauze',16,CH-24,12,'rgba(255,255,255,.55)','left','Inter, sans-serif');
   if(P.hurtF>0){const a=P.hurtF/18,g3=ctx.createRadialGradient(CW/2,CH/2,Math.min(CW,CH)*.3,CW/2,CH/2,Math.max(CW,CH)*.75);g3.addColorStop(0,'rgba(255,0,40,0)');g3.addColorStop(1,`rgba(255,0,40,${.55*a})`);ctx.fillStyle=g3;ctx.fillRect(0,0,CW,CH);}
   if(P.car&&speedOf(P.car)>5.2&&!MG.on){const k=clamp((speedOf(P.car)-5.2)/3,0,1);ctx.strokeStyle=`rgba(255,255,255,${.25*k})`;ctx.lineWidth=1.5;for(let i=0;i<14;i++){const a=(i*2.399+frameN*.07)%TAU,r0=Math.max(CW,CH)*(.42+((i*37+frameN*3)%40)/100);ctx.beginPath();ctx.moveTo(CW/2+Math.cos(a)*r0,CH/2+Math.sin(a)*r0);ctx.lineTo(CW/2+Math.cos(a)*(r0+60*k),CH/2+Math.sin(a)*(r0+60*k));ctx.stroke();}}
+  drawMissionBanner();
   if(bigMap)drawBigMap();
   if(paused){ctx.fillStyle='rgba(10,0,25,.65)';ctx.fillRect(0,0,CW,CH);txt('PAUZE',CW/2,CH/2-50,60,'#ffd166','center');txt(IS_TOUCH?'Tik op ▶ om verder te spelen':'Druk op P om verder te spelen',CW/2,CH/2+26,16,'#fff','center','Inter, sans-serif');}
   if(IS_TOUCH&&frameN%6===0)updTouchUI();

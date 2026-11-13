@@ -10,3 +10,6 @@ function drawPplSprite(r,w,anim,moving){const sc=w/r[3],L=r[2]*sc,s=moving?Math.
   ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(2,2,L*.42,w*.42,0,0,TAU);ctx.fill();
   ctx.fillStyle='#1d1a18';ctx.beginPath();ctx.ellipse(s,-w*.16,2.6,1.7,0,0,TAU);ctx.ellipse(-s,w*.16,2.6,1.7,0,0,TAU);ctx.fill();
   const bob=moving?1+Math.abs(Math.sin(anim))*.04:1;ctx.save();ctx.scale(bob,bob);ctx.drawImage(PPL,r[0],r[1],r[2],r[3],-L/2,-w/2,L,w);ctx.restore();}
+// strand-decor (TOPDOWN Nature Beach Island pack, verkleind tot één atlas)
+const BEACHA=new Image();let BEACHA_OK=false;BEACHA.onload=()=>{BEACHA_OK=true;};BEACHA.src='assets/beach.webp';
+const BEACH_SPR={"sailboat": [0, 0, 92, 160], "tower": [94, 0, 104, 160], "surf": [200, 0, 125, 160], "chair": [327, 0, 134, 160], "castle": [463, 0, 146, 160], "umbrella": [611, 0, 160, 153], "bush": [773, 0, 138, 160], "palm": [0, 162, 120, 160], "palm2": [122, 162, 159, 160], "kayak": [283, 162, 160, 142], "rowboat": [445, 162, 160, 133], "oats": [607, 162, 124, 160], "rock": [733, 162, 160, 101], "shell": [895, 162, 119, 160], "bottle": [0, 324, 66, 160], "fire": [68, 324, 150, 160], "hammock": [220, 324, 160, 118], "tiki": [382, 324, 160, 158]};

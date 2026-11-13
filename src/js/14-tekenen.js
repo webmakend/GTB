@@ -40,7 +40,7 @@ function drawDog(g){ctx.save();ctx.translate(g.x,g.y);ctx.rotate(g.a);ctx.scale(
 function drawPed(p,isPlayer){ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);
   if(p.state==='down'&&p.spr&&PPL_OK){const r=p.spr,w=16,sc=w/r[3],L=r[2]*sc;ctx.fillStyle='rgba(0,0,0,.22)';ctx.beginPath();ctx.ellipse(1,2,11,6,0,0,TAU);ctx.fill();ctx.rotate(Math.PI/2);ctx.scale(1.15,.8);ctx.drawImage(PPL,r[0],r[1],r[2],r[3],-L/2,-w/2,L,w);ctx.restore();return;}
   if(p.state==='down'){ctx.fillStyle='rgba(0,0,0,.2)';ctx.beginPath();ctx.ellipse(1,2,10,5,0,0,TAU);ctx.fill();ctx.fillStyle='#222';ctx.fillRect(-12,-4,6,3);ctx.fillRect(-12,1,6,3);ctx.fillStyle=p.col;ctx.beginPath();ctx.ellipse(0,0,8,5,0,0,TAU);ctx.fill();ctx.fillStyle=p.hair;ctx.beginPath();ctx.arc(9,0,3.4,0,TAU);ctx.fill();ctx.restore();return;}
-  if(p.spr&&PPL_OK){drawPplSprite(p.spr,isPlayer?17:16,p.anim,p.state!=='idle');
+  if(p.spr&&PPL_OK){drawPplSprite(p.spr,isPlayer?17:16,p.anim,isPlayer?P.moving:p.state!=='idle',isPlayer?p.run:p.state==='flee');
     if(isPlayer){ctx.globalAlpha=(frameN>>4)&1?1:.35;ctx.fillStyle='#ffd166';ctx.beginPath();ctx.arc(11,0,2.8,0,TAU);ctx.fill();ctx.globalAlpha=1;}
     if(p.wet>0){ctx.fillStyle='rgba(90,170,255,.45)';ctx.beginPath();ctx.ellipse(0,0,5,8,0,0,TAU);ctx.fill();if(frameN%8===0)parts.push({x:p.x,y:p.y,vx:rr(-.3,.3),vy:rr(-.3,.3),l:16,ml:16,s:1.6,k:'w'});}
     ctx.restore();return;}
@@ -54,6 +54,9 @@ function drawPed(p,isPlayer){ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);
 function drawSwimmer(){ctx.save();ctx.translate(P.x,P.y);ctx.rotate(P.a);const s=Math.sin(P.anim*1.2);ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(-2,0,9+Math.abs(s)*2,Math.PI*.6,Math.PI*1.4);ctx.stroke();
   ctx.strokeStyle='#e9b48a';ctx.lineWidth=2.5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(1,-3);ctx.lineTo(5+s*4,-8);ctx.moveTo(1,3);ctx.lineTo(5-s*4,8);ctx.stroke();ctx.fillStyle='#ff2e88';ctx.beginPath();ctx.ellipse(-3,0,3,4,0,0,TAU);ctx.fill();ctx.fillStyle='#2b1d0e';ctx.beginPath();ctx.arc(1,0,3.4,0,TAU);ctx.fill();ctx.restore();}
 function drawBeach(vx0,vy0,vx1,vy1){const iv=(x,y)=>x>vx0-40&&x<vx1+40&&y>vy0-40&&y<vy1+40;
+  if(BEACHA_OK)for(const p of BPROPS){if(!iv(p.x,p.y))continue;const r=BEACH_SPR[p.k];if(!r)continue;const h=p.sz,w=h*r[2]/r[3],bob=p.w?Math.sin(frameN*.03+p.x)*1.2:0;
+    ctx.fillStyle=p.w?'rgba(255,255,255,.18)':'rgba(0,0,0,.2)';ctx.beginPath();ctx.ellipse(p.x+3,p.y+1,w*.42,Math.max(3,h*.12),0,0,TAU);ctx.fill();
+    ctx.save();ctx.translate(p.x,p.y+bob);if(p.f)ctx.scale(-1,1);if(p.k==='fire'){const fl=1+.06*Math.sin(frameN*.4);ctx.scale(fl,fl);}ctx.drawImage(BEACHA,r[0],r[1],r[2],r[3],-w/2,-h*.92,w,h);ctx.restore();}
   for(const s2 of SWIMMERS){if(!iv(s2.x,s2.y))continue;const r=6+3*Math.sin(frameN*.05+s2.ph);ctx.strokeStyle='rgba(255,255,255,.5)';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(s2.x,s2.y,r+4,0,TAU);ctx.stroke();ctx.fillStyle='#e9b48a';ctx.beginPath();ctx.arc(s2.x+Math.cos(frameN*.08+s2.ph)*6,s2.y+3,2,0,TAU);ctx.fill();ctx.fillStyle=s2.cap||s2.hair;ctx.beginPath();ctx.arc(s2.x,s2.y,4,0,TAU);ctx.fill();}
   for(const b of BWALK){if(!iv(b.x,b.y))continue;ctx.save();ctx.translate(b.x,b.y);ctx.rotate(b.a);
     if(PPL_OK){if(b.spr==null)b.spr=pplSpr('walk');drawPplSprite(b.spr,15,b.anim,!(b.stop>0));}ctx.restore();}
@@ -142,7 +145,7 @@ function renderWorld(){
   for(const p of peds)if(p.state!=='down'&&inV(p.x,p.y,20))drawPed(p);
   if(!P.car&&!P.dead){if(swimming())drawSwimmer();else{const jz=P.jz||0;if(jz>0){ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(P.x+2,P.y+3,6-jz*.05,8-jz*.06,0,0,TAU);ctx.fill();ctx.save();ctx.translate(P.x-jz*.25,P.y-jz*.6);ctx.scale(1+jz/45,1+jz/45);ctx.translate(-P.x,-P.y);}
     if(P.squash>0&&!(jz>0)){const q=P.squash/9;ctx.save();ctx.translate(P.x,P.y);ctx.scale(1+.3*q,1-.22*q);ctx.translate(-P.x,-P.y);}
-    drawPed({spr:P.ch&&P.ch.spr!=null?PPL_SPR[P.ch.spr[0]][P.ch.spr[1]]:null,x:P.x,y:P.y,a:P.a,anim:jz>0?1.2:P.anim,col:P.ch?P.ch.body:'#ff2e88',hair:P.ch?P.ch.head:'#2b1d0e',state:'walk',kind:'p',wet:0},true);if(jz>0||P.squash>0)ctx.restore();}}
+    drawPed({run:P.running,spr:P.ch&&P.ch.spr!=null?PPL_SPR[P.ch.spr[0]][P.ch.spr[1]]:null,x:P.x,y:P.y,a:P.a,anim:jz>0?1.2:P.anim,col:P.ch?P.ch.body:'#ff2e88',hair:P.ch?P.ch.head:'#2b1d0e',state:'walk',kind:'p',wet:0},true);if(jz>0||P.squash>0)ctx.restore();}}
   for(const c of cars)if(!c.dead&&inV(c.x,c.y,60))drawCar(c);
   drawTrees(vx0,vy0,vx1,vy1,cx,cy);drawBuildings(vx0,vy0,vx1,vy1,cx,cy);drawCables(vx0,vy0,vx1,vy1,cx,cy);drawBridgeSign(vx0,vy0,vx1,vy1,cx,cy);drawParts();drawBalloons();
   if(!GL.ok)drawEvening(vx0,vy0,vx1,vy1);

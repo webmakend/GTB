@@ -29,7 +29,7 @@ const BUILDINGS=[],TREES=[],TERRACE=[];
 // kleuren naar de luchtfoto's: veel oranje pannen, leisteen-grijs, witte en bakstenen gevels
 const ROOFS=['#d0623a','#c85a33','#d97048','#bd5530','#cf6a43','#d0623a','#c85a33','#56595f','#4b4e54','#63666c','#7a3b2c'];
 const WALLS=['#ece6da','#e2d8c6','#f2eee6','#8a4a36','#9c5a42','#b98060','#d9cdb8','#7d4434','#e8e1d3'];
-const SIGNS={'Kruidvat':['#e2001a','#fff'],'Intertoys':['#f26b0f','#fff'],'Bruna':['#0b4da2','#ffd200'],'Shoeby':['#111','#fff'],'HEMA':['#d6001c','#fff'],
+const SIGNS={'Action':['#0a1f8f','#ffffff'],'Kruidvat':['#e2001a','#fff'],'Intertoys':['#f26b0f','#fff'],'Bruna':['#0b4da2','#ffd200'],'Shoeby':['#111','#fff'],'HEMA':['#d6001c','#fff'],
  'Kapsalon Saer':['#2b2b2b','#e8c46a'],'Kapper Dubai':['#0d0d0d','#d4af37'],'LEF':['#1d6b4a','#fff'],'De Heeren van Bommel':['#5a1622','#f1dfb3'],'Xenos':['#e30613','#fff'],'Sport 2000':['#003da5','#fff'],
  'Toast & Tosti':['#f2b134','#3a2410'],'Zorba':['#1f5fa8','#fff'],'Máxima':['#6cace4','#fff'],'CinCin':['#7a1f3d','#fff'],"Kim's Kitchen":['#2e7d32','#fff'],'De Verdraagzaamheid':['#203a5c','#f1dfb3'],'De Eetgelegenheid':['#4e342e','#fff']};
 const CATC={'Winkel':[['#2d6cdf','#fff'],['#7b2cbf','#fff'],['#e76f51','#fff'],['#264653','#fff']],'Kapper / Barbershop':[['#111','#e8c46a'],['#3d3d3d','#fff']],'Restaurant':[['#7a1f3d','#fff'],['#1d6b4a','#fff'],['#4e342e','#ffd166']]};
@@ -49,7 +49,7 @@ function prepBuilding(b){
   BUILDINGS.push(b);
   if(!b.pass)polyFill(b.p,i=>{G[i]=BUILD;});
 }
-let BEACH=null,BEACHERS=[],SWIMMERS=[],BWALK=[];
+let BEACH=null,BEACHERS=[],SWIMMERS=[],BWALK=[],BPROPS=[];
 const SAY_BEACH=['Ik heb nu al zand op plekken waar het zonlicht nog nooit is geweest.','Broodje kaas met een extra krokant laagje schelpengruis.','Ik kan Tuil zien liggen aan de overkant!','Het is heerlijk weer!','Wil je ook een pilsje?','Kun jij mijn rug even insmeren?'];
 function makeBeach(){const n=FORT.length,cyT=FORTBB[1]+(FORTBB[3]-FORTBB[1])*.32,c=centroid(FORT);let best=[],cur=[];
   for(let k=0;k<2*n;k++){const i=k%n;if(FORT[i][1]<cyT){cur.push(i);if(cur.length>best.length)best=cur.slice();if(cur.length>=n)break;}else cur=[];}
@@ -116,6 +116,12 @@ function genWorld(){
   // strandgasten en zwemmers
   if(BEACH){const b=BEACH.bb;for(let i=0;i<4000&&BEACHERS.length<46;i++){const x=R(b[0],b[2]),y=R(b[1],b[3]);if(cellAt(x,y)!==SAND||inFort(x,y))continue;if(BEACHERS.some(q=>Math.abs(q.x-x)<34&&Math.abs(q.y-y)<34))continue;
       BEACHERS.push({x,y,a:R(-.4,.4)+(rnd()<.5?0:Math.PI),towel:RP(['#ff4fa3','#36d1ff','#ffe14d','#7dff6a','#ff8a3d','#ffffff','#e63946']),skin:RP(['#f1c27d','#e0ac69','#c68642','#8d5524','#ffdbac']),suit:RP(['#1d3557','#e63946','#2a9d8f','#111','#f4a261']),hair:RP(HAIRS),umb:rnd()<.3?RP(['#ff4fa3','#36d1ff','#ffd166','#7dff6a']):null,sit:rnd()<.3});}
+    // strand-decor: palmen, parasols, ligstoelen, strandtent, reddingstoren, boten aan de waterkant
+    {const want=[['palm',9,64],['palm2',5,70],['umbrella',8,34],['chair',8,26],['oats',8,26],['bush',3,30],['castle',2,26],['tower',1,58],['tiki',1,62],['surf',1,34],['fire',1,26],['hammock',1,40],['shell',3,10],['bottle',1,10],['rock',2,30]];
+      const okP=(x,y,sz)=>BPROPS.every(p=>Math.hypot(p.x-x,p.y-y)>(p.sz+sz)*.55)&&BEACHERS.every(q=>Math.hypot(q.x-x,q.y-y)>sz*.6+14);
+      for(const [k,n,sz] of want){let c=0;for(let i=0;i<4000&&c<n;i++){const x=R(b[0],b[2]),y=R(b[1],b[3]);if(cellAt(x,y)!==SAND||inFort(x,y))continue;if(!okP(x,y,sz))continue;BPROPS.push({k,x,y,sz,f:rnd()<.5});c++;}}
+      for(const [k,n,sz] of [['kayak',2,30],['rowboat',2,34],['sailboat',1,46]]){let c=0;for(let i=0;i<6000&&c<n;i++){const x=R(b[0]-150,b[2]+150),y=R(b[1]-200,b[3]);if(cellAt(x,y)!==WATER||inFort(x,y))continue;let nearS=false;for(const [dx,dy] of [[0,40],[0,70],[40,40],[-40,40]])if(cellAt(x+dx,y+dy)===SAND)nearS=true;if(!nearS||!okP(x,y,sz))continue;BPROPS.push({k,x,y,sz,f:rnd()<.5,w:1});c++;}}
+      BPROPS.sort((p,q)=>p.y-q.y);}
     for(let i=0;i<5000&&BWALK.length<12;i++){const x=R(b[0],b[2]),y=R(b[1],b[3]);if(cellAt(x,y)!==SAND||inFort(x,y))continue;
       BWALK.push({x,y,a:R(0,6.28),anim:R(0,6),spd:R(.35,.6),think:0,talkCd:0,skin:RP(['#f1c27d','#e0ac69','#c68642','#8d5524','#ffdbac']),suit:RP(['#ff2e88','#36d1ff','#ffe14d','#e63946','#7dff6a','#ffffff','#111']),hair:RP(['#2b1d0e','#e8c070','#7a3e12','#111','#c0392b','#f5deb3']),state:'walk'});}
     for(let i=0;i<6000&&SWIMMERS.length<22;i++){const x=R(b[0]-200,b[2]+200),y=R(b[1]-260,b[3]);if(cellAt(x,y)!==WATER||inFort(x,y))continue;let nearS=false;for(const [dx,dy] of [[0,60],[0,120],[60,60],[-60,60],[0,180]])if(cellAt(x+dx,y+dy)===SAND)nearS=true;if(!nearS)continue;

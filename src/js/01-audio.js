@@ -84,7 +84,11 @@ function sfx(kind,v,w){if(!AU.c)return;const t=AU.c.currentTime,S=[AU.sfx];
   else if(kind==='slap'){noiseHit(t,.09,.6,'highpass',1800,S);noiseHit(t,.05,.4,'bandpass',900,S,1);kick(t,AU.sfx);}
   else if(kind==='kiss'){const c=AU.c,o=c.createOscillator(),g=c.createGain();o.type='sine';o.frequency.setValueAtTime(500,t);o.frequency.exponentialRampToValueAtTime(1300,t+.12);o.connect(g);g.connect(AU.sfx);env(g,t,.01,.08,.04,.1);o.start(t);o.stop(t+.3);noiseHit(t+.11,.05,.12,'bandpass',2500,S,2);}
   else if(kind==='rub'){noiseHit(t,.09,.05,'bandpass',rr(900,1400),S,1.2);}
-  else if(kind==='mmm'){const c=AU.c,o=c.createOscillator(),f=c.createBiquadFilter(),g=c.createGain(),vib=c.createOscillator(),vg=c.createGain();o.type='triangle';const f0=rr(230,280);o.frequency.setValueAtTime(f0,t);o.frequency.linearRampToValueAtTime(f0*1.12,t+.25);o.frequency.linearRampToValueAtTime(f0*.95,t+.6);
-    vib.frequency.value=5.5;vg.gain.value=4;vib.connect(vg);vg.connect(o.frequency);f.type='lowpass';f.frequency.value=900;o.connect(f);f.connect(g);g.connect(AU.sfx);env(g,t,.08,.07,.3,.25);o.start(t);vib.start(t);o.stop(t+.8);vib.stop(t+.8);}
+  else if(kind==='mmm'){const c=AU.c,k=v||1,f0=rr(210,270),dur=rr(.7,1.05);
+    // tevreden 'mmm/ahh': stem (driehoek + formant) met vibrato en een zuchtje adem
+    for(const [mult,amp,ft] of [[1,.22,700],[2,.08,1400]]){const o=c.createOscillator(),f=c.createBiquadFilter(),g=c.createGain(),vib=c.createOscillator(),vg=c.createGain();o.type='triangle';
+      o.frequency.setValueAtTime(f0*mult,t);o.frequency.linearRampToValueAtTime(f0*mult*1.18,t+dur*.35);o.frequency.linearRampToValueAtTime(f0*mult*.9,t+dur);vib.frequency.value=5.2;vg.gain.value=5*mult;vib.connect(vg);vg.connect(o.frequency);
+      f.type='bandpass';f.frequency.value=ft;f.Q.value=.9;o.connect(f);f.connect(g);g.connect(AU.sfx);env(g,t,.09,amp*k,dur*.5,dur*.45);o.start(t);vib.start(t);o.stop(t+dur+.2);vib.stop(t+dur+.2);}
+    noiseHit(t+dur*.6,dur*.5,.06*k,'bandpass',1100,S,.8);}
   else if(kind==='door')tone('square',90,t,.002,.03,.06,.12,S,500);}
 

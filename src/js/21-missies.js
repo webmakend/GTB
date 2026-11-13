@@ -1,5 +1,6 @@
 // ====================== missies (kerk, Kruidvat, strand + insmeer-minigame) ======================
 const MIS={on:false,done:false,stage:1,x:0,y:0,inside:0,gold:false,ann:0,girl:null,cool:0};
+const MIS_DO={1:'Loop naar de ingang van de Sint-Maartenskerk (Kerkplein). Volg de gele pijl.',2:'Koop zonnebrand bij de Kruidvat in de Boschstraat (€8,99).',3:'Breng de zonnebrand naar de meid op het strand en smeer haar rug in.'};
 const MIS_TXT={1:'MISSIE 1: bezoek de Sint-Maartenskerk',2:'MISSIE 2: koop zonnebrand bij de Kruidvat',3:'MISSIE 2: smeer de meid op het strand in'};
 function churchDoor(){const gk=BUILDINGS.find(b=>b.n==='Grote of Sint-Maartenskerk');if(!gk)return null;const x0=gk.bb[0],ys=gk.p.filter(q=>q[0]<x0+150).map(q=>q[1]),cy=(Math.min(...ys)+Math.max(...ys))/2;return snap(x0-34,cy);}
 function kruidvatDoor(){const l=LANDMARKS.find(l=>l.n==='Kruidvat');if(!l)return null;const b=BUILDINGS.find(b=>b.sign==='Kruidvat');let x=l.x,y=l.y;if(b&&b.sa!=null){}const s0=snap(x,y);return s0;}
@@ -8,13 +9,13 @@ function pickGirl(){if(!BEACHERS.length)return null;const cx=(BEACH.bb[0]+BEACH.
 function setStage(st){MIS.stage=st;MIS.inside=0;let d=null;if(st===1)d=churchDoor();else if(st===2)d=kruidvatDoor();else if(st===3){if(!MIS.girl)MIS.girl=pickGirl();if(MIS.girl)d=[MIS.girl.x,MIS.girl.y];}
   if(d){MIS.x=d[0];MIS.y=d[1];MIS.on=true;}else if(st<3)setStage(st+1);else{MIS.done=true;}}
 function initMission(){MIS.done=false;MIS.gold=false;MIS.girl=null;MIS.cool=0;MIS.ann=0;MIS.on=true;setStage(1);}
-function missionStep(){if(!MIS.on||MIS.done||P.dead)return;if(MIS.ann>0&&--MIS.ann===0)msg('MISSIE 2','Koop zonnebrand bij de Kruidvat (Boschstraat) en ga naar het strand','#ffd166',260);
+function missionStep(){if(!MIS.on||MIS.done||P.dead)return;if(MIS.ann>0&&--MIS.ann===0)missionBanner('MISSIE 2: ZONNEBRAND','Je hebt €20. Koop zonnebrand bij de Kruidvat in de Boschstraat en breng het naar het strand. Volg de gele pijl.');
   if(MIS.cool>0)MIS.cool--;
   if(MIS.stage===1){if(MIS.inside>0){if(--MIS.inside===0){P.hp=P.maxhp;heat=0;stars=0;MIS.gold=true;sfx('reward');addMoney(20);
         msg('MISSIE GESLAAGD!','Beloning: €20 + gouden waterballonnen','#ffd166',260);setStage(2);MIS.ann=270;}return;}
     if(!P.car&&Math.hypot(P.x-MIS.x,P.y-MIS.y)<34){MIS.inside=230;sfx('organ');setTimeout(()=>sfx('bellc'),400);msg('SINT-MAARTENSKERK','Je stapt binnen… stilte, orgelmuziek en 600 jaar geschiedenis','#ffe8b0',220);}}
   else if(MIS.stage===2){if(!P.car&&Math.hypot(P.x-MIS.x,P.y-MIS.y)<38){if(P.money<8.99){if(!MIS.cool){msg('TE WEINIG GELD','Zonnebrand kost €8,99','#ff6b6b',140);MIS.cool=200;}return;}
-      addMoney(-8.99);sfx('kassa');MIS.lotion=true;msg('ZONNEBRAND GEKOCHT','Factor 30 · nu snel naar het strand aan de Waal','#ffd166',220);setStage(3);}}
+      addMoney(-8.99);sfx('kassa');MIS.lotion=true;msg('ZONNEBRAND GEKOCHT','Factor 30','#ffd166',120);setStage(3);setTimeout(()=>missionBanner('MISSIE 2: NAAR HET STRAND','Loop of rijd naar het strand aan de Waal. Zoek de meid op het gele laken en smeer haar rug in.'),1600);}}
   else if(MIS.stage===3){const g=MIS.girl;if(!g||!BEACHERS.includes(g)){MIS.girl=null;setStage(3);return;}MIS.x=g.x;MIS.y=g.y;const d=Math.hypot(P.x-g.x,P.y-g.y);
     if(d<170&&d>60&&!g.asked){g.asked=1;bubbles=bubbles.filter(q=>q.p!==g);bubbles.push({p:g,t:'Kun jij mijn rug even insmeren?',life:220});sfx('blip',480);}
     if(d>140)g.asked=0;
@@ -26,8 +27,8 @@ const MG={on:false,g:null,t:0,T:840,hy:0,py:0,cov:null,res:'',rt:0,N:22,hearts:[
 const JOY=['Mmm, heerlijk…','Ahh, lekker koel!','Ja, precies daar!','Jij kan dit goed!','Hmm, wat fijn…','Oeh, dat is lekker!'];
 function mgPlace(){const hdr=uiTop().bottom+8+clamp(CW/14,22,32)+34,avail=CH-100-hdr,iw=RUG.width||424,ih=RUG.height||705,sc=Math.min(avail/ih,CW*.86/iw),dw=iw*sc,dh=ih*sc;return{dw,dh,dx:CW/2-dw/2,dy:hdr+(avail-dh)/2};}
 function mgBox(){const p=mgPlace();return{w:p.dw,top:p.dy+p.dh*.3,bot:p.dy+p.dh*.95,cx:CW/2};}
-function mgStart(g){MG.on=true;MG.g=g;MG.t=0;MG.res='';MG.rt=0;MG.cov=new Float32Array(MG.N);MG.mini=[];MG.joyT=0;MG.joyCd=60;MG.lastPct=0;const B=mgBox();MG.hy=MG.py=(B.top+B.bot)/2;bigMap=false;document.getElementById('touch').style.display='none';sfx('blip',500);}
-function mgEnd(){MG.on=false;if(IS_TOUCH)document.getElementById('touch').style.display='block';}
+function mgStart(g){MG.on=true;MG.g=g;MG.t=0;MG.res='';MG.rt=0;MG.cov=new Float32Array(MG.N);MG.mini=[];MG.joyT=0;MG.joyCd=60;MG.lastPct=0;const B=mgBox();MG.hy=MG.py=(B.top+B.bot)/2;bigMap=false;document.getElementById('touch').style.display='none';sfx('blip',500);MG.vol=radio.volume;radio.volume=Math.min(radio.volume,.1);}
+function mgEnd(){MG.on=false;radio.volume=MODE==='play'?.45:(MG.vol||.45);if(IS_TOUCH)document.getElementById('touch').style.display='block';}
 function mgStep(){frameN++;const B=mgBox();if(MG.res){if(--MG.rt<=0){const kiss=MG.res==='kiss';mgEnd();if(kiss){MIS.done=true;msg('MISSIE 2 GESLAAGD!','Ze is ingesmeerd én je kreeg een kus 💋','#ff7ab6',260);sfx('reward');}
       else{hurt(35);shake=12;MIS.cool=360;msg('PAK SLAAG!','Half werk… kom later nog eens terug','#ff4f6d',220);}}
     if(MG.res==='kiss'&&frameN%4===0)MG.hearts.push({x:CW/2+rr(-80,80),y:CH*.5,vy:rr(-2.5,-1.2),l:70});return;}
@@ -36,7 +37,7 @@ function mgStep(){frameN++;const B=mgBox();if(MG.res){if(--MG.rt<=0){const kiss=
   if(dy>1.2){const r=(MG.hy-B.top)/(B.bot-B.top)*MG.N;for(let i=0;i<MG.N;i++){const dd=Math.abs(i+.5-r);if(dd<1.6)MG.cov[i]=Math.min(1,MG.cov[i]+Math.min(.06,dy*.0055)*(1-dd/1.6));}if(frameN%6===0)sfx('rub');}
   let sum=0,mn=1;for(const v of MG.cov){sum+=v;mn=Math.min(mn,v);}const pct=sum/MG.N;
   if(MG.joyT>0)MG.joyT--;if(MG.joyCd>0)MG.joyCd--;
-  if(dy>1.2&&pct>MG.lastPct+.12&&MG.joyCd<=0){MG.lastPct=pct;MG.joy=rpick(JOY);MG.joyT=95;MG.joyCd=80;sfx('mmm');for(let i=0;i<4;i++)MG.mini.push({x:CW/2+rr(-90,90),y:B.top+rr(0,60),vy:rr(-1.6,-.8),l:60});}
+  if(dy>1.2&&pct>MG.lastPct+.07&&MG.joyCd<=0){MG.lastPct=pct;MG.joy=rpick(JOY);MG.joyT=95;MG.joyCd=55;sfx('mmm',1.4);for(let i=0;i<4;i++)MG.mini.push({x:CW/2+rr(-90,90),y:B.top+rr(0,60),vy:rr(-1.6,-.8),l:60});}
   for(const h of MG.mini){h.y+=h.vy;h.l--;}MG.mini=MG.mini.filter(h=>h.l>0);
   if(pct>.9&&mn>.55){MG.res='kiss';MG.rt=150;sfx('kiss');setTimeout(()=>sfx('kiss'),260);buzz(40);}
   else if(MG.t>=MG.T){MG.res='slap';MG.rt=110;sfx('slap');setTimeout(()=>sfx('slap'),180);shake=10;buzz([60,40,60]);}

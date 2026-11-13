@@ -39,7 +39,7 @@ function playerStep(){
     if(P.jz>0){P.jz+=P.jv;P.jv-=.32;if(P.jz<=0){P.jz=0;P.jv=0;sfx('step',1);buzz(10);P.squash=9;for(let i=0;i<6;i++){const a=rr(0,TAU);parts.push({x:P.x,y:P.y,vx:Math.cos(a)*1.2,vy:Math.sin(a)*1.2,l:20,ml:20,s:2,k:'d'});}}}
     if(touch.on&&(Math.abs(touch.jx)>.12||Math.abs(touch.jy)>.12)){mx=touch.jx;my=touch.jy;run=Math.hypot(mx,my)>.92;}
     const sw=swimming();if(sw&&frameN%14===0)parts.push({x:P.x,y:P.y,vx:0,vy:0,l:40,ml:40,s:6,k:'p'});
-    const m=Math.hypot(mx,my);if(m>.1){const rk=P.ch?P.ch.perk.run:1,sp=(sw?1.45:run?3.3:2.3)*rk*Math.min(1,m)*(P.jz>0?1.15:1);mx/=m;my/=m;P.a=Math.atan2(my,mx);const nx=P.x+mx*sp,ny=P.y+my*sp;if(!footBlocked(nx,P.y))P.x=nx;if(!footBlocked(P.x,ny))P.y=ny;const ph=Math.floor(P.anim/Math.PI);P.anim+=sp*.28;if(Math.floor(P.anim/Math.PI)!==ph&&!(P.jz>0)){if(sw){if(ph%2===0)sfx('swim');}else{const gt=cellAt(P.x,P.y);sfx('step',run?1:0,(gt===GRASS||gt===PARK||gt===SAND)?1:0);}}}
+    const m=Math.hypot(mx,my);P.moving=m>.1;P.running=P.moving&&run;if(m>.1){const rk=P.ch?P.ch.perk.run:1,sp=(sw?1.45:run?3.3:2.3)*rk*Math.min(1,m)*(P.jz>0?1.15:1);mx/=m;my/=m;P.a=Math.atan2(my,mx);const nx=P.x+mx*sp,ny=P.y+my*sp;if(!footBlocked(nx,P.y))P.x=nx;if(!footBlocked(P.x,ny))P.y=ny;const ph=Math.floor(P.anim/Math.PI);P.anim+=sp*.28;if(Math.floor(P.anim/Math.PI)!==ph&&!(P.jz>0)){if(sw){if(ph%2===0)sfx('swim');}else{const gt=cellAt(P.x,P.y);sfx('step',run?1:0,(gt===GRASS||gt===PARK||gt===SAND)?1:0);}}}
     pushOutOfCars(P,6);
     if(k.act&&P.throwCd<=0&&!sw)throwBalloon();
     if(heat<.5&&P.hp<P.maxhp)P.hp=Math.min(P.maxhp,P.hp+.03);}

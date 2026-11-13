@@ -24,7 +24,7 @@ Open `index.html` via een webserver (bijv. GitHub Pages of `python3 -m http.serv
 | `vendor/pixi.min.js` | PixiJS 8 (MIT), zelf gebundeld uit de broncode (`tools/build-pixi.mjs`) |
 | `data/game.json` | Wereld uit OpenStreetMap (vesting, wegen, gebouwen, water, bedrijven) |
 | `tools/` | `build.mjs` (bouwt index.html), OSM-scripts (`osm2world.py`, `island.py`), bedrijven koppelen (`biz2.py`) |
-| `assets/` | Muziek, intro-artwork, logo, personages (`char_*.webp`) en auto-sprites (`cars.png`) |
+| `assets/` | Muziek, intro-artwork, logo, personages (`char_*.webp`), auto-sprites (`cars.png`, `vehicles.png`), mensen (`people.png`), strand-decor (`beach.webp`) |
 | `tools/render_people.py`, `tools/render3d.py` | Rendert PSX- en Universal Base-personages (FBX, met eenvoudige arm-skinning) naar `assets/people.png` en `assets/rug.webp` |
 | `tools/render_cars.py`, `tools/fbx.py` | Rendert 3D-auto's (FBX) van bovenaf naar sprites; FBX-lezer zonder externe libraries |
 | `godot/engine_sound.gd` | Procedureel motorgeluid voor Godot 4.3 (`AudioStreamGenerator`) |
@@ -46,3 +46,4 @@ Kaartdata © OpenStreetMap-bijdragers (ODbL).
 
 3D-auto's: Designersoup Low Poly Car Pack Volume 1, van bovenaf gerenderd naar `assets/cars.png`.
 Personages: Characters PSX 1.2 (voetgangers, politie) en Universal Base Characters (strand, insmeer-scène).
+Voertuigen: Free Low Poly Vehicles Pack by Rgsdev (CC0). Strand-decor: Beach & Island Top-Down 2D Props (nacl1234) — alleen verkleind in de game-atlas, niet los herverspreiden.

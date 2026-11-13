@@ -9,6 +9,11 @@ const CT={
  velzart:{n:'VelzArt',eng:44,w:21,l:46,acc:.21,max:8.8,turn:.058,grip:.82,hp:125,col:['#0b0b0b']},
  bakfiets:{n:'Bakfiets',w:12,l:26,acc:.07,max:3.2,turn:.08,grip:.9,hp:50,ev:1,col:['#2a6f97','#7b8f3a','#a63d40']},
  fatbike:{n:'Fatbike',w:10,l:24,acc:.22,max:7.6,turn:.085,grip:.86,hp:40,ev:1,bike:1,col:['#111111','#2b2b2b','#4a4a4a','#1f3d2b','#7a0f1e']},
+ bus:{n:'Bus',eng:26,w:26,l:92,acc:.07,max:5,turn:.035,grip:.9,hp:260,col:['#1e88e5']},
+ ambulance:{n:'Ambulance',eng:36,w:23,l:54,acc:.15,max:8,turn:.05,grip:.84,hp:160,col:['#ffffff']},
+ firetruck:{n:'Brandweerwagen',eng:28,w:26,l:80,acc:.09,max:6.5,turn:.04,grip:.88,hp:260,col:['#c62828']},
+ truck:{n:'Vrachtwagen',eng:26,w:27,l:70,acc:.08,max:5.5,turn:.04,grip:.9,hp:240,col:['#2e7d32']},
+ limo:{n:'Limousine',eng:40,w:21,l:76,acc:.13,max:7.5,turn:.04,grip:.84,hp:150,col:['#111111']},
  tractor:{n:'Trekker',w:26,l:40,acc:.08,max:4,turn:.05,grip:.9,hp:180,eng:22,col:['#2e7d32','#c62828','#1565c0','#2e7d32']},
 };
 const SHIRTS=['#d64541','#3a7bd5','#f5b041','#58d68d','#af7ac5','#eeeeee','#2c3e50','#e67e22','#1abc9c','#7f8c8d','#c2185b','#f7dc6f'];
@@ -43,7 +48,7 @@ function spawnCivCar(initial){
     const ei=Math.random()*EDGES.length|0,e=EDGES[ei];if(e.len<40)continue;const f=Math.random()<.5?1:0,F=edgeFrame(e,f),s=rr(10,e.len-10);
     const parked=Math.random()<.3&&e.w>=50;
     let type='sedan';const zr=Math.random();
-    if(zr<.06)type='velzart';else if(zr<.10)type='taxi';else if(zr<.15)type='sport';else if(zr<.33)type='hatch';else if(zr<.43)type='van';else if(zr<.47)type='bakfiets';else if(zr<.58)type='fatbike';else if(zr<.64)type='tractor';
+    if(zr<.06)type='velzart';else if(zr<.10)type='taxi';else if(zr<.15)type='sport';else if(zr<.33)type='hatch';else if(zr<.43)type='van';else if(zr<.47)type='bakfiets';else if(zr<.58)type='fatbike';else if(zr<.64)type='tractor';else if(zr<.665)type='bus';else if(zr<.685)type='truck';else if(zr<.70)type='ambulance';else if(zr<.71)type='firetruck';else if(zr<.72)type='limo';
     if(parked&&(type==='fatbike'||type==='tractor'))type='hatch';
     const t=CT[type],lane=parked?e.w/2-t.w/2-2:e.w/4;
     const x=F.A.x+F.ux*s+F.nx*lane,y=F.A.y+F.uy*s+F.ny*lane,d=Math.hypot(x-o.x,y-o.y);

@@ -2,8 +2,8 @@
 const CHARS=[
  {id:'vince',spr:['civ',6],name:'VINCE',img:'assets/char_vince.webp',c:'#36d1c4',bg:['#ffb05c','#c2386e','#2a0d45'],skin:'#e2ad88',skinD:'#b5805e',hair:'slick',hairC:'#231a16',beard:'shadow',outfit:'polo',top:'#e9ecd6',topD:'#c5c9ae',eye:'#3c5f7a',jaw:'square',body:'#3aa39a',head:'#3b2a1c'},
  {id:'lola',spr:['civ',16],name:'LOLA',img:'assets/char_lola.webp',c:'#ff2e88',bg:['#ff8fc0','#8a2be2','#1a0629'],skin:'#e7b08e',skinD:'#bf8463',hair:'wavy',hairC:'#5a2a18',beard:'',outfit:'crop',top:'#3a2a55',topD:'#271b3c',eye:'#4f6b3a',jaw:'soft',lips:'#b5435a',ear:'drop',body:'#b04fc0',head:'#3a2418'},
- {id:'joey',spr:['civ',1],name:'JOEY',c:'#36d1ff',bg:['#5fe0ff','#2f56c9','#120a35'],skin:'#d9a07c',skinD:'#a8704f',hair:'mohawk',hairC:'#3b2416',beard:'stubble',outfit:'tee',top:'#3f6f93',topD:'#2c5170',eye:'#3b2a16',jaw:'square',scar:1,body:'#3f6f93',head:'#3b2416'},
- {id:'roxy',spr:['civ',15],name:'ROXY',c:'#ffd166',bg:['#ffd166','#e0473c','#2a0a1a'],skin:'#d49a74',skinD:'#a8704f',hair:'pony',hairC:'#4a2416',beard:'',outfit:'leather',top:'#d9e6b0',topD:'#151517',eye:'#3b2a16',jaw:'soft',lips:'#a8323f',glasses:1,ear:'hoop',body:'#151517',head:'#4a2416'}];
+ {id:'joey',img:'assets/char_joey.webp',spr:['civ',1],name:'JOEY',c:'#36d1ff',bg:['#5fe0ff','#2f56c9','#120a35'],skin:'#d9a07c',skinD:'#a8704f',hair:'mohawk',hairC:'#3b2416',beard:'stubble',outfit:'tee',top:'#3f6f93',topD:'#2c5170',eye:'#3b2a16',jaw:'square',scar:1,body:'#1b1b1b',head:'#6f6f6f'},
+ {id:'roxy',img:'assets/char_roxy.webp',spr:['civ',15],name:'ROXY',c:'#ffd166',bg:['#ffd166','#e0473c','#2a0a1a'],skin:'#d49a74',skinD:'#a8704f',hair:'pony',hairC:'#4a2416',beard:'',outfit:'leather',top:'#d9e6b0',topD:'#151517',eye:'#3b2a16',jaw:'soft',lips:'#a8323f',glasses:1,ear:'hoop',body:'#f2f2f2',head:'#e8c070'}];
 const PERK0={drive:1,run:1,throw:1,hp:100};CHARS.forEach(c=>c.perk=PERK0);
 function portraitSVG(ch,uid){
   const O='#120a14',sw=4.5,S=ch.skin,SD=ch.skinD,g=`g${uid}`,W=ch.jaw==='soft';
