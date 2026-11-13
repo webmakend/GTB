@@ -51,13 +51,21 @@ def load(path,texdirs,skip=()):
         Vw=(np.c_[V,np.ones(len(V))]@mat(model).T)[:,:3]
         uvl=list(walk(g['c'],'LayerElementUV'))
         if uvl:uv=next(walk(uvl[0]['c'],'UV'))['p'][0].reshape(-1,2);ui=list(walk(uvl[0]['c'],'UVIndex'));uvi=ui[0]['p'][0] if ui else np.arange(len(I))
-        tri=[];tuv=[];poly=[]
+        lm=list(walk(g['c'],'LayerElementMaterial'));pm=None
+        if lm:
+            mm=list(walk(lm[0]['c'],'Materials'));pm=mm[0]['p'][0] if mm else None
+        mcols=[]
+        for mid in mats:
+            p=P70(by[mid]);d=p.get('DiffuseColor',[.7,.7,.7]);mcols.append([max(0,min(1,float(c)))**(1/2.2) for c in d[:3]])
+        tri=[];tuv=[];poly=[];tmc=[];pi=0
         for k,ix in enumerate(I):
             vi=ix if ix>=0 else -ix-1;poly.append((vi,k))
             if ix<0:
+                mi=int(pm[pi]) if pm is not None and len(pm)>pi else (int(pm[0]) if pm is not None and len(pm) else 0)
                 for j in range(1,len(poly)-1):
                     q=[poly[0],poly[j],poly[j+1]];tri.append([Vw[a] for a,_ in q]);tuv.append([uv[uvi[b]] for _,b in q] if uvl else [[0,0]]*3)
-                poly=[]
+                    tmc.append(mcols[mi] if mcols and mi<len(mcols) else [.7,.7,.7])
+                poly=[];pi+=1
         vid=[];poly=[]
         for k,ix in enumerate(I):
             vi=ix if ix>=0 else -ix-1;poly.append(vi)
@@ -74,7 +82,7 @@ def load(path,texdirs,skip=()):
                     if 'Indexes' in kids:
                         bone=next((by[x]['p'][1] for x,y,_ in links if y==a and x in by and by[x]['n']=='Model'),o['p'][1]).split(b'\x00')[0].decode().split(':')[-1]
                         cl.setdefault(bone,[]).append((kids['Indexes'][0],kids['Weights'][0]))
-        meshes.append({'name':gname,'tri':np.array(tri),'uv':np.array(tuv,dtype=float),'tex':tex,'V':Vw,'vid':np.array(vid),'cl':cl,'M':mat(model)})
+        meshes.append({'name':gname,'tri':np.array(tri),'uv':np.array(tuv,dtype=float),'tex':tex,'mc':np.array(tmc),'V':Vw,'vid':np.array(vid),'cl':cl,'M':mat(model)})
     return meshes
 def render(meshes,R,size,out,pad=6,texfix=None,bg=None,height=None,light=(-.35,-.5,.8),amb=.5):
     """R: 3x3 rotatie naar kijkruimte: x->rechts, y->omlaag in beeld, z->naar de camera."""
@@ -89,7 +97,8 @@ def render(meshes,R,size,out,pad=6,texfix=None,bg=None,height=None,light=(-.35,-
         if tex is not None and texfix:tex=texfix(m,tex)
         th,tw=(tex.shape[:2] if tex is not None else (1,1))
         T=m['tri']@np.array(R).T
-        for tri,uv in zip(T,m['uv']):
+        MC=m.get('mc')
+        for ti,(tri,uv) in enumerate(zip(T,m['uv'])):
             x=(tri[:,0]-mn[0])*sc+pad;y=(tri[:,1]-mn[1])*sc+pad;z=tri[:,2]
             n=np.cross(tri[1]-tri[0],tri[2]-tri[0]);nn=np.linalg.norm(n)
             if nn==0:continue
@@ -107,7 +116,11 @@ def render(meshes,R,size,out,pad=6,texfix=None,bg=None,height=None,light=(-.35,-
             if tex is not None:
                 u=w0*uv[0,0]+w1*uv[1,0]+w2*uv[2,0];v=w0*uv[0,1]+w1*uv[1,1]+w2*uv[2,1]
                 px=np.clip((u%1)*tw,0,tw-1).astype(int);py=np.clip((1-(v%1))*th,0,th-1).astype(int);col=tex[py,px]
-            else:col=np.ones(msk.shape+(4,))*.7
+            else:
+                c3=MC[ti] if MC is not None and len(MC)>ti else [.7,.7,.7];col=np.ones(msk.shape+(4,));col[...,:3]=c3
+            if m.get('bikz') is not None and tex is not None:
+                ct,cb,zc,ua=m['bikz'];zz0=m['tri'][ti][:,ua].mean();mxc=col[...,:3].max(-1);mnc=col[...,:3].min(-1);gm=((mxc-mnc)/np.maximum(mxc,1e-4)<.13)&(mxc>.15)
+                if gm.any():cc=np.array(ct if zz0>zc else cb);col=col.copy();col[gm,:3]=np.clip(cc[None,:]*(.55+.6*mxc[gm])[:,None],0,1)
             msk&=col[...,3]>.35
             upd=msk&(zz>sub);sub[upd]=zz[upd];im=img[y0:y1+1,x0:x1+1]
             im[upd,:3]=np.clip(col[upd,:3]*sh,0,1);im[upd,3]=1

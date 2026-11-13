@@ -3,7 +3,7 @@ const WD=JSON.parse(document.getElementById('wdata').textContent);
 const W=WD.W,H=WD.H,T=16,GW=Math.ceil(W/T),GH=Math.ceil(H/T);
 const GRASS=0,ROAD=1,WALK=2,BUILD=3,WATER=4,PARK=5,PLAZA=6,PATH=7,SAND=8;
 const G=new Uint8Array(GW*GH),BRG=new Uint8Array(GW*GH);
-const FORT=WD.fort,FORTBB=bbox(FORT);let BRIDGE=null,LAMPS=[];
+const FORT=WD.fort,FORTBB=bbox(FORT);let BRIDGE=null,LAMPS=[],KLIP=null;
 const inFort=(x,y)=>x>FORTBB[0]&&x<FORTBB[2]&&y>FORTBB[1]&&y<FORTBB[3]&&pip(x,y,FORT);
 // rivier: oever + afsluiting naar het noorden
 const WATERS=WD.water;
@@ -22,6 +22,17 @@ function stampLine(p,hw,fn){for(let i=0;i<p.length-1;i++)stampSeg(p[i][0],p[i][1
   for(const r of WD.roads){if(!(r.k==='tertiary'||r.k==='residential'||r.k==='unclassified'))continue;r.p.forEach((q,i)=>{if(!r.j[i])return;const d=Math.hypot(q[0]-ne[0],q[1]-ne[1]);if(d<bd){bd=d;A=q;jid=r.j[i];}});}
   if(!A)return;const dx=W-90-A[0],dy=70-A[1],L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L;const B=[Math.round(A[0]+ux*L),Math.round(A[1]+uy*L)];
   WD.roads.push({n:'Martinus Nijhoffbrug',k:'tertiary',w:110,bridge:1,p:[A,B],j:[jid,'brug_einde']});BRIDGE={A,B,ux,uy,L};})();
+(function addKlipperstraat(){let ee=null;for(const q of FORT)if(!ee||q[0]>ee[0])ee=q;let A=null,jid=null,bd=1e18;
+  for(const r of WD.roads){if(r.k==='service'||r.bridge)continue;r.p.forEach((q,i)=>{if(!r.j||!r.j[i])return;const d=Math.hypot(q[0]-ee[0],q[1]-ee[1]);if(d<bd){bd=d;A=q;jid=r.j[i];}});}
+  if(!A)return;const x0=Math.max(ee[0]+230,A[0]+300),x1=W-40,cy=ee[1],y0=cy-520,y1=cy+520;if(x1-x0<300)return;
+  WD.islands.push([[x0,y0],[x1,y0],[x1,y1],[x0,y1]]);
+  const B=[x0+90,A[1]],Cc=[x0+90,y0+60],Dd=[x0+90,y1-60];
+  WD.roads.push({n:'Klipperstraat',k:'residential',w:70,p:[A,B],j:[jid,'klip_b']});
+  WD.roads.push({n:'Klipperstraat',k:'residential',w:70,p:[Cc,B,Dd],j:['klip_c','klip_b','klip_d']});
+  WD.parking.push([[x0+150,cy+60],[x1-20,cy+60],[x1-20,y1-40],[x0+150,y1-40]]);
+  const bx0=x0+170,bx1=x1-30,by0=cy-380,by1=cy+20;WD.buildings.push({p:[[bx0,by0],[bx1,by0],[bx1,by1],[bx0,by1]],b:'retail',n:''});
+  for(const z of WD.biz)if(z.n==='Action'){z.x=(bx0+bx1)/2;z.y=(by0+by1)/2;}
+  KLIP={x0,x1,y0,y1};})();
 const ROADS=WD.roads.map(r=>{const m=r.p[r.p.length>>1];return{...r,fort:inFort(m[0],m[1]),bb:bbox(r.p)};});
 for(const r of ROADS)r.brick=r.k==='pedestrian'||(r.fort&&r.k!=='tertiary');
 const PATHS=WD.paths.map(p=>({...p,bb:bbox(p.p)}));

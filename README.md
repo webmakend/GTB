@@ -11,7 +11,8 @@ Open `index.html` via een webserver (bijv. GitHub Pages of `python3 -m http.serv
 
 **Missies**
 1. Breng een bezoek aan de Sint-Maartenskerk (Kerkplein 1) → €20 + gouden waterballonnen.
-2. Koop zonnebrand bij de Kruidvat (Boschstraat) en smeer de meid op het strand in.
+2. Koop zonnebrand bij de Kruidvat (Boschstraat) en smeer de meid op het strand in → €40 fooi.
+3. Avondje stappen in Café Henke (Waterstraat 4): binnen in first-person met dansende figuren, discolicht en eigen muziek.
 
 ## Mappen
 | Map | Inhoud |
@@ -25,6 +26,7 @@ Open `index.html` via een webserver (bijv. GitHub Pages of `python3 -m http.serv
 | `data/game.json` | Wereld uit OpenStreetMap (vesting, wegen, gebouwen, water, bedrijven) |
 | `tools/` | `build.mjs` (bouwt index.html), OSM-scripts (`osm2world.py`, `island.py`), bedrijven koppelen (`biz2.py`) |
 | `assets/` | Muziek, intro-artwork, logo, personages (`char_*.webp`), auto-sprites (`cars.png`, `vehicles.png`), mensen (`people.png`), strand-decor (`beach.webp`) |
+| `tools/anim.py`, `tools/render_dancers.py` | FBX-skeletanimatie (Mixamo) evalueren en overzetten op PSX-personages → `assets/dancers.webp` |
 | `tools/render_people.py`, `tools/render3d.py` | Rendert PSX- en Universal Base-personages (FBX, met eenvoudige arm-skinning) naar `assets/people.png` en `assets/rug.webp` |
 | `tools/render_cars.py`, `tools/fbx.py` | Rendert 3D-auto's (FBX) van bovenaf naar sprites; FBX-lezer zonder externe libraries |
 | `godot/engine_sound.gd` | Procedureel motorgeluid voor Godot 4.3 (`AudioStreamGenerator`) |

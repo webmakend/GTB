@@ -9,6 +9,7 @@ function init(){
 init();
 let last=performance.now(),acc=0;
 function frame(now){requestAnimationFrame(frame);const dt=Math.min(100,now-last);last=now;
+  if(MODE==='play'&&CLUB.on){acc+=dt;let n=0;while(acc>=16.667&&n<4){clubStep();acc-=16.667;n++;}if(n>=4)acc=0;if(CLUB.on)drawClub();return;}
   if(MODE==='play'){if(!paused&&!bigMap){acc+=dt;let n=0;while(acc>=16.667&&n<4){if(MG.on)mgStep();else if(hitStop>0){hitStop--;frameN++;}else step();acc-=16.667;n++;}if(n>=4)acc=0;}renderWorld();}
 }
 requestAnimationFrame(frame);
