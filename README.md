@@ -25,6 +25,7 @@ Open `index.html` via een webserver (bijv. GitHub Pages of `python3 -m http.serv
 | `data/game.json` | Wereld uit OpenStreetMap (vesting, wegen, gebouwen, water, bedrijven) |
 | `tools/` | `build.mjs` (bouwt index.html), OSM-scripts (`osm2world.py`, `island.py`), bedrijven koppelen (`biz2.py`) |
 | `assets/` | Muziek, intro-artwork, logo, personages (`char_*.webp`) en auto-sprites (`cars.png`) |
+| `tools/render_people.py`, `tools/render3d.py` | Rendert PSX- en Universal Base-personages (FBX, met eenvoudige arm-skinning) naar `assets/people.png` en `assets/rug.webp` |
 | `tools/render_cars.py`, `tools/fbx.py` | Rendert 3D-auto's (FBX) van bovenaf naar sprites; FBX-lezer zonder externe libraries |
 | `godot/engine_sound.gd` | Procedureel motorgeluid voor Godot 4.3 (`AudioStreamGenerator`) |
 
@@ -44,3 +45,4 @@ Alle modules in `src/js/` delen één scope en worden in alfabetische volgorde a
 Kaartdata © OpenStreetMap-bijdragers (ODbL).
 
 3D-auto's: Designersoup Low Poly Car Pack Volume 1, van bovenaf gerenderd naar `assets/cars.png`.
+Personages: Characters PSX 1.2 (voetgangers, politie) en Universal Base Characters (strand, insmeer-scène).

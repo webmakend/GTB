@@ -26,7 +26,7 @@ function drawFX(Z){for(const f of FX){const a=f.l/f.ml,age=1-a;if(f.k==='r'){ctx
 function drawSkids(vx0,vy0,vx1,vy1){ctx.lineCap='round';for(const k of SKIDS){if(k.x1<vx0-20||k.x1>vx1+20||k.y1<vy0-20||k.y1>vy1+20)continue;ctx.strokeStyle=`rgba(20,16,14,${.32*Math.min(1,k.l/300)})`;ctx.lineWidth=3.2;ctx.beginPath();ctx.moveTo(k.x0,k.y0);ctx.lineTo(k.x1,k.y1);ctx.stroke();}}
 function msg(t,sub,col,life){msgs.length=0;msgs.push({t,sub:sub||'',col:col||'#ffd166',life:life||150,ml:life||150});}
 function makeCar(type,x,y,a,driver){const t=CT[type];return{id:CID++,type,t,x,y,a,spr:pickSprite(type),prevA:a,vx:0,vy:0,hp:t.hp,col:rpick(t.col),driver,ai:null,state:'ok',burn:0,sink:0,keep:0,dead:0,ctl:[0,0,0],hitCd:0};}
-function makePed(x,y,kind){return{x,y,a:rr(0,TAU),spd:rr(.5,.9),state:'walk',kind,think:rr(30,200)|0,anim:rr(0,6),col:kind==='cop'?'#1d3f8f':rpick(SHIRTS),hair:kind==='cop'?'#14213d':rpick(HAIRS),downT:0,fleeT:0,fx:0,fy:0,cross:0,wet:0,talkCd:0};}
+function makePed(x,y,kind){return{spr:kind==='cop'?pplSpr('cop'):kind==='civ'?pplSpr('civ'):null,x,y,a:rr(0,TAU),spd:rr(.5,.9),state:'walk',kind,think:rr(30,200)|0,anim:rr(0,6),col:kind==='cop'?'#1d3f8f':rpick(SHIRTS),hair:kind==='cop'?'#14213d':rpick(HAIRS),downT:0,fleeT:0,fx:0,fy:0,cross:0,wet:0,talkCd:0};}
 const fwdSpeed=c=>c.vx*Math.cos(c.a)+c.vy*Math.sin(c.a),speedOf=c=>Math.hypot(c.vx,c.vy),me=()=>P.car||P;
 function edgeFrame(e,f){const Aid=f?e.a:e.b,Bid=f?e.b:e.a,A=NODES[Aid],B=NODES[Bid],ux=(B.x-A.x)/e.len,uy=(B.y-A.y)/e.len;return{Aid,Bid,A,B,ux,uy,nx:-uy,ny:ux};}
 let ZU=clamp(parseFloat(lsGet('gtb6zoom'))||1,.3,2.6),zoomKick=0;

@@ -15,5 +15,5 @@ function restartGame(){paused=false;bigMap=false;P.stats={nat:0,omver:0,gejat:0}
 let restartArm=0;function askRestart(){if(performance.now()-restartArm<2500){restartArm=0;restartGame();}else{restartArm=performance.now();msg('OPNIEUW BEGINNEN?','Tik nog een keer op ⟲','#ffd166',140);}}
 function startPlay(){MODE='play';radio.volume=.45;musicPlay();try{renderWorld();}catch(e){}
   if(IS_TOUCH)document.getElementById('touch').style.display='block';
-  document.getElementById('topBtns').style.display='flex';document.getElementById('sideBtns').style.display='flex';placeTopBtns();msg(P.ch?P.ch.name+' IN BOMMEL':'WELKOM IN BOMMEL','Missie 1: breng een bezoek aan de Sint-Maartenskerk','#ffd166',240);last=performance.now();}
+  document.getElementById('topBtns').style.display='flex';placeTopBtns();msg(P.ch?P.ch.name+' IN BOMMEL':'WELKOM IN BOMMEL','Missie 1: breng een bezoek aan de Sint-Maartenskerk','#ffd166',240);last=performance.now();}
 document.getElementById('play').addEventListener('click',showPick);

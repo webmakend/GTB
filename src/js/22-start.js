@@ -4,7 +4,7 @@ function init(){
   resize();genWorld();buildGraph();buildMini();buildVectorMap();buildPats();initBarges();
   const mk=ROADS.find(r=>r.n==='Markt');SPAWN=mk?mk.p[mk.p.length>>1]:[W/2,H/2];respawn();camZ=1.15;
   populate();initMission();
-  setupTouch();setupMapClick();setupZoom();
+  setupTouch();setupMapClick();setupZoom();setupPinch();
 }
 init();
 let last=performance.now(),acc=0;
