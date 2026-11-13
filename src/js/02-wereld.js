@@ -22,17 +22,6 @@ function stampLine(p,hw,fn){for(let i=0;i<p.length-1;i++)stampSeg(p[i][0],p[i][1
   for(const r of WD.roads){if(!(r.k==='tertiary'||r.k==='residential'||r.k==='unclassified'))continue;r.p.forEach((q,i)=>{if(!r.j[i])return;const d=Math.hypot(q[0]-ne[0],q[1]-ne[1]);if(d<bd){bd=d;A=q;jid=r.j[i];}});}
   if(!A)return;const dx=W-90-A[0],dy=70-A[1],L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L;const B=[Math.round(A[0]+ux*L),Math.round(A[1]+uy*L)];
   WD.roads.push({n:'Martinus Nijhoffbrug',k:'tertiary',w:110,bridge:1,p:[A,B],j:[jid,'brug_einde']});BRIDGE={A,B,ux,uy,L};})();
-(function addKlipperstraat(){let ee=null;for(const q of FORT)if(!ee||q[0]>ee[0])ee=q;let A=null,jid=null,bd=1e18;
-  for(const r of WD.roads){if(r.k==='service'||r.bridge)continue;r.p.forEach((q,i)=>{if(!r.j||!r.j[i])return;const d=Math.hypot(q[0]-ee[0],q[1]-ee[1]);if(d<bd){bd=d;A=q;jid=r.j[i];}});}
-  if(!A)return;const x0=Math.max(ee[0]+230,A[0]+300),x1=W-40,cy=ee[1],y0=cy-520,y1=cy+520;if(x1-x0<300)return;
-  WD.islands.push([[x0,y0],[x1,y0],[x1,y1],[x0,y1]]);
-  const B=[x0+90,A[1]],Cc=[x0+90,y0+60],Dd=[x0+90,y1-60];
-  WD.roads.push({n:'Klipperstraat',k:'residential',w:70,p:[A,B],j:[jid,'klip_b']});
-  WD.roads.push({n:'Klipperstraat',k:'residential',w:70,p:[Cc,B,Dd],j:['klip_c','klip_b','klip_d']});
-  WD.parking.push([[x0+150,cy+60],[x1-20,cy+60],[x1-20,y1-40],[x0+150,y1-40]]);
-  const bx0=x0+170,bx1=x1-30,by0=cy-380,by1=cy+20;WD.buildings.push({p:[[bx0,by0],[bx1,by0],[bx1,by1],[bx0,by1]],b:'retail',n:''});
-  for(const z of WD.biz)if(z.n==='Action'){z.x=(bx0+bx1)/2;z.y=(by0+by1)/2;}
-  KLIP={x0,x1,y0,y1};})();
 const ROADS=WD.roads.map(r=>{const m=r.p[r.p.length>>1];return{...r,fort:inFort(m[0],m[1]),bb:bbox(r.p)};});
 for(const r of ROADS)r.brick=r.k==='pedestrian'||(r.fort&&r.k!=='tertiary');
 const PATHS=WD.paths.map(p=>({...p,bb:bbox(p.p)}));
@@ -40,7 +29,7 @@ const BUILDINGS=[],TREES=[],TERRACE=[];
 // kleuren naar de luchtfoto's: veel oranje pannen, leisteen-grijs, witte en bakstenen gevels
 const ROOFS=['#d0623a','#c85a33','#d97048','#bd5530','#cf6a43','#d0623a','#c85a33','#56595f','#4b4e54','#63666c','#7a3b2c'];
 const WALLS=['#ece6da','#e2d8c6','#f2eee6','#8a4a36','#9c5a42','#b98060','#d9cdb8','#7d4434','#e8e1d3'];
-const SIGNS={'Action':['#0a1f8f','#ffffff'],'Kruidvat':['#e2001a','#fff'],'Intertoys':['#f26b0f','#fff'],'Bruna':['#0b4da2','#ffd200'],'Shoeby':['#111','#fff'],'HEMA':['#d6001c','#fff'],
+const SIGNS={'Kruidvat':['#e2001a','#fff'],'Intertoys':['#f26b0f','#fff'],'Bruna':['#0b4da2','#ffd200'],'Shoeby':['#111','#fff'],'HEMA':['#d6001c','#fff'],
  'Kapsalon Saer':['#2b2b2b','#e8c46a'],'Kapper Dubai':['#0d0d0d','#d4af37'],'LEF':['#1d6b4a','#fff'],'De Heeren van Bommel':['#5a1622','#f1dfb3'],'Xenos':['#e30613','#fff'],'Sport 2000':['#003da5','#fff'],
  'Toast & Tosti':['#f2b134','#3a2410'],'Zorba':['#1f5fa8','#fff'],'Máxima':['#6cace4','#fff'],'CinCin':['#7a1f3d','#fff'],"Kim's Kitchen":['#2e7d32','#fff'],'De Verdraagzaamheid':['#203a5c','#f1dfb3'],'De Eetgelegenheid':['#4e342e','#fff']};
 const CATC={'Winkel':[['#2d6cdf','#fff'],['#7b2cbf','#fff'],['#e76f51','#fff'],['#264653','#fff']],'Kapper / Barbershop':[['#111','#e8c46a'],['#3d3d3d','#fff']],'Restaurant':[['#7a1f3d','#fff'],['#1d6b4a','#fff'],['#4e342e','#ffd166']]};

@@ -30,9 +30,6 @@ function renderChunk(ci,cj){
   fillPolys(WD.islands,pat('park'),'#8f8a80',5);
   fillPolys(WD.parking,'#8e8f8f','#77787a',2);
   g.restore();
-  // winkelcentrum Klipperstraat (buiten de vesting)
-  if(KLIP&&inBox([KLIP.x0,KLIP.y0,KLIP.x1,KLIP.y1],ox,oy,X1,Y1,20)){const k=KLIP;g.fillStyle=pat('park');g.strokeStyle='#8f8a80';g.lineWidth=8;g.beginPath();g.rect(k.x0,k.y0,k.x1-k.x0,k.y1-k.y0);g.fill();g.stroke();
-    for(const p of WD.parking){if(!p.bb)p.bb=bbox(p);if(p.bb[0]<k.x0)continue;pathPoly(g,p);g.closePath();g.fillStyle='#8e8f8f';g.fill();g.strokeStyle='rgba(255,255,255,.7)';g.lineWidth=2;for(let x=p.bb[0]+20;x<p.bb[2]-10;x+=34){g.beginPath();g.moveTo(x,p.bb[1]+10);g.lineTo(x,p.bb[1]+90);g.stroke();g.beginPath();g.moveTo(x,p.bb[3]-90);g.lineTo(x,p.bb[3]-10);g.stroke();}}}
   // stoepen
   const RV=ROADS.filter(r=>inBox(r.bb,ox,oy,X1,Y1,r.w+70));
   g.strokeStyle=pat('pave');for(const r of RV){g.lineWidth=r.w+(r.fort?88:44);pathPoly(g,r.p);g.stroke();}

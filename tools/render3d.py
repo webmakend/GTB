@@ -119,7 +119,7 @@ def render(meshes,R,size,out,pad=6,texfix=None,bg=None,height=None,light=(-.35,-
             else:
                 c3=MC[ti] if MC is not None and len(MC)>ti else [.7,.7,.7];col=np.ones(msk.shape+(4,));col[...,:3]=c3
             if m.get('bikz') is not None and tex is not None:
-                ct,cb,zc,ua=m['bikz'];zz0=m['tri'][ti][:,ua].mean();mxc=col[...,:3].max(-1);mnc=col[...,:3].min(-1);gm=((mxc-mnc)/np.maximum(mxc,1e-4)<.13)&(mxc>.15)
+                ct,cb,zc,ua=m['bikz'];zz0=m['bindz'][ti] if m.get('bindz') is not None else m['tri'][ti][:,ua].mean();mxc=col[...,:3].max(-1);mnc=col[...,:3].min(-1);gm=((mxc-mnc)/np.maximum(mxc,1e-4)<.13)&(mxc>.15)
                 if gm.any():cc=np.array(ct if zz0>zc else cb);col=col.copy();col[gm,:3]=np.clip(cc[None,:]*(.55+.6*mxc[gm])[:,None],0,1)
             msk&=col[...,3]>.35
             upd=msk&(zz>sub);sub[upd]=zz[upd];im=img[y0:y1+1,x0:x1+1]

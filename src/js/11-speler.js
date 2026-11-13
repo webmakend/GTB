@@ -2,7 +2,7 @@
 const keys={},pressed={};
 window.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();if(!keys[e.code])pressed[e.code]=true;keys[e.code]=true;
   if(MODE==='play'){if(e.code==='KeyM')bigMap=!bigMap;if(e.code==='KeyP'||e.code==='Escape')paused=!paused;if(e.code==='KeyN')musicToggle();if(e.code==='Minus'||e.code==='NumpadSubtract')setZoom(ZU/1.15);if(e.code==='Equal'||e.code==='NumpadAdd')setZoom(ZU*1.15);}
-  if(MODE==='intro'&&(e.code==='Enter'||e.code==='Space'))showPick();else if(MODE==='pick'){if(e.code==='ArrowRight')scrollToCard(Math.min(CHARS.length-1,pickIdx+1),true);if(e.code==='ArrowLeft')scrollToCard(Math.max(0,pickIdx-1),true);if(e.code==='Enter'||e.code==='Space')choose(pickIdx);}});
+  if(MODE==='intro'&&(e.code==='Enter'||e.code==='Space'))showPick();else if(MODE==='pick'){if(e.code==='ArrowRight')scrollToCard(Math.min(PICK.length-1,pickIdx+1),true);if(e.code==='ArrowLeft')scrollToCard(Math.max(0,pickIdx-1),true);if(e.code==='Enter'||e.code==='Space')choose(pickIdx);}});
 window.addEventListener('keyup',e=>{keys[e.code]=false;});
 window.addEventListener('blur',()=>{for(const k in keys)keys[k]=false;});
 document.addEventListener('contextmenu',e=>e.preventDefault());

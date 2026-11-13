@@ -123,25 +123,26 @@ def to_render(s,ms,colors=None,texdirs=()):
                 poly=[];pi+=1
         out.append({'name':nm,'tri':np.array(tri),'uv':np.array(tuv,dtype=float),'tex':tex,'mc':np.array(tmc)})
     return out
-def retarget_globals(C,D,t,Cb=None,Db=None,Q=None):
+def retarget_globals(C,D,t,Cb=None,Db=None,Q=None,NMAP=None):
     """Zet de animatie van D (tijd t) over op skelet C via wereld-rotatie-delta's per bot (zelfde botnamen)."""
     Cb=Cb or C.globals(None);Db=Db or D.globals(None);Dt=D.globals(t);Q=np.eye(3) if Q is None else np.array(Q);Qi=Q.T
     dn={D.name[m]:m for m in D.models}
-    hipC=next((m for m in C.models if C.name[m]=='Hips'),None);hipD=dn.get('Hips')
-    k=(Cb[hipC][1,3]/Db[hipD][1,3]) if hipC and hipD and abs(Db[hipD][1,3])>1e-9 else 1
+    NM=NMAP or {};cn=lambda m:NM.get(C.name[m],C.name[m])
+    hipC=next((m for m in C.models if cn(m)=='Hips'),None);hipD=dn.get('Hips')
+    upC=np.array(Q if Q is not None else np.eye(3))@np.array([0,1,0.]);k=((Cb[hipC][:3,3]@upC)/Db[hipD][1,3]) if hipC and hipD and abs(Db[hipD][1,3])>1e-9 else 1
     G={}
     def g(m):
         if m in G:return G[m]
-        pa=C.parent.get(m);nm=C.name[m]
+        pa=C.parent.get(m);nm=cn(m)
         if pa in C.models:
             P=g(pa);Pb=Cb[pa];off=np.linalg.inv(Pb)@Cb[m];M=P@off
         else:M=Cb[m].copy()
         RD=(g(pa)[:3,:3]@np.linalg.inv(Cb[pa][:3,:3])) if pa in C.models else np.eye(3)   # standaard: volg de ouder
         if nm in dn:
-            d=dn[nm];ch=[x for x in C.models if C.parent.get(x)==m and C.name[x] in dn]
+            d=dn[nm];ch=[x for x in C.models if C.parent.get(x)==m and cn(x) in dn]
             if nm in('Hips','Spine','Spine1','Spine2','Neck','Head'):RD=Q@Dt[d][:3,:3]@np.linalg.inv(Db[d][:3,:3])@Qi
             elif len(ch)==1 and any(nm.endswith(k) for k in('Arm','ForeArm','UpLeg','Leg')):
-                cc=ch[0];dc=dn[C.name[cc]]
+                cc=ch[0];dc=dn[cn(cc)]
                 vC=Cb[cc][:3,3]-Cb[m][:3,3];vD=Q@(Dt[dc][:3,3]-Dt[d][:3,3])
                 if np.linalg.norm(vC)>1e-9 and np.linalg.norm(vD)>1e-9:
                     a1=vC/np.linalg.norm(vC);b1=vD/np.linalg.norm(vD);ax=np.cross(a1,b1);sn=np.linalg.norm(ax);cs=float(a1@b1)

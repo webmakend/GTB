@@ -1,8 +1,8 @@
 // ====================== Café Henke: binnen in first-person (FPV) ======================
-// Rondkijken door te slepen (of pijltjestoetsen). Dansende figuren zijn PSX-personages met Mixamo-dansen
-// (tools/render_dancers.py). Discolicht, lichtbundels, stroboscoop en eigen muziek (assets/bar-music.mp3).
+// Rondkijken door te slepen (of pijltjestoetsen). Dansers: Universal Base-vrouwen en PSX-mannen met Mixamo-dansen
+// (tools/render_dancers2.py). Discolicht, lichtbundels, stroboscoop en eigen muziek (assets/bar-music.mp3).
 const DANCE=new Image();let DANCE_OK=false;DANCE.onload=()=>{DANCE_OK=true;};DANCE.src='assets/dancers.webp';
-const DANCE_META=[{"w": 184, "h": 170, "n": 12, "y": 0}, {"w": 134, "h": 170, "n": 12, "y": 172}, {"w": 129, "h": 170, "n": 12, "y": 344}, {"w": 140, "h": 170, "n": 12, "y": 516}, {"w": 121, "h": 170, "n": 12, "y": 688}, {"w": 160, "h": 170, "n": 12, "y": 860}, {"w": 170, "h": 170, "n": 12, "y": 1032}, {"w": 138, "h": 170, "n": 12, "y": 1204}];
+const DANCE_META=[{"w": 106, "h": 180, "n": 12, "f": 1, "y": 0}, {"w": 110, "h": 180, "n": 12, "f": 1, "y": 182}, {"w": 128, "h": 180, "n": 12, "f": 1, "y": 364}, {"w": 108, "h": 180, "n": 12, "f": 1, "y": 546}, {"w": 101, "h": 180, "n": 12, "f": 1, "y": 728}, {"w": 110, "h": 180, "n": 12, "f": 1, "y": 910}, {"w": 128, "h": 180, "n": 12, "f": 1, "y": 1092}, {"w": 108, "h": 180, "n": 12, "f": 1, "y": 1274}, {"w": 128, "h": 180, "n": 12, "f": 0, "y": 1456}, {"w": 142, "h": 180, "n": 12, "f": 0, "y": 1638}, {"w": 170, "h": 180, "n": 12, "f": 0, "y": 1820}];
 const barMusic=new Audio();barMusic.src='assets/bar-music.mp3';barMusic.loop=true;barMusic.preload='none';barMusic.setAttribute('playsinline','');
 const CLUB={on:false,yaw:0,pitch:0,vy:0,t:0,dancers:[],dots:[],pano:null,beat:0,flash:0,joined:0};
 function buildPano(){const W2=3072,H2=800,c=document.createElement('canvas');c.width=W2;c.height=H2;const g=c.getContext('2d');
@@ -29,7 +29,7 @@ function buildPano(){const W2=3072,H2=800,c=document.createElement('canvas');c.w
   neon(()=>{g.beginPath();g.moveTo(0,40);g.lineTo(W2,40);},'#ff2e88',8);neon(()=>{g.beginPath();g.moveTo(0,70);g.lineTo(W2,70);},'#36d1ff',6);
   return c;}
 function clubInit(){if(!CLUB.pano)CLUB.pano=buildPano();CLUB.dancers=[];const n=26;
-  for(let i=0;i<n;i++){const a=i<14?rr(-1.1,1.1):rr(-Math.PI,Math.PI),d=rr(2.6,7.4);if(Math.abs(wrap(a-Math.PI))<.5&&d>5)continue;CLUB.dancers.push({x:Math.cos(a)*d,z:Math.sin(a)*d,s:i%DANCE_META.length,ph:rr(0,24),sp:rr(.8,1.2),bob:rr(0,6)});}
+  for(let i=0;i<n;i++){const a=i<14?rr(-1.1,1.1):rr(-Math.PI,Math.PI),d=rr(2.6,7.4);if(Math.abs(wrap(a-Math.PI))<.5&&d>5)continue;const W_=DANCE_META.map((m,k)=>k).filter(k=>DANCE_META[k].f),M_=DANCE_META.map((m,k)=>k).filter(k=>!DANCE_META[k].f);CLUB.dancers.push({x:Math.cos(a)*d,z:Math.sin(a)*d,s:(Math.random()<.78||!M_.length)?rpick(W_):rpick(M_),ph:rr(0,24),sp:rr(.8,1.2),bob:rr(0,6)});}
   CLUB.dots=[];for(let i=0;i<420;i++){const a=rr(0,TAU),d=Math.sqrt(Math.random())*8.6;CLUB.dots.push({x:Math.cos(a)*d,z:Math.sin(a)*d,c:rpick(['#ff2e88','#36d1ff','#ffd166','#c77dff','#7dff6a']),ph:rr(0,6)});}}
 function enterClub(){clubInit();CLUB.on=true;CLUB.t=0;CLUB.yaw=0;CLUB.pitch=0;CLUB.joined=0;bigMap=false;document.getElementById('touch').style.display='none';document.getElementById('topBtns').style.display='none';
   document.getElementById('lightc').style.display='none';GL.shown=false;clubBtn(true);try{radio.pause();}catch(e){}if(AU.on){barMusic.currentTime=0;barMusic.volume=.9;barMusic.play().catch(()=>{});}sfx('door');}

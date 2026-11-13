@@ -6,7 +6,7 @@ const PPL_SPR={"civ": [[0, 0, 64, 112], [0, 114, 64, 112], [0, 228, 63, 124], [0
 const RUG=new Image();let RUG_OK=false;RUG.onload=()=>{RUG_OK=true;};RUG.src='assets/rug.webp';
 function pplSpr(kind,i){const L=PPL_SPR[kind];return L[(i==null?Math.random()*L.length:i)|0];}
 // teken een staand persoon (r=atlas-rechthoek), breedte over de schouders ~w wereld-px
-function drawPplSprite(r,w,anim,moving,run,legC){const sc=w/r[3],L=r[2]*sc,s=moving?Math.sin(anim)*(run?10.5:6.2):0;
+function drawPplSprite(r,w,anim,moving,run,legC){const sc=w/r[3],L=r[2]*sc,s=moving?Math.sin(anim*(run?.5:.7))*(run?10:6.2):0;
   ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(2,2,L*.42,w*.42,0,0,TAU);ctx.fill();
   // benen: van heup naar voet, om en om naar voren/achteren (rennen = grotere passen)
   ctx.lineCap='round';for(const sd of [-1,1]){const fx=s*sd,fy=sd*w*.14;ctx.strokeStyle=legC||'#2a2622';ctx.lineWidth=w*.21;ctx.beginPath();ctx.moveTo(0,fy);ctx.lineTo(fx,fy);ctx.stroke();ctx.fillStyle='#141210';ctx.beginPath();ctx.ellipse(fx+(fx>=0?1.4:-1.4),fy,2.9,1.9,0,0,TAU);ctx.fill();}
