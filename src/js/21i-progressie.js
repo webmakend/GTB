@@ -2,7 +2,9 @@
 // Alles wordt los van het opslagslot bewaard (gtb_prog_v1), zodat je voortgang altijd blijft.
 const PRG_KEY='gtb_prog_v1';
 const PRG={hist:[],xp:0,lvl:1,coins:[],ach:[],day:'',streak:0,gun:false,robs:0,jobs:0,races:0,dirty:false,combo:0,comboT:0,toasts:[],drift:0,lastStars:0,dailyDone:false,reveal:0,revealC:-1};
-const RANKS=['Toerist','Bommelaar','Straatschoffie','Kruimeldief','Gladjanus','Boef','Bendelid','Gangster','Baas van de Waterstraat','Peetvader van Bommel','Maarten van Rossum'];
+const RANKS=['Loopjongen','Straatschoffie','Associate','Mob','Made Man','Soldato','Caporegime','Consigliere','Underboss','The Boss','Godfather','Capo dei Capi'];
+const RANK_TXT=['Je haalt koffie en loopt boodschapjes voor de familie.','Je kent de straten van Bommel op je duimpje.','Je werkt voor de familie, maar je hoort er nog niet bij.','De familie begint je te vertrouwen.','Je hebt de omertà gezworen: de zwijgplicht. Nu ben je een echte "made man".','Je bent een soldaat van de familie en verdient geld voor je capo.','Je leidt je eigen crew van soldaten.','Je bent de rechterhand en adviseur van de baas.','Je bent de tweede man van de familie.','Jij bent de baas van de familie Bommel.','De Peetvader. Heel de Bommelerwaard buigt voor je.','De baas van alle bazen. Hoger kan niet.'];
+function rankOf(l){return RANKS[Math.min(RANKS.length-1,l-1)];}
 const ACH={fiets:['Fietsendief','Steel je eerste fiets'],overval:['Handen omhoog!','Je eerste overval'],overval5:['Kassakraker','5 overvallen'],lam:['Lam als een kanon','5 drankjes op'],plas:['Wildplasser','Plassen op straat'],broek:['Oeps','Broek nat geplast'],
   pistool:['Gevonden voorwerp','Het pistool bij de watertoren gevonden'],omver10:['Kegelclub','10 mensen omver'],gejat10:['Autodief','10 voertuigen gejat'],ster3:['Gezocht','3 sterren'],ontsnapt:['Spoorloos','Ontsnapt aan de politie'],
   missies:['Verhaal uit','Alle verhaalmissies klaar'],munt1:['Glinstering','Eerste Gouden Bommel'],munt10:['Spaarvarken','10 Gouden Bommels'],munt25:['Schatrijk','Alle 25 Gouden Bommels'],level5:['Op weg','Level 5'],level10:['Legende','Level 10'],
@@ -17,10 +19,10 @@ function applyLevelPerks(){P.maxhp=100+Math.min(60,(PRG.lvl-1)*6);}
 function addXP(n,why){if(!n||MODE!=='play')return;const mult=1+Math.min(2,PRG.combo);PRG.combo=Math.min(2,PRG.combo+(PRG.comboT>0?1:0));PRG.comboT=200;const v=Math.round(n*mult);PRG.xp+=v;PRG.dirty=true;
   popTxt(me().x,me().y-34,'+'+v+' RESPECT'+(mult>1?' ×'+mult:''),'#c77dff',1);
   const L=lvlOf(PRG.xp);if(L>PRG.lvl){const old=PRG.lvl;PRG.lvl=L;applyLevelPerks();P.hp=P.maxhp;const cash=25*L;P.money+=cash;P.moneyF=20;
-    missionBanner('LEVEL '+L+': '+(RANKS[Math.min(RANKS.length-1,L-1)]).toUpperCase(),`Respect omhoog! Beloning: €${cash} en meer max. health (${P.maxhp}).`,'#c77dff',300);sfx('reward');
+    missionBanner('PROMOTIE: '+rankOf(L).toUpperCase()+' (LV '+L+')',RANK_TXT[Math.min(RANK_TXT.length-1,L-1)]+` Beloning: €${cash} en ${P.maxhp} max. health.`,'#c77dff',360);sfx('reward');
     for(let i=0;i<40;i++){const a=rr(0,TAU),s=rr(1,4);parts.push({x:me().x,y:me().y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:rr(30,60),ml:60,s:1,k:'st'});}
     if(L>=5)unlock('level5');if(L>=10)unlock('level10');}}
-function unlock(id){if(!ACH[id]||PRG.ach.includes(id))return;PRG.ach.push(id);PRG.dirty=true;PRG.toasts.push({id,t:0});sfx('sting');setTimeout(()=>{const c=PRG.combo;PRG.combo=0;addXP(50);PRG.combo=c;},400);}
+function unlock(id){if(!ACH[id]||PRG.ach.includes(id))return;PRG.ach.push(id);PRG.dirty=true;noteAdd('🏆 PRESTATIE: '+ACH[id][0].toUpperCase(),ACH[id][1]+'  ·  +50 respect','#ffd166',320);sfx('sting');setTimeout(()=>{const c=PRG.combo;PRG.combo=0;addXP(50);PRG.combo=c;},400);}
 function makeCoins(){COINS.length=0;let rs=4242;const rn=()=>((rs=(rs*16807)%2147483647)/2147483647);const bb=FORTBB;let tries=0;
   const extra=[];if(WTOWER)extra.push([WTOWER.x+60,WTOWER.y-170]);
   for(const e of extra)COINS.push({x:e[0],y:e[1],i:COINS.length});
@@ -57,15 +59,8 @@ function progHud(){ctx=fctx;const U=clamp(Math.min(CW,CH)/560,.75,1.25),ut=uiTop
   const base=lvlBase(PRG.lvl),nd=need(PRG.lvl),k=clamp((PRG.xp-base)/nd,0,1),bx=L0+10*U,bw=pw-20*U,by=ut.top+ph-5*U;
   ctx.fillStyle='rgba(255,255,255,.1)';rrect(ctx,bx,by,bw,3.5*U,2);ctx.fill();const g=ctx.createLinearGradient(bx,0,bx+bw,0);g.addColorStop(0,'#7b2ff7');g.addColorStop(1,'#c77dff');ctx.fillStyle=g;rrect(ctx,bx,by,Math.max(3,bw*k),3.5*U,2);ctx.fill();
   ctx.font=`900 ${10*U}px Inter, sans-serif`;const lt='LV '+PRG.lvl,lw=ctx.measureText(lt).width+10*U;ctx.fillStyle='#7b2ff7';rrect(ctx,L0+pw-lw-8*U,ut.top+43*U,lw,15*U,7*U);ctx.fill();ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(lt,L0+pw-lw/2-8*U,ut.top+51*U);
-  // combo
-  if(PRG.combo>0&&PRG.comboT>0){ctx.globalAlpha=Math.min(1,PRG.comboT/40);txt('COMBO ×'+(1+PRG.combo),CW/2,CH-(IS_TOUCH?250:120),clamp(CW/16,20,34),'#c77dff','center');ctx.globalAlpha=1;}
-  // prestatie-toasts
-  if(PRG.toasts.length){const q=PRG.toasts[0];q.t++;const a=q.t<20?q.t/20:q.t>200?Math.max(0,(240-q.t)/40):1,[n,d]=ACH[q.id],w=Math.min(CW-30,340),x=CW/2-w/2,y=CH-(IS_TOUCH?300:120)-(1-a)*30;
-    ctx.globalAlpha=a;ctx.fillStyle='rgba(20,8,36,.92)';rrect(ctx,x,y,w,54,14);ctx.fill();ctx.strokeStyle='#ffd166';ctx.lineWidth=2;rrect(ctx,x,y,w,54,14);ctx.stroke();
-    ctx.font='26px sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText('🏆',x+12,y+27);txt('PRESTATIE: '+n.toUpperCase(),x+50,y+8,15,'#ffd166','left');txt(d+'  ·  +50 respect',x+50,y+31,12,'#fff','left','Inter, sans-serif');ctx.globalAlpha=1;
-    if(q.t>240)PRG.toasts.shift();}
   ctx=wctx;}
 function progMinimap(mp,cxm,cym,S){if(PRG.reveal>0&&PRG.revealC>=0){const c=COINS[PRG.revealC];if(c&&!PRG.coins.includes(c.i)){let [x,y]=mp(c.x,c.y);const dx=x-cxm,dy=y-cym,dd=Math.hypot(dx,dy);if(dd>S/2-7){x=cxm+dx/dd*(S/2-7);y=cym+dy/dd*(S/2-7);}ctx.fillStyle='#ffd34d';ctx.beginPath();ctx.arc(x,y,4.5,0,TAU);ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=1.2;ctx.stroke();}}}
-function progBigMap(mp,fs){const n=PRG.coins.length;txt(`LV ${PRG.lvl} · ${RANKS[Math.min(RANKS.length-1,PRG.lvl-1)]}   ·   Gouden Bommels ${n}/25   ·   Historie ${PRG.hist.length}/${HIST.length}   ·   Prestaties ${PRG.ach.length}/${Object.keys(ACH).length}   ·   Dagbonus: dag ${PRG.streak||1}`,CW/2,CH-22,12,'#c77dff','center','Inter, sans-serif');
+function progBigMap(mp,fs){const n=PRG.coins.length;txt(`LV ${PRG.lvl} · ${rankOf(PRG.lvl)}   ·   Gouden Bommels ${n}/25   ·   Historie ${PRG.hist.length}/${HIST.length}   ·   Prestaties ${PRG.ach.length}/${Object.keys(ACH).length}   ·   Dagbonus: dag ${PRG.streak||1}`,CW/2,CH-22,12,'#c77dff','center','Inter, sans-serif');
   if(PRG.reveal>0&&PRG.revealC>=0){const c=COINS[PRG.revealC];if(c&&!PRG.coins.includes(c.i)){const [x,y]=mp(c.x,c.y);ctx.fillStyle='#ffd34d';ctx.beginPath();ctx.arc(x,y,5,0,TAU);ctx.fill();ctx.strokeStyle='#000';ctx.stroke();}}}
 function revealCoin(){const o=me();let best=-1,bd=1e9;for(const c of COINS){if(PRG.coins.includes(c.i))continue;const d=Math.hypot(c.x-o.x,c.y-o.y);if(d<bd){bd=d;best=c.i;}}if(best<0)return false;PRG.revealC=best;PRG.reveal=60*90;return true;}

@@ -14,7 +14,7 @@ function carNear(){let best=null,bd=1e9;for(const c of cars){if(c.dead||c.state!
   if(Math.abs(lx)<c.t.l/2+18&&Math.abs(ly)<c.t.w/2+20){const d=Math.hypot(dx,dy);if(d<bd){bd=d;best=c;}}}return best;}
 function tryEnter(){const best=carNear();if(!best)return;
   if(best.driver==='npc')ejectDriver(best);else if(best.driver==='cop'){exitCops(best);addHeat(1.2);}else if(best.type==='police')addHeat(1);
-  best.driver='player';best.ai=null;best.keep=1;P.car=best;P.stats.gejat++;showCarName(best);popTxt(best.x,best.y-16,'GEJAT!','#ffd166',1.1);sfx('door');msg(best.t.n.toUpperCase(),'','#ffffff',70);stoleBike(best);addXP(4);}
+  best.driver='player';best.ai=null;best.keep=1;P.car=best;P.stats.gejat++;showCarName(best);popTxt(best.x,best.y-16,'GEJAT!','#ffd166',1.1);sfx('door');stoleBike(best);addXP(4);}
 function exitCar(){const c=P.car,s=c.t.w/2+10,L=[c.x+Math.sin(c.a)*s,c.y-Math.cos(c.a)*s],Rt=[c.x-Math.sin(c.a)*s,c.y+Math.cos(c.a)*s];
   const p=!footBlocked(L[0],L[1])?L:!footBlocked(Rt[0],Rt[1])?Rt:[c.x,c.y];P.x=p[0];P.y=p[1];P.a=c.a;c.driver=null;c.keep=0;c.ctl=[0,0,1];P.car=null;sfx('door');}
 function addMoney(v){P.money=Math.max(0,P.money+v);P.moneyF=20;popTxt(me().x,me().y-20,(v>0?'+':'-')+'€'+Math.abs(v).toFixed(2).replace('.',','),v>0?'#7dff6a':'#ff6b6b',1.2);}

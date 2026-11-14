@@ -20,7 +20,7 @@ function hud(){
    const cc=P.ch?P.ch.c:'#ff2e88';ctx.strokeStyle=cc+'99';ctx.lineWidth=1.5;rrect(ctx,L0,y,pw,ph,14*U);ctx.stroke();
    // portret
    const ar=19*U,ax=L0+10*U+ar,ay=y+10*U+ar;ctx.save();ctx.beginPath();ctx.arc(ax,ay,ar,0,TAU);ctx.fillStyle=cc;ctx.fill();ctx.clip();const im=P.ch&&avatarImg(P.ch);
-   if(im&&im.complete&&im.naturalWidth){const w=im.naturalWidth;ctx.drawImage(im,w*.24,0,w*.52,w*.52,ax-ar,ay-ar,ar*2,ar*2);}else{ctx.fillStyle='#fff';ctx.font=`900 ${18*U}px Inter`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText((P.ch?P.ch.name:'?')[0],ax,ay+1);}
+   if(im&&im.complete&&im.naturalWidth){const w=im.naturalWidth;ctx.drawImage(im,w*.24,(P.ch.avy||0)*w,w*.52,w*.52,ax-ar,ay-ar,ar*2,ar*2);}else{ctx.fillStyle='#fff';ctx.font=`900 ${18*U}px Inter`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText((P.ch?P.ch.name:'?')[0],ax,ay+1);}
    ctx.restore();ctx.strokeStyle=cc;ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(ax,ay,ar,0,TAU);ctx.stroke();
    const tx=ax+ar+9*U,tw=L0+pw-10*U-tx;
    txt((P.ch?P.ch.name:''),tx,y+8*U,15*U,'#fff','left','Anton, Impact, sans-serif');
@@ -40,6 +40,7 @@ function hud(){
       txt((MIS_TXT[MIS.stage]||'').split(':')[0]+'  ·  '+dm+' m',L0+13*U,y+6*U,11*U,'#ffd166','left','Inter, sans-serif');ctx.font=`700 ${12.5*U}px Inter, sans-serif`;ctx.fillStyle='#fff';ctx.textAlign='left';ctx.textBaseline='top';ls.forEach((l,i)=>ctx.fillText(l,L0+13*U,y+(22+i*16)*U));y+=ch-14*U;}
     const Z0=viewZ(),sx=CW/2+(MIS.x-camX)*Z0,sy=CH/2+(MIS.y-camY)*Z0,mg=34;if(!MG.on&&(sx<mg||sx>CW-mg||sy<mg+60||sy>CH-mg)){const a=Math.atan2(sy-CH/2,sx-CW/2),ex=clamp(CW/2+Math.cos(a)*CW,mg,CW-mg),ey=clamp(CH/2+Math.sin(a)*CH,mg+60,CH-mg-(IS_TOUCH?260:0));
       ctx.save();ctx.translate(ex,ey);ctx.rotate(a);ctx.fillStyle='#ffd166';ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(16,0);ctx.lineTo(-8,-11);ctx.lineTo(-3,0);ctx.lineTo(-8,11);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();}}
+  HUDY=y+28*U;
   // minikaart (rond, GTA-stijl) onder de knoppen rechtsboven
   const S=MINI_S=Math.round(clamp(Math.min(CW,CH)*.27,96,150)),mx=CW-S-12,my=ut.top,o=me(),span=S*18;MM={x:mx+S/2,y:my+S/2,r:S/2};
   ctx.save();ctx.beginPath();ctx.arc(mx+S/2,my+S/2,S/2,0,TAU);ctx.fillStyle='#4f86b0';ctx.fill();ctx.clip();
@@ -53,12 +54,10 @@ function hud(){
   // hint
   let hint='';if(!P.dead){if(P.car)hint=IS_TOUCH?'':'E: uitstappen · Spatie: handrem · S: remmen';else if(carNear())hint=IS_TOUCH?'Tik IN STAP om in te stappen':'E: instappen';else if(swimming())hint='Je zwemt! Zoek de kant op';else if(frameN<1500)hint=IS_TOUCH?'💧 = waterballon gooien':'Spatie: waterballon gooien';}
   if(hint)txt(hint,CW/2,CH-(IS_TOUCH?175:40),13.5*U,'#fff','center','Inter, sans-serif');
-  msgs.forEach(m=>{const a=clamp(Math.min(m.life/25,(m.ml-m.life)/8+.2),0,1);ctx.globalAlpha=a;const big=Math.min((sm?36:56)*U,CW*.11);txt(m.t,CW/2,CH*.3,big,m.col,'center');if(m.sub)txt(m.sub,CW/2,CH*.3+big+6,(sm?13:16)*U,'#fff','center','Inter, sans-serif');ctx.globalAlpha=1;});
   if(!IS_TOUCH)txt('E in/uit/actie · Spatie gooien/schieten/handrem · Q wapen · R radio · J springen · M kaart · P pauze',16,CH-24,12,'rgba(255,255,255,.55)','left','Inter, sans-serif');
   if(P.hurtF>0){const a=P.hurtF/18,g3=ctx.createRadialGradient(CW/2,CH/2,Math.min(CW,CH)*.3,CW/2,CH/2,Math.max(CW,CH)*.75);g3.addColorStop(0,'rgba(255,0,40,0)');g3.addColorStop(1,`rgba(255,0,40,${.55*a})`);ctx.fillStyle=g3;ctx.fillRect(0,0,CW,CH);}
   if(P.car&&speedOf(P.car)>5.2&&!MG.on){const k=clamp((speedOf(P.car)-5.2)/3,0,1);ctx.strokeStyle=`rgba(255,255,255,${.25*k})`;ctx.lineWidth=1.5;for(let i=0;i<14;i++){const a=(i*2.399+frameN*.07)%TAU,r0=Math.max(CW,CH)*(.42+((i*37+frameN*3)%40)/100);ctx.beginPath();ctx.moveTo(CW/2+Math.cos(a)*r0,CH/2+Math.sin(a)*r0);ctx.lineTo(CW/2+Math.cos(a)*(r0+60*k),CH/2+Math.sin(a)*(r0+60*k));ctx.stroke();}}
-  drawCarName();statueHint();henkieMarker();actHint();progHud();jobHud();radioHud();netHud();
-  drawMissionBanner();
+  drawCarName();statueHint();henkieMarker();actHint();progHud();jobHud();netHud();drawNotes();
   mapOverlay();
   if(paused){ctx.fillStyle='rgba(10,0,25,.65)';ctx.fillRect(0,0,CW,CH);txt('PAUZE',CW/2,CH/2-50,60,'#ffd166','center');txt(IS_TOUCH?'Tik op ▶ om verder te spelen':'Druk op P om verder te spelen',CW/2,CH/2+26,16,'#fff','center','Inter, sans-serif');}
   if(IS_TOUCH&&frameN%6===0)updTouchUI();

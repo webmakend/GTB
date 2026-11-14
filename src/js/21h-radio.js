@@ -17,7 +17,7 @@ function radioStep(){const inCar=!!P.car&&!CLUB.on&&!(typeof FPV!=='undefined'&&
   if(inCar&&!RADIO.inCar){RADIO.inCar=true;if(!P.car.t.bike){radioPlay();RADIO.show=150;}}
   else if(!inCar&&RADIO.inCar){RADIO.inCar=false;radioAllOff();if(RADIO.st!==0&&AU.on&&!CLUB.on)musicPlay();radio.volume=.45;}
   if(inCar&&!P.car.t.bike&&(pressed.KeyR||touch.radio)){touch.radio=false;RADIO.st=(RADIO.st+1)%STATIONS.length;radioPlay();RADIO.show=150;sfx('blip');}
-  if(RADIO.show>0)RADIO.show--;}
-function radioHud(){if(RADIO.show<=0||!P.car)return;ctx=fctx;const s=STATIONS[RADIO.st],a=Math.min(1,RADIO.show/30),y=CW<640?uiTop().top+(MINI_S||120)+60:uiTop().top+80;ctx.globalAlpha=a;
+  if(RADIO.show===150){const s=STATIONS[RADIO.st];noteAdd('📻 '+s.n,s.s+(IS_TOUCH||!s.s?'':' · R = volgende'),s.c,170,'radio');}if(RADIO.show>0)RADIO.show--;}
+function radioHud(){return;if(RADIO.show<=0||!P.car)return;ctx=fctx;const s=STATIONS[RADIO.st],a=Math.min(1,RADIO.show/30),y=CW<640?uiTop().top+(MINI_S||120)+60:uiTop().top+80;ctx.globalAlpha=a;
   ctx.font='26px Anton, Impact, sans-serif';const w=Math.max(ctx.measureText('📻 '+s.n).width,140)+40;ctx.fillStyle='rgba(10,4,24,.85)';rrect(ctx,CW/2-w/2,y,w,s.s?62:44,14);ctx.fill();ctx.strokeStyle=s.c;ctx.lineWidth=2;rrect(ctx,CW/2-w/2,y,w,s.s?62:44,14);ctx.stroke();
   txt('📻 '+s.n,CW/2,y+8,24,s.c,'center');if(s.s)txt(s.s+(IS_TOUCH?'':'   ·   R = volgende'),CW/2,y+40,11.5,'#fff','center','Inter, sans-serif');ctx.globalAlpha=1;ctx=wctx;}

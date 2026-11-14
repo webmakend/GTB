@@ -5,7 +5,7 @@ function gunGlint(){return WTOWER&&WTOWER.gun&&!P.gun;}
 function gunStep(){
   if(gunGlint()&&!P.car){const g=WTOWER.gun;if(Math.hypot(P.x-g[0],P.y-g[1])<22){P.gun=true;P.weapon=1;PRG.gun=true;PRG.dirty=true;progSave();sfx('reward');camHit(4);
     missionBanner('HANDPISTOOL GEVONDEN!',IS_TOUCH?'Iemand is hier zijn pistool verloren. Wissel met de 🔫-knop en schiet met de actieknop.':'Iemand is hier zijn pistool verloren. Wissel met Q en schiet met Spatie.','#ff6b3d',330);unlock('pistool');addXP(60);}}
-  if(pressed.KeyQ&&P.gun&&!P.car){P.weapon=P.weapon?0:1;sfx('blip');msg(P.weapon?'🔫 PISTOOL':'💧 WATERBALLONNEN','','#ffffff',50);}
+  if(pressed.KeyQ&&P.gun&&!P.car){P.weapon=P.weapon?0:1;sfx('blip');noteAdd(P.weapon?'🔫 PISTOOL':'💧 WATERBALLONNEN','','#ffffff',80,'wapen');}
   for(const b of BULLETS){for(let s=0;s<3;s++){b.x+=b.vx/3;b.y+=b.vy/3;b.l-=1/3;if(b.l<=0)break;
       if(cellAt(b.x,b.y)===BUILD){b.l=0;for(let i=0;i<5;i++)parts.push({x:b.x,y:b.y,vx:rr(-1.5,1.5),vy:rr(-1.5,1.5),l:12,ml:12,s:1,k:'k'});break;}
       let hit=false;

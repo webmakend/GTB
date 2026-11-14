@@ -37,7 +37,7 @@ function setupTouch(){
   zone.addEventListener('pointerup',end);zone.addEventListener('pointercancel',end);
   const bA=document.getElementById('bAct');bA.addEventListener('pointerdown',e=>{e.preventDefault();touch.act=true;bA.classList.add('on');});['pointerup','pointercancel','pointerleave'].forEach(t=>bA.addEventListener(t,()=>{touch.act=false;bA.classList.remove('on');}));
   document.getElementById('bCar').addEventListener('pointerdown',e=>{e.preventDefault();touch.enter=true;buzz(15);});
-  const bX=document.getElementById('bX');bX.addEventListener('pointerdown',e=>{e.preventDefault();buzz(12);if(P.car)touch.radio=true;else if(P.gun){P.weapon=P.weapon?0:1;sfx('blip');msg(P.weapon?'🔫 PISTOOL':'💧 WATERBALLONNEN','','#fff',50);}});
+  const bX=document.getElementById('bX');bX.addEventListener('pointerdown',e=>{e.preventDefault();buzz(12);if(P.car)touch.radio=true;else if(P.gun){P.weapon=P.weapon?0:1;sfx('blip');noteAdd(P.weapon?'🔫 PISTOOL':'💧 WATERBALLONNEN','','#fff',80,'wapen');}});
   const bJ=document.getElementById('bJump');bJ.addEventListener('pointerdown',e=>{e.preventDefault();touch.jump=true;bJ.classList.add('on');buzz(12);});['pointerup','pointercancel','pointerleave'].forEach(t=>bJ.addEventListener(t,()=>bJ.classList.remove('on')));
   document.getElementById('bPause').addEventListener('pointerdown',e=>{e.preventDefault();paused=!paused;document.getElementById('bPause').textContent=paused?'▶':'❚❚';});
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&MODE==='play'){paused=true;document.getElementById('bPause').textContent='▶';}if(AU.c){if(document.hidden)AU.c.suspend();else AU.c.resume();}});

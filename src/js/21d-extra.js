@@ -32,7 +32,7 @@ function openStatue(){let o=document.getElementById('beeldOv');
 // --- automerk/-model kort in beeld bij instappen
 const CAR_NAMES={beetle:'Beatall',delorean:'docLorean',landy:'Landyroamer',pickup:'Pickup',racer:'Tristar Racer',hatchback:'Hatchback',sedan:'Sedan',suv:'SUV',muscle:'Muscle',muscle_2:'Muscle II',roadster:'Roadster',sports:'Sports',taxi:'Taxi',van:'Bestelbus',bus:'Bus',ambulance:'Ambulance',firetruck:'Brandweerwagen',truck:'Vrachtwagen',limousine:'Limousine'};
 let CARNAME=null;
-function showCarName(c){const n=(c.spr&&CAR_NAMES[c.spr.m])||c.t.n||'Auto';CARNAME={t:n,sub:c.t.n&&c.t.n!==n?c.t.n:'',life:110,ml:110};}
+function showCarName(c){const n=(c.spr&&CAR_NAMES[c.spr.m])||c.t.n||'Auto';noteAdd('🚗 '+n,c.t.n&&c.t.n!==n?c.t.n:'','#ffffff',150,'car');}
 function drawCarName(){if(!CARNAME||MG.on)return;if(--CARNAME.life<=0||!P.car){CARNAME=null;return;}const a=clamp(Math.min(CARNAME.life/20,(CARNAME.ml-CARNAME.life)/8),0,1),fs=clamp(CW/9,30,58),x=CW-24,y=CH-(IS_TOUCH?250:90);
   ctx.save();ctx.globalAlpha=a;ctx.translate(x+(1-a)*40,y);ctx.transform(1,0,-.18,1,0,0);ctx.font=`400 ${fs}px Anton, Impact, sans-serif`;ctx.textAlign='right';ctx.textBaseline='alphabetic';ctx.lineWidth=6;ctx.strokeStyle='rgba(0,0,0,.85)';ctx.strokeText(CARNAME.t.toUpperCase(),0,0);ctx.fillStyle='#fff';ctx.fillText(CARNAME.t.toUpperCase(),0,0);
   if(CARNAME.sub){ctx.font=`700 ${fs*.28}px Inter, sans-serif`;ctx.lineWidth=4;ctx.strokeText(CARNAME.sub.toUpperCase(),0,fs*.4);ctx.fillStyle='#ffd166';ctx.fillText(CARNAME.sub.toUpperCase(),0,fs*.4);}ctx.restore();}
