@@ -36,7 +36,7 @@ if ($a === 'hello') { echo json_encode(['ok' => true]); exit; }
 if ($a === 'top') { echo json_encode(['ok' => true, 'top' => top($db)]); exit; }
 if ($a !== 'ping' || $_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(400); echo json_encode(['ok' => false]); exit; }
 
-$raw = file_get_contents('php://input', false, null, 0, 4096);
+$raw = file_get_contents('php://input', false, null, 0, 8192);
 $in = json_decode($raw, true);
 if (!is_array($in)) { http_response_code(400); echo json_encode(['ok' => false]); exit; }
 $id = preg_replace('/[^a-zA-Z0-9]/', '', (string)($in['id'] ?? ''));
@@ -49,11 +49,20 @@ $st = [
   'car' => in_array($in['car'] ?? '', ['', 'b', 'c'], true) ? $in['car'] : '',
   'col' => preg_match('/^#[0-9a-fA-F]{3,6}$/', (string)($in['col'] ?? '')) ? $in['col'] : '',
   'lv' => $num('lv', 1, 99), 'st' => $num('st', 0, 5),
+  'eur' => $num('eur', -1000000, 100000000), 'dead' => $num('dead', 0, 1),
+  'pid' => preg_match('/^[0-9a-f]{12}$/', (string)($in['pid'] ?? '')) ? $in['pid'] : '',
+  'ev' => [],
 ];
+// gebeurtenissen tussen spelers (raak, neergeschoten, vriendschap): alleen bekende soorten, max 12
+foreach (array_slice(is_array($in['ev'] ?? null) ? $in['ev'] : [], 0, 12) as $e) {
+  if (!is_array($e) || !in_array($e['k'] ?? '', ['hit', 'kill', 'frq', 'fok', 'frm'], true)) continue;
+  if (!preg_match('/^[0-9a-f]{12}$/', (string)($e['to'] ?? ''))) continue;
+  $st['ev'][] = ['k' => $e['k'], 'to' => $e['to'], 'i' => max(0, min(1000000000, (int)($e['i'] ?? 0))), 'd' => max(0, min(100000, (int)($e['d'] ?? 0)))];
+}
 $xp = $num('xp', 0, 50000000);
 $stmt = $db->prepare('INSERT INTO players (id,nm,lv,xp,mu,pr,eur,state,seen,ip) VALUES (?,?,?,?,?,?,?,?,?,?)
   ON CONFLICT(id) DO UPDATE SET nm=excluded.nm,lv=excluded.lv,xp=MAX(players.xp,excluded.xp),mu=excluded.mu,pr=excluded.pr,eur=excluded.eur,state=excluded.state,seen=excluded.seen,ip=excluded.ip');
-$stmt->execute([$id, $nm, $st['lv'], $xp, $num('mu', 0, 25), $num('pr', 0, 200), $num('eur', 0, 100000000), json_encode($st), time(), substr(hash('sha256', $_SERVER['REMOTE_ADDR'] ?? ''), 0, 16)]);
+$stmt->execute([$id, $nm, $st['lv'], $xp, $num('mu', 0, 25), $num('pr', 0, 200), $num('eur', -1000000, 100000000), json_encode($st), time(), substr(hash('sha256', $_SERVER['REMOTE_ADDR'] ?? ''), 0, 16)]);
 
 $peers = [];
 $q = $db->prepare('SELECT id,state,xp FROM players WHERE seen > ? AND id <> ? ORDER BY seen DESC LIMIT 60');

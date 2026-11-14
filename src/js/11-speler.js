@@ -17,7 +17,7 @@ function tryEnter(){const best=carNear();if(!best)return;
   best.driver='player';best.ai=null;best.keep=1;P.car=best;P.stats.gejat++;showCarName(best);popTxt(best.x,best.y-16,'GEJAT!','#ffd166',1.1);sfx('door');stoleBike(best);addXP(4);}
 function exitCar(){const c=P.car,s=c.t.w/2+10,L=[c.x+Math.sin(c.a)*s,c.y-Math.cos(c.a)*s],Rt=[c.x-Math.sin(c.a)*s,c.y+Math.cos(c.a)*s];
   const p=!footBlocked(L[0],L[1])?L:!footBlocked(Rt[0],Rt[1])?Rt:[c.x,c.y];P.x=p[0];P.y=p[1];P.a=c.a;c.driver=null;c.keep=0;c.ctl=[0,0,1];P.car=null;sfx('door');}
-function addMoney(v){P.money=Math.max(0,P.money+v);P.moneyF=20;popTxt(me().x,me().y-20,(v>0?'+':'-')+'€'+Math.abs(v).toFixed(2).replace('.',','),v>0?'#7dff6a':'#ff6b6b',1.2);}
+function addMoney(v){P.money=v<0?Math.max(Math.min(0,P.money),P.money+v):P.money+v;P.moneyF=20;popTxt(me().x,me().y-20,(v>0?'+':'-')+'€'+Math.abs(v).toFixed(2).replace('.',','),v>0?'#7dff6a':'#ff6b6b',1.2);}
 function hurt(d){if(P.dead)return;P.hp-=d;P.hurtF=18;buzz(30);shake=Math.max(shake,5);if(P.hp<=0){P.hp=0;wasted('WASTED',P.lastHit);}P.lastHit='';}
 function wasted(t,why){if(P.dead)return;P.dead=220;P.deadKind='wasted';P.deadWhy=why||'';if(P.car){P.car.driver=null;P.car=null;}sfx('sting');buzz([60,40,120]);}
 function busted(){if(P.dead)return;if(P.car){P.car.driver=null;P.car.keep=0;P.car=null;}P.dead=220;P.deadKind='bust';const hadGun=loseWeapons();P.deadWhy=hadGun?'Al je wapens zijn in beslag genomen':'Een nachtje in de cel, morgen weer vrij';noteAdd('BUSTED',hadGun?'Opgepakt! De politie heeft al je wapens afgepakt':'Een nachtje in de cel, morgen weer vrij','#4d8dff',260);sfx('sting');buzz([60,40,120]);}

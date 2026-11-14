@@ -24,6 +24,7 @@ function drawNotes(){HUDX.cards=[];if(MG.on||bigMap)return;ctx=fctx;const U=HUDX
   if(typeof JOB!=='undefined'&&JOB.cur){const j=JOB.cur;let r='';if(JOB.T>0){const s2=Math.max(0,Math.ceil((JOB.T-JOB.t)/60));r=Math.floor(s2/60)+':'+String(s2%60).padStart(2,'0');}else if(JOB.tgt)r=Math.round(Math.hypot(JOB.tgt.x-me().x,JOB.tgt.y-me().y)/9)+' m';add('KLUS · '+j.n,r,JOB.txt||'',j.col||'#36d1ff');}
   // dagbonus (tik om te claimen)
   if(PRG.bonus){add('DAGBONUS · DAG '+PRG.bonus.day,'+€'+PRG.bonus.cash,'Tik om te claimen','#4ade80',()=>progClaim(),.75+.25*Math.sin(frameN*.12));}
+  if(typeof pvpCards==='function')pvpCards(add);
   // actie in de buurt (tik = doen)
   if(ACT.cur&&!ACT.cur.off&&!P.dead&&!P.car){const a=ACT.cur;add(a.k==='rob'?'OVERVAL':a.k==='pee'?'PLASNOOD':a.k==='job'?'KLUS':'ACTIE',IS_TOUCH?'TIK':'E',a.k==='pee'?'Tik hier om tegen een muur te plassen':a.t,a.k==='rob'?'#ff4d4d':'#ffd166',()=>{actTry();});}
   // statusregels (drank, plasnood, spul, energie, combo)

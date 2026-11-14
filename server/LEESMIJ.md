@@ -16,11 +16,13 @@ Het spel is één `index.html` plus de map `assets/`. Met `api.php` erbij kun je
 4. Open `https://jouwdomein.nl/bommel/`. Werkt `https://jouwdomein.nl/bommel/api.php?a=hello` (je ziet `{"ok":true}`), dan schakelt het spel online spelen vanzelf in.
 
 ## Wat spelers dan zien
-- Andere spelers lopen of rijden live rond als paarse "spookspeler" met naam en level, ook op de minikaart.
+- Andere spelers lopen of rijden live rond met hun eigen naam en level erboven, ook op de minikaart.
+- Je kunt andere spelers neerschieten. Wie neergaat, verliest geld (€50 + 15% van wat hij heeft) en dat gaat naar de schutter. Je kunt daardoor in het rood komen.
+- Vrienden (dashboard → 👥 Vrienden) kunnen niet op elkaar schieten. Ontvrienden kan in hetzelfde scherm.
 - 🌐 met het aantal spelers online. Tik erop voor de ranglijst.
 - De ranglijst toont de **top 50 aller tijden** (op respect), met een groen bolletje bij wie nu online is.
 
 ## Goed om te weten
-- Het spel stuurt ongeveer één keer per seconde de positie en score; dat is licht voor gewone hosting (tientallen spelers tegelijk is geen probleem).
+- Het spel stuurt ongeveer twee keer per seconde de positie en score (tijdens schieten vaker); dat is licht voor gewone hosting (tientallen spelers tegelijk is geen probleem).
 - Scores komen van de spelers zelf. Wil je valsspelen tegengaan, dan kun je in `api.php` grenzen inbouwen (bijvoorbeeld maximale respect-stijging per minuut).
 - Gebruik je HTTPS, dan werkt ook geluid en trillen op telefoons het best.

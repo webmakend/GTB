@@ -32,7 +32,7 @@ function menuRender(){const ov=ovEl('menuOv'),b=boxEl();b.appendChild(hEl('GTB B
   r.append(t1,t2,bar,t3);b.appendChild(r);
   const grid=document.createElement('div');grid.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:0 8px';const G=(t,c,f)=>grid.appendChild(btnEl(t,c,f));
   b.appendChild(btnEl('▶  VERDER SPELEN','#ff2e88',menuClose));
-  G('🏆 Ranglijst','#5b2a9e',()=>{menuClose();lbOpen();});G('🎨 Eigen personage','#2a6f97',()=>custOpen());
+  G('🏆 Ranglijst','#5b2a9e',()=>{menuClose();lbOpen();});G('👥 Vrienden'+(Object.keys(PVP.req).length?' ('+Object.keys(PVP.req).length+')':''),'#166534',friendsOpen);G('🎨 Eigen personage','#2a6f97',()=>custOpen());
   G('✏️ Naam aanpassen','#3a3a5a',()=>{menuClose();askName(()=>{const s=getSave(),n=lsGet('gtb_name');if(s&&n){s.name=n;lsSet(SAVE_KEY,JSON.stringify(s));}if(n)writeSave(true);noteAdd('NAAM AANGEPAST',n||'','#7dff6a',150);});const i=document.getElementById('nameIn');if(i)i.value=lsGet('gtb_name')||'';});
   G('⚙️ Instellingen','#3a3a5a',setOpen);G('💾 Opslaan','#1f6b4a',()=>{writeSave();});G('🗺️ Kaart','#3a3a5a',()=>{menuClose();bigMap=true;});
   G('🏠 Keuzescherm','#5a2a2a',()=>{if(getSave())writeSave(true);progSave();menuClose();restartGame();});G('⟲ Opnieuw beginnen','#5a2a2a',menuOpenConfirm);
