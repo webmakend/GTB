@@ -50,7 +50,7 @@ function prepBuilding(b){
   BUILDINGS.push(b);
   if(!b.pass)polyFill(b.p,i=>{G[i]=BUILD;});
 }
-const SHOPS=[];let WTOWER=null;let BEACH=null,BEACHERS=[],SWIMMERS=[],BWALK=[],BPROPS=[];
+const SHOPS=[];let WTOWER=null;const HISTX={};let BEACH=null,BEACHERS=[],SWIMMERS=[],BWALK=[],BPROPS=[];
 const SAY_BEACH=['Ik heb nu al zand op plekken waar het zonlicht nog nooit is geweest.','Broodje kaas met een extra krokant laagje schelpengruis.','Ik kan Tuil zien liggen aan de overkant!','Het is heerlijk weer!','Wil je ook een pilsje?','Kun jij mijn rug even insmeren?'];
 function makeBeach(){const n=FORT.length,cyT=FORTBB[1]+(FORTBB[3]-FORTBB[1])*.32,c=centroid(FORT);let best=[],cur=[];
   for(let k=0;k<2*n;k++){const i=k%n;if(FORT[i][1]<cyT){cur.push(i);if(cur.length>best.length)best=cur.slice();if(cur.length>=n)break;}else cur=[];}
@@ -141,7 +141,14 @@ function genWorld(){
      WD.biz.push({n:'Albert Heijn',c:'Super',cat:'Supermarkt',adr:'Steenweg 8a',x,y},{n:'Gall & Gall',c:'Super',cat:'Slijterij',adr:'Steenweg 8a',x:x+c*122,y:y+sn*122});
      const s2=spiral(x-sn*230,y+c*230,120,[ROAD,WATER,BUILD],600)||spiral(x+c*330,y+sn*330,120,[ROAD,WATER,BUILD],600);
      if(s2){prepBuilding({p:box(s2[0],s2[1],170,110,sa),ht:26,kind:'retail',flat:true,noFac:1,wall:'#f4f4f4',roof:'#c9cfd6',ridge:false});WD.biz.push({n:'Lidl',c:'Super',cat:'Supermarkt',adr:'Steenweg 10',x:s2[0],y:s2[1]});}}
-   WD.biz.push({n:'Het Zusje',c:'Restaurant',cat:'Restaurant',adr:'Markt',x:4180,y:3010});}
+   {const z=spiral(1500,4520,90,[ROAD,WATER,BUILD],700);if(z){prepBuilding({p:box(z[0],z[1],110,80,sa),ht:30,kind:'restaurant',flat:true,noFac:1,wall:'#3a3430',roof:'#56504a',ridge:false});WD.biz.push({n:'Het Zusje',c:'Restaurant',cat:'Restaurant',adr:'Steenweg 2-4',x:z[0],y:z[1]});}}
+   // historische plekken: begraafplaatsen en de muziektent
+   const spot=(x0,y0,r,maxR)=>{for(let R2=0;R2<=maxR;R2+=24)for(let k=0;k<Math.max(1,R2/12);k++){const a=k/Math.max(1,R2/12)*TAU,x=x0+Math.cos(a)*R2,y=y0+Math.sin(a)*R2;const t=cellAt(x,y);if((t===GRASS||t===PARK)&&clear(x,y,r,[ROAD,WATER,BUILD,WALK,PLAZA]))return[x,y];}return null;};
+   const cem=spot(6230,6330,110,700);if(cem){const [x,y]=cem;HISTX.cem={x,y,w:200,h:140,rows:[]};prepBuilding({p:box(x-70,y-48,34,26,0),ht:22,kind:'baarhuisje',wall:'#d8cfc0',roof:'#5d4037',noFac:1});}
+   const jc=spot(6420,6180,70,600);if(jc){HISTX.jcem={x:jc[0],y:jc[1],w:120,h:90};}
+   const mt=spot(8650,4050,80,900);if(mt){HISTX.band={x:mt[0],y:mt[1]};}
+  }
+
   // winkels en horeca
   const used=new Set();
   const signOn=(name,x,y,cat,adr)=>{let best=null,bd=1e9;for(const b of BUILDINGS){if(b.pass||b.kind==='tower'||b.wt||used.has(b))continue;if(Math.abs(b.cx-x)>260||Math.abs(b.cy-y)>260)continue;const d=pip(x,y,b.p)?0:Math.hypot(b.cx-x,b.cy-y);if(d<bd){bd=d;best=b;}}
@@ -156,7 +163,7 @@ function genWorld(){
   if(BEACH){const b=BEACH.bb;for(let i=0;i<4000&&BEACHERS.length<46;i++){const x=R(b[0],b[2]),y=R(b[1],b[3]);if(cellAt(x,y)!==SAND||inFort(x,y))continue;if(BEACHERS.some(q=>Math.abs(q.x-x)<34&&Math.abs(q.y-y)<34))continue;
       BEACHERS.push({x,y,a:R(-.4,.4)+(rnd()<.5?0:Math.PI),towel:RP(['#ff4fa3','#36d1ff','#ffe14d','#7dff6a','#ff8a3d','#ffffff','#e63946']),skin:RP(['#f1c27d','#e0ac69','#c68642','#8d5524','#ffdbac']),suit:RP(['#1d3557','#e63946','#2a9d8f','#111','#f4a261']),hair:RP(HAIRS),umb:rnd()<.3?RP(['#ff4fa3','#36d1ff','#ffd166','#7dff6a']):null,sit:rnd()<.3});}
     // strand-decor: palmen, parasols, ligstoelen, strandtent, reddingstoren, boten aan de waterkant
-    {const want=[['palm',9,64],['palm2',5,70],['umbrella',8,34],['chair',8,26],['oats',8,26],['bush',3,30],['castle',2,26],['tower',1,58],['tiki',1,62],['surf',1,34],['fire',1,26],['hammock',1,40],['shell',3,10],['bottle',1,10],['rock',2,30]];
+    {const want=[['umbrella',8,34],['chair',8,26],['oats',8,26],['bush',3,30],['castle',2,26],['tower',1,58],['tiki',1,62],['surf',1,34],['fire',1,26],['hammock',1,40],['shell',3,10],['bottle',1,10],['rock',2,30]];
       const okP=(x,y,sz)=>BPROPS.every(p=>Math.hypot(p.x-x,p.y-y)>(p.sz+sz)*.55)&&BEACHERS.every(q=>Math.hypot(q.x-x,q.y-y)>sz*.6+14);
       for(const [k,n,sz] of want){let c=0;for(let i=0;i<4000&&c<n;i++){const x=R(b[0],b[2]),y=R(b[1],b[3]);if(cellAt(x,y)!==SAND||inFort(x,y))continue;if(!okP(x,y,sz))continue;BPROPS.push({k,x,y,sz,f:rnd()<.5});c++;}}
       for(const [k,n,sz] of [['kayak',2,30],['rowboat',2,34],['sailboat',1,46]]){let c=0;for(let i=0;i<6000&&c<n;i++){const x=R(b[0]-150,b[2]+150),y=R(b[1]-200,b[3]);if(cellAt(x,y)!==WATER||inFort(x,y))continue;let nearS=false;for(const [dx,dy] of [[0,40],[0,70],[40,40],[-40,40]])if(cellAt(x+dx,y+dy)===SAND)nearS=true;if(!nearS||!okP(x,y,sz))continue;BPROPS.push({k,x,y,sz,f:rnd()<.5,w:1});c++;}}
@@ -167,6 +174,10 @@ function genWorld(){
       SWIMMERS.push({x0:x,y0:y,x,y,ph:R(0,6.28),hair:RP(HAIRS),cap:rnd()<.3?RP(['#ff4fa3','#ffe14d','#36d1ff']):null});}}
   // bomen
   for(let i=0;i<40000&&TREES.length<3400;i++){const x=R(0,W),y=R(0,H),t=cellAt(x,y);let pr=0;if(!inFort(x,y))continue;if(t===PARK)pr=.55;else if(t===GRASS)pr=.16;if(rnd()<pr){let ok=true;for(const q of TREES){if(Math.abs(q.x-x)<22&&Math.abs(q.y-y)<22){ok=false;break;}}if(ok)TREES.push({x,y,r:R(13,24),c:RP(['#3a6b2f','#41752f','#335f2a','#4a7d36','#2f5a28'])});}}
+  // hoge bomen (iepen, platanen, populieren) in parken, op de wallen en langs singels
+  for(let i=0;i<60000&&TREES.filter(t=>t.h).length<420;i++){const x=R(FORTBB[0]-300,FORTBB[2]+300),y=R(FORTBB[1]-300,FORTBB[3]+300),t=cellAt(x,y);if(!(t===PARK||t===GRASS))continue;if(t===GRASS&&rnd()<.55)continue;
+    const r=R(22,34);let ok=true;for(const [dx,dy] of [[r,0],[-r,0],[0,r],[0,-r]]){const tt=cellAt(x+dx,y+dy);if(tt===BUILD||tt===ROAD||tt===WATER){ok=false;break;}}if(!ok)continue;
+    if(TREES.some(q=>Math.abs(q.x-x)<r+(q.r||14)*.7&&Math.abs(q.y-y)<r+(q.r||14)*.7))continue;TREES.push({x,y,r,h:R(46,74),c:RP(['#2f5a28','#355f2c','#2b5226','#3b6a30','#284a22'])});}
 }
 function nearestRoadDir(x,y){let bd=1e18,ang=0;for(const r of ROADS){if(x<r.bb[0]-300||x>r.bb[2]+300||y<r.bb[1]-300||y>r.bb[3]+300)continue;for(let i=0;i<r.p.length-1;i++){const a=r.p[i],b=r.p[i+1],dx=b[0]-a[0],dy=b[1]-a[1],L2=dx*dx+dy*dy||1;let t=((x-a[0])*dx+(y-a[1])*dy)/L2;t=clamp(t,0,1);const qx=a[0]+dx*t-x,qy=a[1]+dy*t-y,d=qx*qx+qy*qy;if(d<bd){bd=d;ang=Math.atan2(dy,dx);}}}return ang;}
 

@@ -3,8 +3,9 @@ let pickIdx=0,PICK=[];
 function buildPick(){const cards=document.getElementById('cards'),dots=document.getElementById('pickDots');cards.innerHTML='';dots.innerHTML='';const sc=savedCard();PICK=sc?[sc].concat(CHARS):CHARS.slice();
   PICK.forEach((ch,i)=>{const el=document.createElement('div');el.className='card';el.style.setProperty('--c',ch.c);
     el.innerHTML=`<div class="art"${ch.img?` style="background:radial-gradient(circle at 70% 30%,#fff3c4 0,#ffd166 12%,rgba(255,122,77,0) 30%),linear-gradient(180deg,${ch.bg[2]},${ch.bg[1]} 55%,${ch.bg[0]})"`:''}>${ch.img?`<img src="${ch.img}" alt="${ch.name}" decoding="async">`:portraitSVG(ch,i)}<div class="nm"><b>${ch.name}</b>${ch.sub?`<small style="display:block;font:800 12px Inter,sans-serif;letter-spacing:1px;color:#7dff6a;text-shadow:0 1px 3px #000">${ch.sub}</small>`:''}</div></div>
-      <button class="kies" data-i="${i}">${ch.save?'VERDER ALS '+ch.name:'KIES '+ch.name}</button>`;cards.appendChild(el);const d=document.createElement('i');dots.appendChild(d);});
+      <button class="kies" data-i="${i}">${ch.save?'VERDER ALS '+ch.name:'KIES '+ch.name}</button>${ch.save?'<button class="wis">🗑 VERWIJDER '+ch.name+'</button>':''}`;cards.appendChild(el);const d=document.createElement('i');dots.appendChild(d);});
   cards.querySelectorAll('.kies').forEach(b=>b.addEventListener('click',()=>choose(+b.dataset.i)));
+  cards.querySelectorAll('.wis').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();if(!b.dataset.arm){b.dataset.arm=1;b.textContent='ZEKER? TIK NOG EEN KEER';setTimeout(()=>{if(b.isConnected){delete b.dataset.arm;b.textContent='🗑 VERWIJDER';}},3000);return;}deleteSave();}));
   cards.addEventListener('scroll',updPick,{passive:true});setTimeout(()=>{scrollToCard(0,false);updPick();},30);}
 function scrollToCard(i,smooth){const cards=document.getElementById('cards'),el=cards.children[i];if(!el)return;cards.scrollTo({left:el.offsetLeft-(cards.clientWidth-el.clientWidth)/2,behavior:smooth?'smooth':'auto'});}
 function updPick(){const cards=document.getElementById('cards'),mid=cards.scrollLeft+cards.clientWidth/2;let best=0,bd=1e9;[...cards.children].forEach((el,i)=>{const d=Math.abs(el.offsetLeft+el.clientWidth/2-mid);if(d<bd){bd=d;best=i;}const k=clamp(1-d/(el.clientWidth*1.2),0,1);el.style.transform=`scale(${.9+.1*k})`;el.style.opacity=.55+.45*k;});
@@ -26,3 +27,5 @@ function choose(i){if(chosen)return;chosen=true;clearInterval(autoIv);const pc=P
 if(window.speechSynthesis){try{speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();}catch(e){}}
 document.getElementById('pPrev').addEventListener('click',()=>scrollToCard(Math.max(0,pickIdx-1),true));
 document.getElementById('pNext').addEventListener('click',()=>scrollToCard(Math.min(PICK.length-1,pickIdx+1),true));
+function deleteSave(){try{localStorage.removeItem(SAVE_KEY);localStorage.removeItem('gtb_name');localStorage.removeItem(PRG_KEY);}catch(e){}
+  Object.assign(PRG,{hist:[],xp:0,lvl:1,coins:[],ach:[],day:'',streak:0,gun:false,robs:0,jobs:0,races:0,dirty:false});P.gun=false;P.weapon=0;buildPick();sfx('slap');}

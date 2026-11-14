@@ -1,15 +1,15 @@
 // ====================== progressie: respect & levels, Gouden Bommels, prestaties, dagbonus ======================
 // Alles wordt los van het opslagslot bewaard (gtb_prog_v1), zodat je voortgang altijd blijft.
-const PROG_KEY='gtb_prog_v1';
-const PRG={xp:0,lvl:1,coins:[],ach:[],day:'',streak:0,gun:false,robs:0,jobs:0,races:0,dirty:false,combo:0,comboT:0,toasts:[],drift:0,lastStars:0,dailyDone:false,reveal:0,revealC:-1};
+const PRG_KEY='gtb_prog_v1';
+const PRG={hist:[],xp:0,lvl:1,coins:[],ach:[],day:'',streak:0,gun:false,robs:0,jobs:0,races:0,dirty:false,combo:0,comboT:0,toasts:[],drift:0,lastStars:0,dailyDone:false,reveal:0,revealC:-1};
 const RANKS=['Toerist','Bommelaar','Straatschoffie','Kruimeldief','Gladjanus','Boef','Bendelid','Gangster','Baas van de Waterstraat','Peetvader van Bommel','Maarten van Rossum'];
 const ACH={fiets:['Fietsendief','Steel je eerste fiets'],overval:['Handen omhoog!','Je eerste overval'],overval5:['Kassakraker','5 overvallen'],lam:['Lam als een kanon','5 drankjes op'],plas:['Wildplasser','Plassen op straat'],broek:['Oeps','Broek nat geplast'],
   pistool:['Gevonden voorwerp','Het pistool bij de watertoren gevonden'],omver10:['Kegelclub','10 mensen omver'],gejat10:['Autodief','10 voertuigen gejat'],ster3:['Gezocht','3 sterren'],ontsnapt:['Spoorloos','Ontsnapt aan de politie'],
   missies:['Verhaal uit','Alle verhaalmissies klaar'],munt1:['Glinstering','Eerste Gouden Bommel'],munt10:['Spaarvarken','10 Gouden Bommels'],munt25:['Schatrijk','Alle 25 Gouden Bommels'],level5:['Op weg','Level 5'],level10:['Legende','Level 10'],
   kasteel:['Cultuursnuiver','Het Stadskasteel bezocht'],uitzicht:['Hoog en droog','Boven op de oude watertoren'],klus3:['Klusjesman','3 klussen gedaan'],race:['Bommel GP','Straatrace gewonnen'],rijk:['Binnen!','€500 op zak'],schat:['Schatzoeker','De schat van Maarten van Rossum'],schutter:['Scherpschutter','Alle flessen geraakt']};
 const COINS=[];
-function progLoad(){try{const s=JSON.parse(lsGet(PROG_KEY)||'null');if(s)Object.assign(PRG,s,{toasts:[],combo:0,comboT:0,dirty:false,dailyDone:false,reveal:0});}catch(e){}PRG.lvl=lvlOf(PRG.xp);P.gun=!!PRG.gun;applyLevelPerks();}
-function progSave(){const o={xp:PRG.xp,coins:PRG.coins,ach:PRG.ach,day:PRG.day,streak:PRG.streak,gun:P.gun,robs:PRG.robs,jobs:PRG.jobs,races:PRG.races};lsSet(PROG_KEY,JSON.stringify(o));PRG.dirty=false;}
+function progLoad(){try{const s=JSON.parse(lsGet(PRG_KEY)||'null');if(s)Object.assign(PRG,s,{toasts:[],combo:0,comboT:0,dirty:false,dailyDone:false,reveal:0});}catch(e){}PRG.lvl=lvlOf(PRG.xp);P.gun=!!PRG.gun;applyLevelPerks();}
+function progSave(){const o={xp:PRG.xp,coins:PRG.coins,ach:PRG.ach,day:PRG.day,streak:PRG.streak,gun:P.gun,robs:PRG.robs,jobs:PRG.jobs,races:PRG.races,hist:PRG.hist};lsSet(PRG_KEY,JSON.stringify(o));PRG.dirty=false;}
 function need(l){return Math.round(120*Math.pow(l,1.45));}
 function lvlOf(xp){let l=1,t=0;while(xp>=t+need(l)){t+=need(l);l++;}return l;}
 function lvlBase(l){let t=0;for(let i=1;i<l;i++)t+=need(i);return t;}
@@ -66,6 +66,6 @@ function progHud(){ctx=fctx;const U=clamp(Math.min(CW,CH)/560,.75,1.25),ut=uiTop
     if(q.t>240)PRG.toasts.shift();}
   ctx=wctx;}
 function progMinimap(mp,cxm,cym,S){if(PRG.reveal>0&&PRG.revealC>=0){const c=COINS[PRG.revealC];if(c&&!PRG.coins.includes(c.i)){let [x,y]=mp(c.x,c.y);const dx=x-cxm,dy=y-cym,dd=Math.hypot(dx,dy);if(dd>S/2-7){x=cxm+dx/dd*(S/2-7);y=cym+dy/dd*(S/2-7);}ctx.fillStyle='#ffd34d';ctx.beginPath();ctx.arc(x,y,4.5,0,TAU);ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=1.2;ctx.stroke();}}}
-function progBigMap(mp,fs){const n=PRG.coins.length;txt(`LV ${PRG.lvl} · ${RANKS[Math.min(RANKS.length-1,PRG.lvl-1)]}   ·   Gouden Bommels ${n}/25   ·   Prestaties ${PRG.ach.length}/${Object.keys(ACH).length}   ·   Dagbonus: dag ${PRG.streak||1}`,CW/2,CH-22,12,'#c77dff','center','Inter, sans-serif');
+function progBigMap(mp,fs){const n=PRG.coins.length;txt(`LV ${PRG.lvl} · ${RANKS[Math.min(RANKS.length-1,PRG.lvl-1)]}   ·   Gouden Bommels ${n}/25   ·   Historie ${PRG.hist.length}/${HIST.length}   ·   Prestaties ${PRG.ach.length}/${Object.keys(ACH).length}   ·   Dagbonus: dag ${PRG.streak||1}`,CW/2,CH-22,12,'#c77dff','center','Inter, sans-serif');
   if(PRG.reveal>0&&PRG.revealC>=0){const c=COINS[PRG.revealC];if(c&&!PRG.coins.includes(c.i)){const [x,y]=mp(c.x,c.y);ctx.fillStyle='#ffd34d';ctx.beginPath();ctx.arc(x,y,5,0,TAU);ctx.fill();ctx.strokeStyle='#000';ctx.stroke();}}}
 function revealCoin(){const o=me();let best=-1,bd=1e9;for(const c of COINS){if(PRG.coins.includes(c.i))continue;const d=Math.hypot(c.x-o.x,c.y-o.y);if(d<bd){bd=d;best=c.i;}}if(best<0)return false;PRG.revealC=best;PRG.reveal=60*90;return true;}

@@ -22,7 +22,7 @@ function manage(){
     placeName=swimming()?(o.y<H*.25?'Zwemmen in de Waal':'Zwemmen in de stadsgracht'):[lm,rn].filter(Boolean).join(' · ')||(inFort(o.x,o.y)?'Vesting Zaltbommel':'Zaltbommel');}
 }
 function step(){
-  frameN++;playerStep();actStep();gunStep();radioStep();progStep();jobStep();
+  frameN++;playerStep();actStep();gunStep();radioStep();progStep();jobStep();netStep();
   for(const c of cars){if(c.dead)continue;if(c===P.car){}else if(c.driver==='npc'&&c.ai)c.ctl=aiCivil(c);else if(c.driver==='cop'&&c.ai)c.ctl=c.ai.mode==='pursuit'?aiCop(c):aiCivil(c);else c.ctl=[0,0,1];carStep(c);}
   carCollisions();carPedHits();for(const p of peds)pedStep(p);missionStep();balloonStep();bargeStep();wantedStep();manage();
   for(const m of msgs)m.life--;while(msgs.length&&msgs[0].life<=0)msgs.shift();

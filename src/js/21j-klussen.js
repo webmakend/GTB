@@ -18,8 +18,8 @@ const JOBDEF=[
   start(){const pts=[roadMid('Waterstraat',.6),roadMid('Waalkade',.5),roadMid('Oliestraat',.5),roadMid('Boschstraat',.35),roadMid('Gamerschestraat',.7),this.g].filter(Boolean);JOB.d.cps=pts;JOB.i=0;JOB.tgt=pts[0];let L=0,a=this.g;for(const q of pts){L+=Math.hypot(q[0]-a[0],q[1]-a[1]);a=q;}JOB.T=Math.round(L/4.4+240);JOB.d.cnt=180;return 'Rij door alle checkpoints en eindig weer op de Markt!';},
   step(){if(JOB.d.cnt>0){JOB.d.cnt--;if(JOB.d.cnt%60===0&&JOB.d.cnt>0){msg(String(JOB.d.cnt/60),'','#ffd166',40);sfx('blip');}if(JOB.d.cnt===0){msg('GO!','','#7dff6a',60);sfx('sting');}JOB.t=0;return;}
     if(near(JOB.tgt,70)){JOB.i++;sfx('reward');if(JOB.i>=JOB.d.cps.length){PRG.races++;unlock('race');jobWin(80+PRG.lvl*5,120,'Je bent de snelste van Bommel!');}else{JOB.tgt=JOB.d.cps[JOB.i];popTxt(me().x,me().y-30,'CHECKPOINT '+JOB.i+'/'+JOB.d.cps.length,'#ffd166',1.2);}}}},
- {id:'vlucht',n:'De grote ontsnapping',ic:'🚨',col:'#4d8dff',giver:()=>shopDoor('Dubai Barbershop'),desc:'De kapper heeft de politie op je afgestuurd. Schud ze af!',
-  start(){addHeat(3.3);JOB.tgt=null;JOB.T=60*120;return 'Drie sterren! Schud de politie binnen 2 minuten af.';},
+ {id:'vlucht',n:'De grote ontsnapping',ic:'🚨',col:'#4d8dff',giver:()=>shopDoor('Dubai Barbershop'),desc:'De kapper heeft de politie op je afgestuurd. Schud ze binnen 30 seconden af!',
+  start(){addHeat(3.3);JOB.tgt=null;JOB.T=60*30;return 'Drie sterren! Schud de politie binnen 30 seconden af.';},
   step(){if(JOB.t>90&&stars===0)jobWin(70,90,'Spoorloos verdwenen. De kapper betaalt je.');}},
  {id:'schat',n:'De schat van Maarten',ic:'🗝️',col:'#f0d58a',giver:()=>shopDoor('Stadskasteel'),desc:'Volg de raadsels van Maarten van Rossum door de stad',
   start(){const wp=LANDMARKS.find(l=>l.n==='Waterpoort'),gk=LANDMARKS.find(l=>l.n==='Gasthuiskapel');JOB.d.cps=[wp&&snap(wp.x,wp.y),gk&&snap(gk.x,gk.y),churchDoor(),WTOWER&&walkNear(WTOWER.x,WTOWER.y,45,120,10),this.g].filter(Boolean);
