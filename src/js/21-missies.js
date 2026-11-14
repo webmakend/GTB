@@ -1,12 +1,12 @@
 // ====================== missies (kerk, Kruidvat, strand + insmeer-minigame) ======================
 const MIS={on:false,done:false,stage:1,x:0,y:0,inside:0,gold:false,ann:0,girl:null,cool:0};
-const MIS_DO={4:'Ga naar Café Henke in de Waterstraat bij de Markt voor een avondje stappen (entree €10).',1:'Loop naar de ingang van de Sint-Maartenskerk (Kerkplein). Volg de gele pijl.',2:'Koop zonnebrand bij de Kruidvat in de Boschstraat (€8,99).',3:'Breng de zonnebrand naar de meid op het strand en smeer haar rug in.'};
-const MIS_TXT={4:'MISSIE 3: avondje stappen in Café Henke',1:'MISSIE 1: bezoek de Sint-Maartenskerk',2:'MISSIE 2: koop zonnebrand bij de Kruidvat',3:'MISSIE 2: smeer de meid op het strand in'};
+const MIS_DO={4:'Ga naar Café Henkie in de Waterstraat bij de Markt voor een avondje stappen (entree €10).',1:'Loop naar de ingang van de Sint-Maartenskerk (Kerkplein). Volg de gele pijl.',2:'Koop zonnebrand bij de Kruidvat in de Boschstraat (€8,99).',3:'Breng de zonnebrand naar de meid op het strand en smeer haar rug in.'};
+const MIS_TXT={4:'MISSIE 3: avondje stappen in Café Henkie',1:'MISSIE 1: bezoek de Sint-Maartenskerk',2:'MISSIE 2: koop zonnebrand bij de Kruidvat',3:'MISSIE 2: smeer de meid op het strand in'};
 function churchDoor(){const gk=BUILDINGS.find(b=>b.n==='Grote of Sint-Maartenskerk');if(!gk)return null;const x0=gk.bb[0],ys=gk.p.filter(q=>q[0]<x0+150).map(q=>q[1]),cy=(Math.min(...ys)+Math.max(...ys))/2;return snap(x0-34,cy);}
 function kruidvatDoor(){const l=LANDMARKS.find(l=>l.n==='Kruidvat');if(!l)return null;const b=BUILDINGS.find(b=>b.sign==='Kruidvat');let x=l.x,y=l.y;if(b&&b.sa!=null){}const s0=snap(x,y);return s0;}
 function pickGirl(){if(!BEACHERS.length)return null;const cx=(BEACH.bb[0]+BEACH.bb[2])/2,cy=(BEACH.bb[1]+BEACH.bb[3])/2;let best=null,bd=1e18;for(const b of BEACHERS){const d=Math.hypot(b.x-cx,b.y-cy);if(d<bd){bd=d;best=b;}}
   if(best){best.special=1;best.sit=false;best.umb=null;best.suit='#ff2e88';best.towel='#ffd166';best.hair='#7a3e12';}return best;}
-function henkeDoor(){const l=LANDMARKS.find(l=>l.n==='Café Henke');return l?snap(l.x,l.y):null;}
+function henkeDoor(){const l=LANDMARKS.find(l=>l.n==='Café Henkie');return l?snap(l.x,l.y):null;}
 function setStage(st){MIS.stage=st;MIS.inside=0;let d=null;if(st===4)d=henkeDoor();else if(st===1)d=churchDoor();else if(st===2)d=kruidvatDoor();else if(st===3){if(!MIS.girl)MIS.girl=pickGirl();if(MIS.girl)d=[MIS.girl.x,MIS.girl.y];}
   if(d){MIS.x=d[0];MIS.y=d[1];MIS.on=true;}else if(st<3)setStage(st+1);else{MIS.done=true;}}
 function henkeStep(){if(MIS.stage!==4||MIS.done||P.car||CLUB.on)return;if(Math.hypot(P.x-MIS.x,P.y-MIS.y)<36&&!MIS.cool){if(P.money<10){msg('TE WEINIG GELD','Entree kost €10','#ff6b6b',140);MIS.cool=200;return;}addMoney(-10);sfx('kassa');enterClub();}}
@@ -32,7 +32,7 @@ function mgPlace(){const hdr=uiTop().bottom+8+clamp(CW/14,22,32)+34,avail=CH-100
 function mgBox(){const p=mgPlace();return{w:p.dw,top:p.dy+p.dh*.3,bot:p.dy+p.dh*.95,cx:CW/2};}
 function mgStart(g){MG.on=true;MG.g=g;MG.t=0;MG.res='';MG.rt=0;MG.cov=new Float32Array(MG.N);MG.mini=[];MG.joyT=0;MG.joyCd=60;MG.lastPct=0;const B=mgBox();MG.hy=MG.py=(B.top+B.bot)/2;bigMap=false;document.getElementById('touch').style.display='none';sfx('blip',500);MG.vol=radio.volume;radio.volume=Math.min(radio.volume,.1);}
 function mgEnd(){MG.on=false;radio.volume=MODE==='play'?.45:(MG.vol||.45);if(IS_TOUCH)document.getElementById('touch').style.display='block';}
-function mgStep(){frameN++;const B=mgBox();if(MG.res){if(--MG.rt<=0){const kiss=MG.res==='kiss';mgEnd();if(kiss){msg('MISSIE 2 GESLAAGD!','Ze is ingesmeerd én je kreeg een kus 💋','#ff7ab6',220);sfx('reward');addMoney(40);setStage(4);setTimeout(()=>missionBanner('MISSIE 3: AVONDJE STAPPEN','Je kreeg €40 fooi. Tijd om te stappen! Café Henke in de Waterstraat bij de Markt is open. Volg de gele pijl.'),3200);}
+function mgStep(){frameN++;const B=mgBox();if(MG.res){if(--MG.rt<=0){const kiss=MG.res==='kiss';mgEnd();if(kiss){msg('MISSIE 2 GESLAAGD!','Ze is ingesmeerd én je kreeg een kus 💋','#ff7ab6',220);sfx('reward');addMoney(40);setStage(4);setTimeout(()=>missionBanner('MISSIE 3: AVONDJE STAPPEN','Je kreeg €40 fooi. Tijd om te stappen! Café Henkie in de Waterstraat bij de Markt is open. Volg de gele pijl.'),3200);}
       else{hurt(35);shake=12;MIS.cool=360;msg('PAK SLAAG!','Half werk… kom later nog eens terug','#ff4f6d',220);}}
     if(MG.res==='kiss'&&frameN%4===0)MG.hearts.push({x:CW/2+rr(-80,80),y:CH*.5,vy:rr(-2.5,-1.2),l:70});return;}
   const k=inp();if(k.up)MG.hy-=9;if(k.down)MG.hy+=9;MG.hy=clamp(MG.hy,B.top+10,B.bot-10);

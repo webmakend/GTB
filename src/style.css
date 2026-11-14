@@ -59,6 +59,7 @@ button{font-family:inherit}
 @keyframes blink{50%{opacity:.35}}
 #mus{position:fixed;top:calc(var(--st) + 10px);right:calc(var(--sr) + 10px);z-index:41;width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.35);background:rgba(10,4,24,.55);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(4px)}
 #mus svg{width:22px;height:22px}
+#mus{visibility:hidden;pointer-events:none}
 /* ---------- bediening in het spel ---------- */
 #touch{position:fixed;inset:0;z-index:10;display:none;pointer-events:none}
 #joyZone{position:absolute;left:0;top:28%;bottom:0;width:58%;pointer-events:auto;touch-action:none}

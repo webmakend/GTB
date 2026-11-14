@@ -2,7 +2,7 @@
 function placeTopBtns(){const sb=document.getElementById('sideBtns');if(!sb)return;const S=Math.round(clamp(Math.min(CW,CH)*.28,100,180)),top=uiTop().bottom+8+S+12;sb.style.top=top+'px';sb.style.flexDirection=(CH-top<260)?'row':'column';}
 function buzz(ms){if(Array.isArray(ms)){try{if(IS_TOUCH&&navigator.vibrate)navigator.vibrate(ms);}catch(e){}return;}try{if(IS_TOUCH&&navigator.vibrate)navigator.vibrate(ms);}catch(e){}}
 function updTouchUI(){document.getElementById('bJump').style.display=P.car||P.dead||swimming()?'none':'flex';const bA=document.getElementById('bAct'),bC=document.getElementById('bCar');const ac=P.car?'REM':'💧<br>GOOI';if(bA._t!==ac){bA.innerHTML=ac;bA._t=ac;}
-  const show=!!P.car||!!carNear(),ct=P.car?'UIT<br>STAP':'IN<br>STAP';bC.style.display=show&&!P.dead?'flex':'none';if(bC._t!==ct){bC.innerHTML=ct;bC._t=ct;}}
+  const ns=!P.car&&nearStatue(),show=!!P.car||ns||!!carNear(),ct=P.car?'UIT<br>STAP':ns?'👁<br>BEKIJK':'IN<br>STAP';bC.style.display=show&&!P.dead?'flex':'none';if(bC._t!==ct){bC.innerHTML=ct;bC._t=ct;}}
 let PINCH=null,joyCancel=()=>{};
 function setupPinch(){const isBtn=t=>t&&t.closest&&t.closest('.tb,.sb,#mus');let first=null;
   window.addEventListener('touchstart',e=>{if(MODE!=='play'||MG.on)return;const now=performance.now();
