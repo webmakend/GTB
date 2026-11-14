@@ -29,7 +29,7 @@ const BUILDINGS=[],TREES=[],TERRACE=[];
 // kleuren naar de luchtfoto's: veel oranje pannen, leisteen-grijs, witte en bakstenen gevels
 const ROOFS=['#d0623a','#c85a33','#d97048','#bd5530','#cf6a43','#d0623a','#c85a33','#56595f','#4b4e54','#63666c','#7a3b2c'];
 const WALLS=['#ece6da','#e2d8c6','#f2eee6','#8a4a36','#9c5a42','#b98060','#d9cdb8','#7d4434','#e8e1d3'];
-const SIGNS={'The Stone':['#141414','#f2f2f2'],'Xenos':['#e30613','#fff'],'Marktzicht Friet':['#ffcc00','#c8102e'],'IJssalon Hygge':['#f7c6d9','#7a1f3d'],'Máxima':['#0f5a3a','#ffd166'],'Huisarts':['#ffffff','#1a7f37'],'Kruidvat':['#e2001a','#fff'],'Intertoys':['#f26b0f','#fff'],'Bruna':['#0b4da2','#ffd200'],'Shoeby':['#111','#fff'],'HEMA':['#d6001c','#fff'],
+const SIGNS={'Dubai Barbershop':['#0d0d0d','#d4af37'],'Kapsalon Saer':['#2b2b2b','#ffffff'],'Van Uffelen Mode':['#1f2a44','#ffffff'],'Suus Dames':['#f3e3d3','#b5523b'],'Stadskasteel':['#4a3b2a','#f0d58a'],'Perla di Cairo':['#0c5c3a','#ffffff'],'CinCin':['#5a0f2e','#ffd9e6'],'The Stone':['#141414','#f2f2f2'],'Xenos':['#e30613','#fff'],'Marktzicht Friet':['#ffcc00','#c8102e'],'IJssalon Hygge':['#f7c6d9','#7a1f3d'],'Máxima':['#0f5a3a','#ffd166'],'Huisarts':['#ffffff','#1a7f37'],'Kruidvat':['#e2001a','#fff'],'Intertoys':['#f26b0f','#fff'],'Bruna':['#0b4da2','#ffd200'],'Shoeby':['#111','#fff'],'HEMA':['#d6001c','#fff'],
  'Kapsalon Saer':['#2b2b2b','#e8c46a'],'Kapper Dubai':['#0d0d0d','#d4af37'],'LEF':['#1d6b4a','#fff'],'De Heeren van Bommel':['#5a1622','#f1dfb3'],'Xenos':['#e30613','#fff'],'Sport 2000':['#003da5','#fff'],
  'Toast & Tosti':['#f2b134','#3a2410'],'Zorba':['#1f5fa8','#fff'],'Máxima':['#6cace4','#fff'],'CinCin':['#7a1f3d','#fff'],"Kim's Kitchen":['#2e7d32','#fff'],'De Verdraagzaamheid':['#203a5c','#f1dfb3'],'De Eetgelegenheid':['#4e342e','#fff']};
 const CATC={'Winkel':[['#2d6cdf','#fff'],['#7b2cbf','#fff'],['#e76f51','#fff'],['#264653','#fff']],'Kapper / Barbershop':[['#111','#e8c46a'],['#3d3d3d','#fff']],'Restaurant':[['#7a1f3d','#fff'],['#1d6b4a','#fff'],['#4e342e','#ffd166']]};
@@ -88,7 +88,7 @@ function genWorld(){
     if(b.flat)b.roof=RP(['#9a9c9e','#86898c','#b3b3ae','#7a7d80','#c4c3bd']);
     if(ob.b==='church'){b.roof='#5d636a';b.wall='#b8ab95';b.label=ob.n;}
     if(ob.b==='civic'){b.wall='#e1d7c2';b.roof='#3d4146';b.label='Stadhuis';}
-    if(ob.n==='Gasthuiskapel'||ob.n==='Maarten van Rossumhuis')b.label=ob.n;
+    if(ob.n==='Gasthuiskapel')b.label=ob.n;if(ob.n==='Maarten van Rossumhuis'){b.castle=1;b.label='Stadskasteel Zaltbommel';b.wall='#a89a86';b.roof='#6d6a66';b.flat=true;b.ridge=false;b.ht=Math.max(b.ht,52);}
     if(b.flat)b.ridge=false;
     prepBuilding(b);
     if(b.label)LANDMARKS.push({n:b.label,x:b.cx,y:b.cy});

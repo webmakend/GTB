@@ -5,7 +5,7 @@ FAC_IMG.src='assets/facades.webp';
 const FAC_BY={};FAC_META.forEach((m,i)=>{(FAC_BY[m.m+'_'+m.lit]=FAC_BY[m.m+'_'+m.lit]||[]).push(i);});
 const FAC_MX=new DOMMatrix();
 function pickFacade(b,h){
-  if(b.kind==='church'||b.kind==='civic'||b.kind==='tower'||b.kind==='pylon'||b.kind==='gate'||b.kind==='houseboat'||b.pass||b.ht<20)return;
+  if(b.castle||b.kind==='church'||b.kind==='civic'||b.kind==='tower'||b.kind==='pylon'||b.kind==='gate'||b.kind==='houseboat'||b.pass||b.ht<20)return;
   const a=(b.bb[2]-b.bb[0])*(b.bb[3]-b.bb[1]),r=(h>>>3)%100;let m;
   if(b.ws||b.gen)m=r<74?0:1;else if(b.flat||a>14000)m=r<50?2:1;else m=r<55?0:(r<92?1:2);
   const L=FAC_BY[m+'_'+((h>>>9)%100<45?1:0)];b.fac=L[(h>>>12)%L.length];

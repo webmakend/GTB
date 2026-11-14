@@ -3,7 +3,9 @@
 // wildplassen, eten (friet, ijs, Máxima) en de huisarts voor nieuwe health.
 const ACT={cur:null,zw:null,racks:[],hintA:0,lowWarn:0};
 P.drunk=0;P.bladder=0;P.bladP=0;P.high=0;P.peeT=0;
-const FOOD={'Marktzicht Friet':{p:3,hp:35,t:'Patatje oorlog',e:'🍟',say:'Patatje oorlog, lekker vet!'},'IJssalon Hygge':{p:2,hp:15,t:'IJsje',e:'🍦',say:'Aardbei met slagroom!'},'Máxima':{p:12,hp:70,t:'Eten bij Máxima',e:'🌮',say:'Burrito en een biefstuk, smullen!'}};
+const FOOD={'Perla di Cairo':{p:8,hp:50,t:'Pizza bij Perla di Cairo',e:'🍕',say:'Pizza quattro formaggi, bellissimo!'},'Marktzicht Friet':{p:3,hp:35,t:'Patatje oorlog',e:'🍟',say:'Patatje oorlog, lekker vet!'},'IJssalon Hygge':{p:2,hp:15,t:'IJsje',e:'🍦',say:'Aardbei met slagroom!'},'Máxima':{p:12,hp:70,t:'Eten bij Máxima',e:'🌮',say:'Burrito en een biefstuk, smullen!'}};
+const MODE_SHOPS=new Set(['The Stone','Van Uffelen Mode','Suus Dames','Elliz in company','Shoetime','Durlinger Schoenen']);
+const CASTLE_FACTS=['Gebouwd in 1535 voor Maarten van Rossum, de beruchtste veldheer van Gelre.','Maarten van Rossum plunderde half Holland. Bommel was zijn thuisbasis.','Binnen: kruisgewelven, schouwen en tegeltableaus van eeuwen oud.','Het Stadskasteel is nu het museum van Zaltbommel.'];
 const ZW_SAY=['Psst… wil je wat spul?','Heb je een euro voor me?','Bommel is mijn huiskamer, vriend.','Niet zeggen tegen de wouten, hè.','Ik ken iedereen hier. Iedereen!'];
 function ptPolyD(x,y,p){let m=1e9;for(let i=0,j=p.length-1;i<p.length;j=i++){const A=p[j],B=p[i],dx=B[0]-A[0],dy=B[1]-A[1],t=clamp(((x-A[0])*dx+(y-A[1])*dy)/(dx*dx+dy*dy||1),0,1);m=Math.min(m,Math.hypot(x-A[0]-t*dx,y-A[1]-t*dy));}return m;}
 function walkNear(x,y,r0,r1,cl){for(let r=r0;r<=r1;r+=8)for(let k=0;k<24;k++){const a=k/24*TAU,px=x+Math.cos(a)*r,py=y+Math.sin(a)*r,t=cellAt(px,py);if((t===WALK||t===PLAZA)&&(!cl||[0,1,2,3,4,5,6,7].every(j=>cellAt(px+Math.cos(j*.785)*cl,py+Math.sin(j*.785)*cl)!==BUILD)))return[px,py];}return null;}
@@ -16,14 +18,18 @@ function initActs(){
 function nearShop(){let best=null,bd=34;for(const s of SHOPS){const b=s.b;if(P.x<b.bb[0]-40||P.x>b.bb[2]+40||P.y<b.bb[1]-40||P.y>b.bb[3]+40)continue;const d=ptPolyD(P.x,P.y,b.p);if(d<bd){bd=d;best=s;}}return best;}
 function actFind(){
   if(P.car||P.dead||CLUB.on||MG.on||P.peeT>0||swimming())return null;
-  if(P.bladder>=100)return{k:'pee',t:'Wildplassen (je moet nodig!)',btn:'💦<br>PLAS'};
+  if(P.bladder>=100&&!carNear())return{k:'pee',t:'',btn:'💦<br>PLAS'};
   const z=ACT.zw;if(z&&Math.hypot(P.x-z.x,P.y-z.y)<46)return{k:'zw',t:P.high>0?'De zwerver: "Rustig aan, maat"':'Spul kopen bij de zwerver (€5)',btn:'💊<br>€5',off:P.high>0};
   const s=nearShop();
   if(s){if(s.n==='Café Henkie')return null;
     if(s.n==='Huisarts')return{k:'doc',s,t:P.hp>=P.maxhp?'Huisarts: je bent kerngezond':'Naar de dokter: volle health (€2)',btn:'🩺<br>€2',off:P.hp>=P.maxhp};
     const f=FOOD[s.n];if(f)return{k:'eat',s,f,t:`${f.t} (€${f.p})`,btn:`${f.e}<br>€${f.p}`};
+    if(s.n==='CinCin')return{k:'wine',s,t:'Glaasje wijn bij CinCin (€4)',btn:'🍷<br>€4'};
+    if(s.c==='Kapper / Barbershop')return{k:'cut',s,t:`Knippen bij ${s.n} (€15)`,btn:'💈<br>€15'};
+    if(s.n==='Stadskasteel')return{k:'castle',s,t:'Stadskasteel bezoeken (€3)',btn:'🏰<br>€3'};
+    if(MODE_SHOPS.has(s.n)&&stars>0)return{k:'outfit',s,t:`Nieuwe outfit bij ${s.n} (€20): politie kwijt`,btn:'👕<br>€20'};
     if(s.c==='Winkel')return s.rob>0?{k:'robbed',s,t:`${s.n}: de kassa is nog leeg`,btn:'',off:1}:{k:'rob',s,t:`${s.n} overvallen!`,btn:'🔫<br>OVERVAL'};}
-  if(P.bladder>=60)return{k:'pee',t:'Wildplassen',btn:'💦<br>PLAS'};
+  if(P.bladder+P.bladP>=20&&!carNear())return{k:'pee',t:'',btn:'💦<br>PLAS'};
   return null;}
 function actTry(){const a=ACT.cur;if(!a)return false;if(a.off)return true;
   if(a.k==='zw'){if(P.money<5){say(ACT.zw,'Geen geld, geen spul.');sfx('blip');return true;}addMoney(-5);P.high=60*45;say(ACT.zw,'Niet alles tegelijk, hè!');sfx('whoosh');msg('ZO… DAT IS STERK SPUL','Alles kleurt en je rent harder','#c77dff',170);if(copNear(320))addHeat(1.1);return true;}
@@ -31,7 +37,11 @@ function actTry(){const a=ACT.cur;if(!a)return false;if(a.off)return true;
   if(a.k==='eat'){const f=a.f;if(P.money<f.p){msg('GEEN GELD','Dat kost €'+f.p,'#ff6b6b',110);return true;}addMoney(-f.p);P.hp=Math.min(P.maxhp,P.hp+f.hp);sfx('mmm');popTxt(P.x,P.y-30,'+'+f.hp+' health','#7dff6a',1.1);msg(f.t.toUpperCase(),f.say,'#ffd166',120);return true;}
   if(a.k==='rob'){const v=Math.round(rr(35,140));a.s.rob=60*240;addMoney(v);addHeat(2.3);sfx('kassa');sfx('bell');camHit(6);msg('OVERVAL!',`€${v} uit de kassa van ${a.s.n}. De politie komt eraan!`,'#ff4d4d',170);
     for(const p of peds)if(p.state!=='down'&&p.kind!=='cop'&&Math.hypot(p.x-P.x,p.y-P.y)<200)say(p,rpick(['Help! Overval!','Bel de politie!','Ik heb je gezien hoor!']));return true;}
-  if(a.k==='pee'){P.peeT=150;P.peeX=P.x;P.peeY=P.y;sfx('splash');return true;}
+  if(a.k==='wine'){if(P.money<4){msg('GEEN GELD','Een glas wijn kost €4','#ff6b6b',110);return true;}addMoney(-4);P.drunk=Math.min(8,P.drunk+1);P.bladP+=26;sfx('kassa');msg('SANTÉ!','Een glaasje rood bij CinCin','#ff9ec4',110);return true;}
+  if(a.k==='cut'){if(P.money<15){msg('GEEN GELD','Knippen kost €15','#ff6b6b',110);return true;}addMoney(-15);ACT.fresh=60*90;sfx('reward');msg('STRAK GEKNIPT!',a.s.n==='Dubai Barbershop'?'Fade met scherpe lijntjes':'Helemaal fris','#d4af37',150);return true;}
+  if(a.k==='castle'){if(P.money<3){msg('GEEN GELD','Een kaartje kost €3','#ff6b6b',110);return true;}addMoney(-3);sfx('organ');missionBanner('STADSKASTEEL ZALTBOMMEL',rpick(CASTLE_FACTS),'#f0d58a',300);return true;}
+  if(a.k==='outfit'){if(P.money<20){msg('GEEN GELD','Een outfit kost €20','#ff6b6b',110);return true;}addMoney(-20);heat=0;stars=0;for(const c of cars)if(c.driver==='cop'&&c.ai)c.ai.mode='patrol';sfx('whoosh');msg('NIEUWE OUTFIT!','De politie herkent je niet meer','#7dff6a',160);return true;}
+  if(a.k==='pee'){if(P.car)return false;P.peeT=150;P.peeX=P.x;P.peeY=P.y;sfx('splash');return true;}
   return false;}
 function buyBeer(){if(P.money<2){msg('GEEN GELD','Een biertje kost €2','#ff6b6b',110);return;}addMoney(-2);P.drunk=Math.min(8,P.drunk+1);P.bladP+=34;sfx('kassa');
   const l=['PROOST!','NOG EENTJE!','GEZELLIG!','HUP, ADTJE!','IK BEN NIET DRONKEN!','WAAR IS DE WC?'];msg(l[Math.min(l.length-1,P.drunk-1)],P.drunk>=4?'De vloer begint te bewegen…':'Lekker koud biertje','#ffd166',110);}
@@ -39,7 +49,7 @@ function actStep(){
   for(const s of SHOPS)if(s.rob>0)s.rob--;
   // drank, plasnood en spul
   if(P.bladP>0){const d=Math.min(P.bladP,.06);P.bladP-=d;P.bladder+=d;}
-  if(P.drunk>0&&frameN%(60*35)===0)P.drunk=Math.max(0,P.drunk-1);
+  if(P.drunk>0&&frameN%(60*12)===0)P.drunk=Math.max(0,P.drunk-1);
   if(P.bladder>=145&&P.peeT<=0&&!CLUB.on){P.bladder=0;P.bladP=0;decals.push({x:P.x,y:P.y,r:13,c:'rgba(225,205,60,.55)'});hurt(5);msg('OEPS… BROEK NAT!','Had je maar eerder moeten wildplassen','#ffd166',170);for(const p of peds)if(p.state!=='down'&&Math.hypot(p.x-P.x,p.y-P.y)<180)say(p,rpick(['Haha, kijk die broek!','Gatver!','Pampers nodig?']));}
   if(P.high>0){P.high--;const h=(frameN*1.6)%360;if(frameN%3===0||P.high===0)cv.style.filter=P.high>0?`hue-rotate(${h|0}deg) saturate(${1.5+Math.sin(frameN*.05)*.4})`:'';if(P.high===0){cv.style.filter='';msg('HET SPUL IS UITGEWERKT','Je voelt je een beetje brak','#c77dff',130);hurt(6);}}
   // wildplassen
@@ -53,6 +63,7 @@ function actStep(){
   const z=ACT.zw;if(z){if(z.talk>0)z.talk--;if(z.talkCd>0)z.talkCd--;const d=Math.hypot(P.x-z.x,P.y-z.y);if(d<130&&z.talk<=0&&!P.car){say(z,rpick(ZW_SAY));z.talk=60*9;}}
   // bijna dood: wijs de huisarts aan
   if(ACT.lowWarn>0)ACT.lowWarn--;if(P.hp>0&&P.hp<P.maxhp*.25&&ACT.lowWarn<=0&&!P.dead&&!CLUB.on){ACT.lowWarn=60*40;msg('BIJNA DOOD!','Ga naar de huisarts in de Gasthuisstraat (€2)','#ff6b6b',190);}
+  if(ACT.fresh>0){ACT.fresh--;if(frameN%240===0)for(const p of peds)if(p.state!=='down'&&p.kind!=='cop'&&Math.hypot(p.x-P.x,p.y-P.y)<120){say(p,rpick(['Lekker kapsel!','Zo, fris geknipt!','Waar heb jij je laten knippen?']));break;}}
   ACT.cur=actFind();
 }
 function stoleBike(c){if(c.type!=='fiets')return;msg('FIETS GEJAT!','Trappen maar','#ffd166',90);for(const p of peds)if(p.state!=='down'&&p.kind!=='cop'&&Math.hypot(p.x-c.x,p.y-c.y)<140){say(p,rpick(['Hé! Mijn fiets!','Fietsendief!','Die staat niet op slot hoor… o wacht.']));addHeat(.6);break;}}
@@ -70,9 +81,10 @@ function drawActs(){
 }
 function actHint(){if(MG.on||bigMap||CLUB.on)return;ctx=fctx;const a=ACT.cur;ACT.hintA+=((a?1:0)-ACT.hintA)*.2;
   // status: drank / plasnood / spul
-  const chips=[];if(P.drunk>0)chips.push(['🍺 '+(P.drunk>=5?'Lam':P.drunk>=3?'Dronken':'Aangeschoten'),'#ffd166']);if(P.bladder>20)chips.push(['🚽 Plasnood '+Math.min(100,P.bladder|0)+'%',P.bladder>=100&&(frameN>>4)%2?'#ff4d4d':'#7fd4ff']);if(P.high>0)chips.push(['🌀 Spul '+Math.ceil(P.high/60)+'s','#c77dff']);
+  const chips=[];if(P.drunk>0)chips.push(['🍺 '+(P.drunk>=5?'Lam':P.drunk>=3?'Dronken':'Aangeschoten'),'#ffd166']);if(P.bladder+P.bladP>=20)chips.push(['🚽 Plasnood '+Math.min(100,P.bladder|0)+'%'+(IS_TOUCH?'':' · E'),P.bladder>=100&&(frameN>>4)%2?'#ff4d4d':'#7fd4ff']);if(P.high>0)chips.push(['🌀 Spul '+Math.ceil(P.high/60)+'s','#c77dff']);
   if(chips.length){ctx.font='800 13px Inter, sans-serif';let w=0;const ws=chips.map(c=>ctx.measureText(c[0]).width+20);w=ws.reduce((s,x)=>s+x,0)+(chips.length-1)*6;let x=CW/2-w/2;const y=uiTop().top+44;
     chips.forEach((c,i)=>{ctx.fillStyle='rgba(12,8,24,.78)';rrect(ctx,x,y,ws[i],26,13);ctx.fill();ctx.strokeStyle=c[1];ctx.lineWidth=1.5;rrect(ctx,x,y,ws[i],26,13);ctx.stroke();ctx.fillStyle=c[1];ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(c[0],x+10,y+13.5);x+=ws[i]+6;});}
+  if(a&&a.k==='pee'){ACT.hintA=0;ACT.lastT='';}
   if(ACT.hintA>.02&&(a||ACT.lastT)){if(a)ACT.lastT=a.t+(a.off?'':IS_TOUCH?'':'   [E]');ctx.globalAlpha=ACT.hintA;ctx.font='800 15px Inter, sans-serif';const t=ACT.lastT,w=ctx.measureText(t).width+30,y=CH-118;
     ctx.fillStyle='rgba(12,8,24,.82)';rrect(ctx,CW/2-w/2,y,w,34,17);ctx.fill();ctx.strokeStyle=a&&a.k==='rob'?'#ff4d4d':'#ffd166';ctx.lineWidth=2;rrect(ctx,CW/2-w/2,y,w,34,17);ctx.stroke();ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(t,CW/2,y+17.5);ctx.globalAlpha=1;}
   ctx=wctx;}

@@ -114,6 +114,7 @@ function drawBuildings(vx0,vy0,vx1,vy1,cx,cy){
     else if(b.kind==='tower'){ctx.strokeStyle='rgba(0,0,0,.4)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(r[0][0],r[0][1]);ctx.lineTo(r[2][0],r[2][1]);ctx.moveTo(r[1][0],r[1][1]);ctx.lineTo(r[3][0],r[3][1]);ctx.stroke();ctx.fillStyle='#d8b54a';ctx.beginPath();ctx.arc(rcx,rcy,4,0,TAU);ctx.fill();}
     else if(b.kind==='gate'){ctx.fillStyle='rgba(0,0,0,.22)';ctx.beginPath();ctx.moveTo(r[0][0]*.85+rcx*.15,r[0][1]*.85+rcy*.15);for(let i=1;i<n;i++)ctx.lineTo(r[i][0]*.85+rcx*.15,r[i][1]*.85+rcy*.15);ctx.fill();}
     else{ctx.strokeStyle='rgba(0,0,0,.18)';ctx.lineWidth=2;ctx.stroke();}
+    if(b.castle)drawCastleTop(b,r,f,cx,cy);
     if(b.sign){const sg=b.signC;let a=b.sa;if(a>Math.PI/2)a-=Math.PI;if(a<-Math.PI/2)a+=Math.PI;ctx.save();ctx.translate(rcx,rcy);ctx.rotate(a);ctx.font='800 13px Inter, sans-serif';const tw=ctx.measureText(b.sign).width+12;
       ctx.shadowColor=sg[0];ctx.shadowBlur=14;ctx.fillStyle=sg[0];ctx.fillRect(-tw/2,-10,tw,20);ctx.shadowBlur=0;ctx.strokeStyle='rgba(255,255,255,.7)';ctx.lineWidth=1.2;ctx.strokeRect(-tw/2+1.5,-8.5,tw-3,17);ctx.fillStyle=sg[1];ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(b.sign,0,1);ctx.restore();}}
 }
@@ -164,3 +165,22 @@ function renderWorld(){
   hud();ctx=wctx;
 }
 
+function drawCastleTop(b,r,f,cx,cy){const n=r.length;ctx.save();
+  // kantelen langs de dakrand
+  for(let i=0;i<n-1;i++){const a=r[i],q=r[i+1],L=Math.hypot(q[0]-a[0],q[1]-a[1]);if(L<8)continue;const ux=(q[0]-a[0])/L,uy=(q[1]-a[1])/L,k=Math.floor(L/9);
+    for(let j=0;j<k;j+=2){const x=a[0]+ux*(j*9+4.5),y=a[1]+uy*(j*9+4.5);ctx.fillStyle='#8c8072';ctx.fillRect(x-3.5,y-3.5,7,7);ctx.fillStyle='rgba(255,255,255,.18)';ctx.fillRect(x-3.5,y-3.5,7,2);}}
+  // ronde torentjes op de hoeken (iets hoger dan het dak)
+  const pts=r.slice(0,n-1);let corners=pts.map((p,i)=>({p,i})).filter((o,i)=>{const A=pts[(i-1+pts.length)%pts.length],B=pts[(i+1)%pts.length];const v1=[o.p[0]-A[0],o.p[1]-A[1]],v2=[B[0]-o.p[0],B[1]-o.p[1]];return Math.abs(v1[0]*v2[1]-v1[1]*v2[0])/(Math.hypot(...v1)*Math.hypot(...v2)+1e-6)>.5;});
+  if(corners.length>4)corners=[0,1,2,3].map(k=>corners[Math.floor(k*corners.length/4)]);
+  const f2=f*1.45;
+  for(const o of corners){const bx=b.p[o.i][0],by=b.p[o.i][1],tx=bx+(bx-cx)*f2,ty=by+(by-cy)*f2,R=14;
+    ctx.fillStyle='#7d7163';ctx.beginPath();ctx.moveTo(bx-R,by);ctx.lineTo(tx-R,ty);ctx.lineTo(tx+R,ty);ctx.lineTo(bx+R,by);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#9b8f80';ctx.beginPath();ctx.arc(tx,ty,R,0,TAU);ctx.fill();
+    ctx.fillStyle='#3e4a5c';ctx.beginPath();ctx.arc(tx,ty,R-2,0,TAU);ctx.fill();
+    ctx.fillStyle='#53627a';ctx.beginPath();ctx.moveTo(tx,ty);ctx.arc(tx,ty,R-2,-2.4,-.2);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#d8b54a';ctx.beginPath();ctx.arc(tx+(tx-bx)*.05,ty+(ty-by)*.05,2,0,TAU);ctx.fill();}
+  // vlag op het midden
+  const mx=b.cx+(b.cx-cx)*f*1.6,my=b.cy+(b.cy-cy)*f*1.6,w=Math.sin(frameN*.12);
+  ctx.strokeStyle='#ddd';ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(b.cx+(b.cx-cx)*f,b.cy+(b.cy-cy)*f);ctx.lineTo(mx,my);ctx.stroke();
+  ctx.fillStyle='#c8102e';ctx.beginPath();ctx.moveTo(mx,my);ctx.quadraticCurveTo(mx+9,my-3+w*2,mx+18,my+w*3);ctx.lineTo(mx+18,my+7+w*3);ctx.quadraticCurveTo(mx+9,my+4+w*2,mx,my+7);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#ffd166';ctx.fillRect(mx+2,my+2.5,12,2);ctx.restore();}
