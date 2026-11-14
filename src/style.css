@@ -55,7 +55,7 @@ button{font-family:inherit}
 #pickNav button{width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);color:#fff;font-size:20px;cursor:pointer}
 #pickDots{display:flex;gap:6px}#pickDots i{width:8px;height:8px;border-radius:4px;background:rgba(255,255,255,.3);transition:all .3s}#pickDots i.on{width:22px;background:#ff2e88}
 /* ---------- geluid ---------- */
-#snd{position:fixed;left:50%;top:calc(var(--st) + 14px);transform:translateX(-50%);z-index:40;display:none;align-items:center;gap:6px;background:rgba(255,46,136,.9);color:#fff;font:800 14px Inter,sans-serif;padding:10px 18px;border-radius:24px;box-shadow:0 0 20px rgba(255,46,136,.6);animation:blink 1.4s infinite;cursor:pointer}
+#snd{position:fixed;left:50%;top:auto;bottom:calc(var(--sb) + 300px);transform:translateX(-50%);z-index:40;display:none;align-items:center;gap:6px;background:rgba(255,46,136,.9);color:#fff;font:800 14px Inter,sans-serif;padding:10px 18px;border-radius:24px;box-shadow:0 0 20px rgba(255,46,136,.6);animation:blink 1.4s infinite;cursor:pointer}
 @keyframes blink{50%{opacity:.35}}
 #mus{position:fixed;top:calc(var(--st) + 10px);right:calc(var(--sr) + 10px);z-index:41;width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.35);background:rgba(10,4,24,.55);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(4px)}
 #mus svg{width:22px;height:22px}
@@ -83,3 +83,22 @@ button{font-family:inherit}
 .card .wis{margin-top:8px;padding:9px 12px;border-radius:12px;border:2px solid rgba(255,90,110,.7);background:rgba(40,8,20,.75);color:#ff8a9a;font:800 13px Inter,sans-serif;letter-spacing:1px;cursor:pointer}
 
 #bPause,#bSave,#bRestart{display:none!important}
+
+/* ---- knoppen in de stijl van het voorbeeld: donker glas met neon-rand ---- */
+.tb{--c:#7fd4ff;--g:rgba(127,212,255,.45);border:3px solid var(--c)!important;background:radial-gradient(circle at 50% 30%,rgba(46,54,78,.92),rgba(12,14,26,.92) 70%)!important;box-shadow:0 0 16px var(--g),inset 0 0 14px var(--g),0 6px 14px rgba(0,0,0,.5);color:#fff;flex-direction:column;gap:2px;font:900 12px Inter,'Arial Black',sans-serif!important;letter-spacing:.6px;text-shadow:0 1px 2px rgba(0,0,0,.6);transition:transform .08s}
+.tb svg{width:42%;height:auto;max-height:46%;filter:drop-shadow(0 0 4px var(--g))}
+.tb span{display:block;line-height:1}
+.tb:active,.tb.on{transform:scale(.93);background:radial-gradient(circle at 50% 30%,rgba(70,80,110,.95),rgba(20,22,40,.95) 70%)!important}
+#bAct{--c:#3aa8ff;--g:rgba(58,168,255,.6);right:calc(var(--sr) + 18px);bottom:calc(var(--sb) + 26px);width:116px;height:116px;font-size:17px!important;background:radial-gradient(circle at 50% 30%,#2a7fe0,#0d2f6b 72%)!important}
+#bJump{--c:#2fd1b0;--g:rgba(47,209,176,.45);right:calc(var(--sr) + 26px);bottom:calc(var(--sb) + 156px);width:86px;height:86px;font-size:12px!important}
+#bX{--c:#ff4fb3;--g:rgba(255,79,179,.5);right:calc(var(--sr) + 124px);bottom:calc(var(--sb) + 112px);width:84px;height:84px;font-size:12px!important}
+#bCar{--c:#ffa53a;--g:rgba(255,165,58,.5);right:calc(var(--sr) + 142px);bottom:calc(var(--sb) + 8px);width:86px;height:86px;font-size:10.5px!important}
+#bAmmo{--c:#8a93a8;--g:rgba(138,147,168,.35);right:calc(var(--sr) + 36px);bottom:calc(var(--sb) + 256px);width:66px;height:66px;font-size:13px!important;display:none}
+#bAmmo svg{width:46%}
+#bAmmo b{position:absolute;right:6px;bottom:10px;font:900 13px Inter,sans-serif}
+#joyHint{visibility:hidden!important}
+#joyBase{width:150px!important;height:150px!important;margin:-75px 0 0 -75px!important;border:2px solid rgba(255,255,255,.16)!important;background:radial-gradient(circle,rgba(30,34,52,.55) 0 46%,rgba(14,16,28,.62) 47% 100%)!important;box-shadow:inset 0 0 22px rgba(0,0,0,.6),0 6px 18px rgba(0,0,0,.45);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 150'%3E%3Cg fill='rgba(255,255,255,.28)'%3E%3Cpath d='M75 10l9 11H66z'/%3E%3Cpath d='M75 140l9-11H66z'/%3E%3Cpath d='M10 75l11 9V66z'/%3E%3Cpath d='M140 75l-11 9V66z'/%3E%3C/g%3E%3Ccircle cx='75' cy='75' r='44' fill='none' stroke='rgba(255,255,255,.12)' stroke-width='2'/%3E%3C/svg%3E"),radial-gradient(circle,rgba(30,34,52,.55) 0 46%,rgba(14,16,28,.62) 47% 100%)!important}
+#joyBase.idle{opacity:.85}
+#joyKnob{left:43px;top:43px;width:64px!important;height:64px!important;background:radial-gradient(circle,#3a1d52 0 52%,transparent 54%),conic-gradient(from 200deg,#36d1ff,#7b6bff,#ff2e88,#ff6fb5,#36d1ff)!important;box-shadow:0 0 18px rgba(54,209,255,.55),0 0 26px rgba(255,46,136,.4)!important}
+#topBtns .sb{border-radius:50%!important;background:radial-gradient(circle at 50% 30%,rgba(46,54,78,.92),rgba(12,14,26,.92))!important;border:2px solid rgba(255,255,255,.22)!important}

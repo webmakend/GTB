@@ -42,7 +42,7 @@ function playerStep(){
     const sw=swimming();if(sw&&frameN%14===0)parts.push({x:P.x,y:P.y,vx:0,vy:0,l:40,ml:40,s:6,k:'p'});
     const m=Math.hypot(mx,my);P.moving=m>.1;P.running=P.moving&&run;if(m>.1){const rk=P.ch?P.ch.perk.run:1,sp=(sw?1.45:run?3.3:2.3)*rk*Math.min(1,m)*(P.jz>0?1.15:1)*(P.high>0?1.3:1)*(P.boost>0?1.3:1)*(P.drunk>=4?.85:1);mx/=m;my/=m;if(P.drunk>=2){const w=Math.sin(frameN*.045)*Math.min(1,P.drunk/6)*.9;const c2=Math.cos(w),s2=Math.sin(w);[mx,my]=[mx*c2-my*s2,mx*s2+my*c2];}P.a=Math.atan2(my,mx);const nx=P.x+mx*sp,ny=P.y+my*sp;if(!footBlocked(nx,P.y))P.x=nx;if(!footBlocked(P.x,ny))P.y=ny;const ph=Math.floor(P.anim/Math.PI);P.anim+=sp*.28;if(Math.floor(P.anim/Math.PI)!==ph&&!(P.jz>0)){if(sw){if(ph%2===0)sfx('swim');}else{const gt=cellAt(P.x,P.y);sfx('step',run?1:0,(gt===GRASS||gt===PARK||gt===SAND)?1:0);}}}
     if(!(P.jz>7))pushOutOfCars(P,6);
-    if(k.act&&P.throwCd<=0&&!sw){if(P.weapon===1&&P.gun)fireGun();else throwBalloon();}
+    if(k.act&&P.throwCd<=0&&!sw){if(P.weapon===1&&P.gun)fireGun();else if(P.ammo>0){P.ammo--;throwBalloon();}else{P.throwCd=30;noteAdd('💧 BALLONNEN OP','Even wachten, ze vullen zich vanzelf bij','#7fc8ff',90,'ammo');}}
     if(heat<.5&&P.hp<P.maxhp)P.hp=Math.min(P.maxhp,P.hp+.03);}
 }
 function beachHits(){for(const c of cars){if(c.dead)continue;const sp=speedOf(c);if(sp<1.6)continue;for(let i=BEACHERS.length-1;i>=0;i--){const b=BEACHERS[i];if(Math.abs(b.x-c.x)>26||Math.abs(b.y-c.y)>26)continue;if(b.special)continue;BEACHERS.splice(i,1);const p=makePed(b.x,b.y,'civ');p.col=b.suit;p.hair=b.hair;peds.push(p);knockDown(p,c===P.car,Math.atan2(c.vy,c.vx));}}

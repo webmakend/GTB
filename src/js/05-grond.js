@@ -6,9 +6,9 @@ function buildPats(){seed=77;
   PATS={
    grass:mkPat(96,96,(g,w,h)=>noise(g,w,h,'#6d9a4c',['#76a354','#64904a','#7aa85a','#5f8a45'],900,3)),
    park:mkPat(96,96,(g,w,h)=>noise(g,w,h,'#5d8f45',['#669a4c','#558641','#6aa152','#507d3d'],900,3)),
-   asphalt:mkPat(64,64,(g,w,h)=>noise(g,w,h,'#4a4b4f',['#525357','#45464a','#57585c','#404145'],700,2)),
+   asphalt:mkPat(64,64,(g,w,h)=>noise(g,w,h,'#3c3e43',['#44464b','#37393e','#484a4f','#33353a'],800,2)),
    brick:mkPat(24,24,(g,w,h)=>{g.fillStyle='#7d5446';g.fillRect(0,0,w,h);const cs=['#8a5d4c','#93634f','#7f5545','#86604f','#9a6a55'];for(let y=0;y<4;y++)for(let x=0;x<3;x++){g.fillStyle=cs[(x*7+y*3)%5];g.fillRect(x*8+(y%2?4:0)-8+.5,y*6+.5,7,5);g.fillRect(x*8+(y%2?4:0)+16.5,y*6+.5,7,5);}}),
-   pave:mkPat(32,32,(g,w,h)=>{g.fillStyle='#c2bdb2';g.fillRect(0,0,w,h);g.strokeStyle='rgba(90,85,75,.22)';g.lineWidth=1;for(let i=0;i<=32;i+=16){g.beginPath();g.moveTo(i+.5,0);g.lineTo(i+.5,32);g.stroke();g.beginPath();g.moveTo(0,i+.5);g.lineTo(32,i+.5);g.stroke();}}),
+   pave:mkPat(32,32,(g,w,h)=>{g.fillStyle='#b4b3ae';g.fillRect(0,0,w,h);g.strokeStyle='rgba(90,85,75,.22)';g.lineWidth=1;for(let i=0;i<=32;i+=16){g.beginPath();g.moveTo(i+.5,0);g.lineTo(i+.5,32);g.stroke();g.beginPath();g.moveTo(0,i+.5);g.lineTo(32,i+.5);g.stroke();}}),
    plaza:mkPat(20,20,(g,w,h)=>{g.fillStyle='#b9ab95';g.fillRect(0,0,w,h);const cs=['#c2b49e','#ae9f88','#bba98f','#c7bba5'];for(let y=0;y<4;y++)for(let x=0;x<4;x++){g.fillStyle=cs[(x+y*3)%4];g.fillRect(x*5+.5,y*5+.5,4,4);}}),
    water:mkPat(128,128,(g,w,h)=>{g.fillStyle='#3d6d8c';g.fillRect(0,0,w,h);for(let i=0;i<70;i++){g.fillStyle=i%2?'rgba(255,255,255,.07)':'rgba(10,30,50,.10)';g.fillRect(R(0,w),R(0,h),R(8,22),2);}}),
    sand:mkPat(48,48,(g,w,h)=>noise(g,w,h,'#d8c592',['#e0ce9c','#cdb985','#d3c08c'],300,2)),
@@ -40,7 +40,8 @@ function renderChunk(ci,cj){
   g.strokeStyle='#6d6a64';for(const r of RV){if(r.k==='pedestrian')continue;g.lineWidth=r.w+4;pathPoly(g,r.p);g.stroke();}
   for(const r of RV){g.strokeStyle=r.k==='pedestrian'?pat('plaza'):r.brick?pat('brick'):pat('asphalt');g.lineWidth=r.w;pathPoly(g,r.p);g.stroke();}
   for(const r of RV){if(!r.bridge)continue;g.strokeStyle='#e8e2d4';g.lineWidth=3;for(const o of [-r.w/2+6,r.w/2-6]){const dx=r.p[1][0]-r.p[0][0],dy=r.p[1][1]-r.p[0][1],l=Math.hypot(dx,dy),nx=-dy/l*o,ny=dx/l*o;g.beginPath();g.moveTo(r.p[0][0]+nx,r.p[0][1]+ny);g.lineTo(r.p[1][0]+nx,r.p[1][1]+ny);g.stroke();}}
-  for(const r of RV){if(r.brick||r.w<60)continue;g.setLineDash([22,20]);g.strokeStyle='rgba(255,255,255,.75)';g.lineWidth=2.5;pathPoly(g,r.p);g.stroke();g.setLineDash([]);}
+  for(const r of RV){if(r.brick||r.w<60)continue;g.setLineDash([22,20]);g.strokeStyle='rgba(255,255,255,.75)';g.lineWidth=2.5;pathPoly(g,r.p);g.stroke();g.setLineDash([]);
+    if(r.k!=='pedestrian'&&!r.bridge)for(let k=0;k<r.p.length-1;k++){const a=r.p[k],q=r.p[k+1],dx=q[0]-a[0],dy=q[1]-a[1],l=Math.hypot(dx,dy)||1;for(const o of [-r.w/2+5,r.w/2-5]){const nx=-dy/l*o,ny=dx/l*o;g.strokeStyle='rgba(255,255,255,.55)';g.lineWidth=1.6;g.beginPath();g.moveTo(a[0]+nx,a[1]+ny);g.lineTo(q[0]+nx,q[1]+ny);g.stroke();}}}
   // brugleuningen
   g.fillStyle='#d6d0c4';
   const cx0=Math.floor(ox/T),cy0=Math.floor(oy/T);

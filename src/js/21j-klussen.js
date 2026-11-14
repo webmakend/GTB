@@ -59,10 +59,6 @@ function drawJobsWorld(){const t=frameN*.08;
 function jobHud(){if(!JOB.cur||MG.on)return;ctx=fctx;const j=JOB.cur,U=clamp(Math.min(CW,CH)/560,.75,1.2),w=Math.min(CW<640?CW*.6:330*U,340),x=14,y=HUDY;
   let tl='';if(JOB.T>0){const s=Math.max(0,Math.ceil((JOB.T-JOB.t)/60));tl=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
   const extra=j.id==='schiet'?' · nog '+(JOB.d.left!=null?JOB.d.left:8)+' flessen':j.id==='race'&&JOB.d.cps?' · checkpoint '+Math.min(JOB.i+1,JOB.d.cps.length)+'/'+JOB.d.cps.length:'';
-  ctx.font=`700 ${12*U}px Inter, sans-serif`;const ls=wrapLines(JOB.txt||'',w-24*U),h=(26+ls.length*15)*U;
-  ctx.fillStyle='rgba(10,4,24,.8)';rrect(ctx,x,y,w,h,10*U);ctx.fill();ctx.strokeStyle=j.col;ctx.lineWidth=2;rrect(ctx,x,y,w,h,10*U);ctx.stroke();
-  txt(j.ic+' KLUS: '+j.n.toUpperCase()+extra,x+12*U,y+6*U,11*U,j.col,'left','Inter, sans-serif');if(tl)txt(tl,x+w-12*U,y+4*U,15*U,JOB.T-JOB.t<600&&(frameN>>4)%2?'#ff4d4d':'#fff','right');
-  ctx.font=`700 ${12*U}px Inter, sans-serif`;ctx.fillStyle='#fff';ctx.textAlign='left';ctx.textBaseline='top';ls.forEach((l,i)=>ctx.fillText(l,x+12*U,y+(22+i*15)*U));HUDY=y+h+8*U;
   if(JOB.tgt){const Z0=viewZ(),sx=CW/2+(JOB.tgt[0]-camX)*Z0,sy=CH/2+(JOB.tgt[1]-camY)*Z0,mg=34;if(sx<mg||sx>CW-mg||sy<mg+60||sy>CH-mg){const a=Math.atan2(sy-CH/2,sx-CW/2),ex=clamp(CW/2+Math.cos(a)*CW,mg,CW-mg),ey=clamp(CH/2+Math.sin(a)*CH,mg+60,CH-mg-(IS_TOUCH?260:0));
     ctx.save();ctx.translate(ex,ey);ctx.rotate(a);ctx.fillStyle=j.col;ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(16,0);ctx.lineTo(-8,-11);ctx.lineTo(-3,0);ctx.lineTo(-8,11);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();}}
   ctx=wctx;}

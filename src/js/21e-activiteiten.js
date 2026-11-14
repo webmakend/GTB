@@ -2,7 +2,7 @@
 // Zwerver met 'spul', fietsen stelen uit de rekken, winkels overvallen, bier bij Café Henkie en daarna
 // wildplassen, eten (friet, ijs, Máxima) en de huisarts voor nieuwe health.
 const ACT={cur:null,zw:null,racks:[],hintA:0,lowWarn:0};
-P.drunk=0;P.bladder=0;P.bladP=0;P.high=0;P.peeT=0;P.boost=0;
+P.drunk=0;P.bladder=0;P.bladP=0;P.high=0;P.peeT=0;P.boost=0;P.ammo=12;
 const FOOD={'Het Zusje':{p:15,hp:80,t:'Diner bij Het Zusje',e:'🍽️',say:'Shared dining: alles proeven!'},'Perla di Cairo':{p:8,hp:50,t:'Pizza bij Perla di Cairo',e:'🍕',say:'Pizza quattro formaggi, bellissimo!'},'Marktzicht Friet':{p:3,hp:35,t:'Patatje oorlog',e:'🍟',say:'Patatje oorlog, lekker vet!'},'IJssalon Hygge':{p:2,hp:15,t:'IJsje',e:'🍦',say:'Aardbei met slagroom!'},'Máxima':{p:12,hp:70,t:'Eten bij Máxima',e:'🌮',say:'Burrito en een biefstuk, smullen!'}};
 const MODE_SHOPS=new Set(['The Stone','Van Uffelen Mode','Suus Dames','Elliz in company','Shoetime','Durlinger Schoenen']);
 const CASTLE_FACTS=['Gebouwd in 1535 voor Maarten van Rossum, de beruchtste veldheer van Gelre.','Maarten van Rossum plunderde half Holland. Bommel was zijn thuisbasis.','Binnen: kruisgewelven, schouwen en tegeltableaus van eeuwen oud.','Het Stadskasteel is nu het museum van Zaltbommel.'];
@@ -53,7 +53,7 @@ function actTry(){const a=ACT.cur;if(!a)return false;if(a.off)return true;
 function buyBeer(){if(P.money<2){msg('GEEN GELD','Een biertje kost €2','#ff6b6b',110);return;}addMoney(-2);P.drunk=Math.min(8,P.drunk+1);P.bladP+=34;sfx('kassa');
   const l=['PROOST!','NOG EENTJE!','GEZELLIG!','HUP, ADTJE!','IK BEN NIET DRONKEN!','WAAR IS DE WC?'];msg(l[Math.min(l.length-1,P.drunk-1)],P.drunk>=4?'De vloer begint te bewegen…':'Lekker koud biertje','#ffd166',110);}
 function actStep(){
-  for(const s of SHOPS)if(s.rob>0)s.rob--;if(P.boost>0)P.boost--;
+  for(const s of SHOPS)if(s.rob>0)s.rob--;if(P.boost>0)P.boost--;if(P.ammo<12&&frameN%70===0)P.ammo++;
   // drank, plasnood en spul
   if(P.bladP>0){const d=Math.min(P.bladP,.06);P.bladP-=d;P.bladder+=d;}
   if(P.drunk>0&&frameN%(60*12)===0)P.drunk=Math.max(0,P.drunk-1);

@@ -66,3 +66,7 @@ function custOpen(){const ov=ovEl('menuOv');let o=custLoad();const b=boxEl();b.a
 // knop in de balk rechtsboven
 (function(){const tb=document.getElementById('topBtns');if(!tb)return;const d=document.createElement('div');d.className='sb';d.id='bMenu';d.title='Menu';d.innerHTML='<svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="2.4" rx="1.2"/><rect x="4" y="11" width="16" height="2.4" rx="1.2"/><rect x="4" y="16" width="16" height="2.4" rx="1.2"/></svg>';d.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();menuOpen();});tb.insertBefore(d,tb.firstChild);})();
 window.addEventListener('keydown',e=>{if(MODE==='play'&&(e.code==='Tab'||e.code==='KeyO')){e.preventDefault();const ov=document.getElementById('menuOv');if(ov&&ov.style.display==='flex')menuClose();else menuOpen();}});
+window.addEventListener('pointerdown',e=>{if(MODE!=='play')return;const r=cv.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,m=HUDX.misRect;
+  const ov=document.getElementById('menuOv'),open=(ov&&ov.style.display==='flex')||NET.open||(document.getElementById('nameDlg')||{}).open;
+  if(paused&&!open&&!bigMap){paused=false;e.preventDefault();e.stopPropagation();return;}
+  if(m&&!paused&&x>=m.x&&x<=m.x+m.w&&y>=m.y&&y<=m.y+m.h){HUDX.misOpen=!HUDX.misOpen;sfx('blip');e.preventDefault();e.stopPropagation();}},true);

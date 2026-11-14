@@ -27,7 +27,7 @@ for(const r of ROADS)r.brick=r.k==='pedestrian'||(r.fort&&r.k!=='tertiary');
 const PATHS=WD.paths.map(p=>({...p,bb:bbox(p.p)}));
 const BUILDINGS=[],TREES=[],TERRACE=[];
 // kleuren naar de luchtfoto's: veel oranje pannen, leisteen-grijs, witte en bakstenen gevels
-const ROOFS=['#d0623a','#c85a33','#d97048','#bd5530','#cf6a43','#d0623a','#c85a33','#56595f','#4b4e54','#63666c','#7a3b2c'];
+const ROOFS=['#3a3f47','#41454c','#353a41','#4a4340','#4d3f39','#3d3835','#544c46','#5b3f34','#2f3338','#463c38','#3c4249'];
 const WALLS=['#ece6da','#e2d8c6','#f2eee6','#8a4a36','#9c5a42','#b98060','#d9cdb8','#7d4434','#e8e1d3'];
 const SIGNS={'Albert Heijn':['#00a0e2','#ffffff'],'Lidl':['#0050aa','#fff000'],'Gall & Gall':['#7a1c2e','#ffffff'],'Het Zusje':['#2f2a26','#f5d7a1'],'Dubai Barbershop':['#0d0d0d','#d4af37'],'Kapsalon Saer':['#2b2b2b','#ffffff'],'Van Uffelen Mode':['#1f2a44','#ffffff'],'Suus Dames':['#f3e3d3','#b5523b'],'Stadskasteel':['#4a3b2a','#f0d58a'],'Perla di Cairo':['#0c5c3a','#ffffff'],'CinCin':['#5a0f2e','#ffd9e6'],'The Stone':['#141414','#f2f2f2'],'Xenos':['#e30613','#fff'],'Marktzicht Friet':['#ffcc00','#c8102e'],'IJssalon Hygge':['#f7c6d9','#7a1f3d'],'Máxima':['#0f5a3a','#ffd166'],'Huisarts':['#ffffff','#1a7f37'],'Kruidvat':['#e2001a','#fff'],'Intertoys':['#f26b0f','#fff'],'Bruna':['#0b4da2','#ffd200'],'Shoeby':['#111','#fff'],'HEMA':['#d6001c','#fff'],
  'Kapsalon Saer':['#2b2b2b','#e8c46a'],'Kapper Dubai':['#0d0d0d','#d4af37'],'LEF':['#1d6b4a','#fff'],'De Heeren van Bommel':['#5a1622','#f1dfb3'],'Xenos':['#e30613','#fff'],'Sport 2000':['#003da5','#fff'],
@@ -85,7 +85,7 @@ function genWorld(){
     let m=(ob.b==='apartments'?14:ob.b==='house'?8+(h%4):ob.b==='church'?22:ob.b==='retail'||ob.b==='commercial'?10:ob.b==='shed'||ob.b==='roof'||a<1200?4:9+(h%5));
     if(ob.b==='civic')m=16;if(ob.b==='houseboat')m=4;if(ob.ws&&ob.b!=='church')m=Math.max(m,13+(h%5));if(ob.bs&&ob.b!=='church')m=Math.max(m,10+(h%4));if(ob.ms&&ob.b!=='church'&&ob.b!=='civic')m=Math.max(m,15+(h%5));
     b.ht=m*3.2;b.flat=(ob.b==='retail'||ob.b==='commercial'||ob.b==='industrial'||ob.b==='apartments'||a>25000)&&ob.b!=='church';
-    if(b.flat)b.roof=RP(['#9a9c9e','#86898c','#b3b3ae','#7a7d80','#c4c3bd']);
+    if(b.flat)b.roof=RP(['#5f6266','#55585c','#6b6d70','#4c4f53','#646668']);
     if(ob.b==='church'){b.roof='#5d636a';b.wall='#b8ab95';b.label=ob.n;}
     if(ob.b==='civic'){b.wall='#e1d7c2';b.roof='#3d4146';b.label='Stadhuis';}
     if(ob.n==='Gasthuiskapel')b.label=ob.n;if(ob.n==='Maarten van Rossumhuis'){b.castle=1;b.label='Stadskasteel Zaltbommel';b.wall='#a89a86';b.roof='#6d6a66';b.flat=true;b.ridge=false;b.ht=Math.max(b.ht,52);}
@@ -97,7 +97,7 @@ function genWorld(){
   // gaten langs de Waterstraat opvullen met smalle, hoge gevels (± 5–7 m breed)
   {const inB=(x,y)=>BUILDINGS.some(b=>x>b.bb[0]-4&&x<b.bb[2]+4&&y>b.bb[1]-4&&y<b.bb[3]+4&&pip(x,y,b.p)),onRoad=(x,y)=>ROADS.some(r=>{if(x<r.bb[0]-r.w||x>r.bb[2]+r.w||y<r.bb[1]-r.w||y>r.bb[3]+r.w)return false;for(let i=0;i<r.p.length-1;i++)if(segD(x,y,r.p[i],r.p[i+1])<r.w/2+12)return true;return false;}),
      inPl=(x,y)=>WD.plaza.some(p=>pip(x,y,p));let rs=7;const rnd2=()=>((rs=(rs*16807)%2147483647)/2147483647);
-   const wallC=['#8b4a35','#a0563c','#c9b79c','#e8e0d0','#7a4a3a','#b8664a','#d9cbb0','#6e3f30','#efe6d6','#a77b5a'],roofC=['#4a3a34','#5d4a40','#3d3a3a','#6b4a3a'];
+   const wallC=['#8b4a35','#a0563c','#c9b79c','#e8e0d0','#7a4a3a','#b8664a','#d9cbb0','#6e3f30','#efe6d6','#a77b5a'],roofC=['#3a3f47','#4a4340','#3d3835','#4d3f39','#2f3338'];
    for(const r of WSTR.concat(BSTR,MSTR))for(let i=0;i<r.p.length-1;i++){const isB=r.n==='Boschstraat',isM=r.n==='Markt'||r.n==='Gamerschestraat';const A=r.p[i],B=r.p[i+1],L=Math.hypot(B[0]-A[0],B[1]-A[1]);if(L<40)continue;const ux=(B[0]-A[0])/L,uy=(B[1]-A[1])/L,nx=-uy,ny=ux;
      for(const sd of [-1,1]){let t=4;while(t<L-24){const w=44+rnd2()*22,fo=r.w/2+18;if(t+w>L-4)break;let ok=false;
        for(const D of [115,90,68,48]){const p0=[A[0]+ux*t+nx*sd*fo,A[1]+uy*t+ny*sd*fo],p1=[p0[0]+ux*w,p0[1]+uy*w],p2=[p1[0]+nx*sd*D,p1[1]+ny*sd*D],p3=[p0[0]+nx*sd*D,p0[1]+ny*sd*D],cxx=(p0[0]+p2[0])/2,cyy=(p0[1]+p2[1])/2;

@@ -8,7 +8,7 @@
 //    daarbuiten de paarse avondgloed.
 // Lukt WebGL niet, dan valt het spel terug op de oude canvas-belichting (drawEvening).
 const GL={ok:false,app:null,world:null,amb:null,chunks:new Map(),pool:[],used:0,tex:{},res:1};
-const LCS=512,LBAKE=.5,LR=110; // kaartvak (wereld-px), bakschaal, lamp-straal
+const LCS=512,LBAKE=.5,LR=128; // kaartvak (wereld-px), bakschaal, lamp-straal
 
 function texFromCanvas(c){return PIXI.Texture.from(c);}
 function makeLightTextures(){
@@ -16,7 +16,7 @@ function makeLightTextures(){
   rg.addColorStop(0,'rgba(255,255,255,1)');rg.addColorStop(.25,'rgba(255,255,255,.55)');rg.addColorStop(.6,'rgba(255,255,255,.16)');rg.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=rg;g.fillRect(0,0,128,128);
   const c=document.createElement('canvas');c.width=256;c.height=128;const h=c.getContext('2d'),cg=h.createRadialGradient(0,64,4,0,64,256);
   cg.addColorStop(0,'rgba(255,255,255,1)');cg.addColorStop(.45,'rgba(255,255,255,.45)');cg.addColorStop(1,'rgba(255,255,255,0)');h.fillStyle=cg;h.beginPath();h.moveTo(0,58);h.arc(0,64,256,-.42,.42);h.lineTo(0,70);h.closePath();h.fill();
-  const a=document.createElement('canvas');a.width=a.height=256;const k=a.getContext('2d'),ag=k.createLinearGradient(0,0,180,256);ag.addColorStop(0,'#d9a07c');ag.addColorStop(.5,'#a27598');ag.addColorStop(1,'#564c96');k.fillStyle=ag;k.fillRect(0,0,256,256);
+  const a=document.createElement('canvas');a.width=a.height=256;const k=a.getContext('2d'),ag=k.createLinearGradient(0,0,180,256);ag.addColorStop(0,'#8f9fcc');ag.addColorStop(.5,'#6a79ae');ag.addColorStop(1,'#46508c');k.fillStyle=ag;k.fillRect(0,0,256,256);
   GL.tex.rad=texFromCanvas(r);GL.tex.cone=texFromCanvas(c);GL.tex.amb=texFromCanvas(a);}
 
 async function initLights(){const el=document.getElementById('lightc');
