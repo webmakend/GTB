@@ -46,6 +46,7 @@ function prepBuilding(b){
   // nok langs de langste zijde (bij smalle diepe panden = haaks op de straat)
   if(b.ridge!==false&&b.p.length<=9){let best=0,ang=0;for(let i=0;i<b.p.length-1;i++){const a=b.p[i],q=b.p[i+1],l=Math.hypot(q[0]-a[0],q[1]-a[1]);if(l>best){best=l;ang=Math.atan2(q[1]-a[1],q[0]-a[0]);}}b.ra=ang;b.ridge=true;}else b.ridge=false;
   if(b.ridge&&!b.flat&&h%3===0)b.chim=[R(.3,.7),R(.3,.7)];
+  pickFacade(b,h);
   BUILDINGS.push(b);
   if(!b.pass)polyFill(b.p,i=>{G[i]=BUILD;});
 }
@@ -80,7 +81,7 @@ function genWorld(){
   WD.buildings.forEach((ob,k)=>{const c=centroid(ob.p),h0=hsh(ob.p[0][0],ob.p[0][1]);const front=nearR(AR,c[0],c[1],125),edge=edgeD(c[0],c[1]);ob.ws=nearWS(c[0],c[1],190);ob.keep=!!(ob.ws||bizB.has(k)||ob.n||ob.b==='church'||ob.b==='civic'||(front&&edge>300&&(nearMain(c[0],c[1],175)||h0%100<72)));});
   for(const ob of WD.buildings){
     if(!ob.keep)continue;
-    const b={p:ob.p,n:ob.n,kind:ob.b};const a=polyArea(ob.p),h=hsh(ob.p[0][0],ob.p[0][1]);
+    const b={p:ob.p,n:ob.n,kind:ob.b,ws:ob.ws};const a=polyArea(ob.p),h=hsh(ob.p[0][0],ob.p[0][1]);
     let m=(ob.b==='apartments'?14:ob.b==='house'?8+(h%4):ob.b==='church'?22:ob.b==='retail'||ob.b==='commercial'?10:ob.b==='shed'||ob.b==='roof'||a<1200?4:9+(h%5));
     if(ob.b==='civic')m=16;if(ob.b==='houseboat')m=4;if(ob.ws&&ob.b!=='church')m=Math.max(m,13+(h%5));
     b.ht=m*3.2;b.flat=(ob.b==='retail'||ob.b==='commercial'||ob.b==='industrial'||ob.b==='apartments'||a>25000)&&ob.b!=='church';

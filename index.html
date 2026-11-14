@@ -4181,6 +4181,7 @@ function prepBuilding(b){
   // nok langs de langste zijde (bij smalle diepe panden = haaks op de straat)
   if(b.ridge!==false&&b.p.length<=9){let best=0,ang=0;for(let i=0;i<b.p.length-1;i++){const a=b.p[i],q=b.p[i+1],l=Math.hypot(q[0]-a[0],q[1]-a[1]);if(l>best){best=l;ang=Math.atan2(q[1]-a[1],q[0]-a[0]);}}b.ra=ang;b.ridge=true;}else b.ridge=false;
   if(b.ridge&&!b.flat&&h%3===0)b.chim=[R(.3,.7),R(.3,.7)];
+  pickFacade(b,h);
   BUILDINGS.push(b);
   if(!b.pass)polyFill(b.p,i=>{G[i]=BUILD;});
 }
@@ -4215,7 +4216,7 @@ function genWorld(){
   WD.buildings.forEach((ob,k)=>{const c=centroid(ob.p),h0=hsh(ob.p[0][0],ob.p[0][1]);const front=nearR(AR,c[0],c[1],125),edge=edgeD(c[0],c[1]);ob.ws=nearWS(c[0],c[1],190);ob.keep=!!(ob.ws||bizB.has(k)||ob.n||ob.b==='church'||ob.b==='civic'||(front&&edge>300&&(nearMain(c[0],c[1],175)||h0%100<72)));});
   for(const ob of WD.buildings){
     if(!ob.keep)continue;
-    const b={p:ob.p,n:ob.n,kind:ob.b};const a=polyArea(ob.p),h=hsh(ob.p[0][0],ob.p[0][1]);
+    const b={p:ob.p,n:ob.n,kind:ob.b,ws:ob.ws};const a=polyArea(ob.p),h=hsh(ob.p[0][0],ob.p[0][1]);
     let m=(ob.b==='apartments'?14:ob.b==='house'?8+(h%4):ob.b==='church'?22:ob.b==='retail'||ob.b==='commercial'?10:ob.b==='shed'||ob.b==='roof'||a<1200?4:9+(h%5));
     if(ob.b==='civic')m=16;if(ob.b==='houseboat')m=4;if(ob.ws&&ob.b!=='church')m=Math.max(m,13+(h%5));
     b.ht=m*3.2;b.flat=(ob.b==='retail'||ob.b==='commercial'||ob.b==='industrial'||ob.b==='apartments'||a>25000)&&ob.b!=='church';
@@ -4492,6 +4493,28 @@ function drawPplSprite(r,w,anim,moving,run,legC){const sc=w/r[3],L=r[2]*sc,s=mov
 // strand-decor (TOPDOWN Nature Beach Island pack, verkleind tot één atlas)
 const BEACHA=new Image();let BEACHA_OK=false;BEACHA.onload=()=>{BEACHA_OK=true;};BEACHA.src='assets/beach.webp';
 const BEACH_SPR={"sailboat": [0, 0, 92, 160], "tower": [94, 0, 104, 160], "surf": [200, 0, 125, 160], "chair": [327, 0, 134, 160], "castle": [463, 0, 146, 160], "umbrella": [611, 0, 160, 153], "bush": [773, 0, 138, 160], "palm": [0, 162, 120, 160], "palm2": [122, 162, 159, 160], "kayak": [283, 162, 160, 142], "rowboat": [445, 162, 160, 133], "oats": [607, 162, 124, 160], "rock": [733, 162, 160, 101], "shell": [895, 162, 119, 160], "bottle": [0, 324, 66, 160], "fire": [68, 324, 150, 160], "hammock": [220, 324, 160, 118], "tiki": [382, 324, 160, 158]};
+
+// ---- 06c-gevels-data.js
+// gegenereerd door tools/render_buildings.py --atlas (Quaternius-gevels)
+const FAC_META=[{"m":0,"c":0,"lit":0,"ww":55,"x":0,"y":0,"w":87,"h":150},{"m":0,"c":0,"lit":1,"ww":55,"x":89,"y":0,"w":87,"h":150},{"m":0,"c":1,"lit":0,"ww":55,"x":178,"y":0,"w":87,"h":150},{"m":0,"c":1,"lit":1,"ww":55,"x":267,"y":0,"w":87,"h":150},{"m":0,"c":2,"lit":0,"ww":55,"x":356,"y":0,"w":87,"h":150},{"m":0,"c":2,"lit":1,"ww":55,"x":445,"y":0,"w":87,"h":150},{"m":0,"c":3,"lit":0,"ww":55,"x":534,"y":0,"w":87,"h":150},{"m":0,"c":3,"lit":1,"ww":55,"x":623,"y":0,"w":87,"h":150},{"m":0,"c":4,"lit":0,"ww":55,"x":712,"y":0,"w":87,"h":150},{"m":0,"c":4,"lit":1,"ww":55,"x":801,"y":0,"w":87,"h":150},{"m":0,"c":5,"lit":0,"ww":55,"x":890,"y":0,"w":87,"h":150},{"m":0,"c":5,"lit":1,"ww":55,"x":979,"y":0,"w":87,"h":150},{"m":1,"c":0,"lit":0,"ww":84,"x":1068,"y":0,"w":137,"h":150},{"m":1,"c":0,"lit":1,"ww":84,"x":1207,"y":0,"w":137,"h":150},{"m":1,"c":1,"lit":0,"ww":84,"x":1346,"y":0,"w":137,"h":150},{"m":1,"c":1,"lit":1,"ww":84,"x":1485,"y":0,"w":137,"h":150},{"m":1,"c":2,"lit":0,"ww":84,"x":1624,"y":0,"w":137,"h":150},{"m":1,"c":2,"lit":1,"ww":84,"x":1763,"y":0,"w":137,"h":150},{"m":1,"c":3,"lit":0,"ww":84,"x":1902,"y":0,"w":137,"h":150},{"m":1,"c":3,"lit":1,"ww":84,"x":0,"y":152,"w":137,"h":150},{"m":1,"c":4,"lit":0,"ww":84,"x":139,"y":152,"w":137,"h":150},{"m":1,"c":4,"lit":1,"ww":84,"x":278,"y":152,"w":137,"h":150},{"m":2,"c":0,"lit":0,"ww":103,"x":417,"y":152,"w":150,"h":150},{"m":2,"c":0,"lit":1,"ww":103,"x":569,"y":152,"w":150,"h":150},{"m":2,"c":1,"lit":0,"ww":103,"x":721,"y":152,"w":150,"h":150},{"m":2,"c":1,"lit":1,"ww":103,"x":873,"y":152,"w":150,"h":150},{"m":2,"c":2,"lit":0,"ww":103,"x":1025,"y":152,"w":150,"h":150},{"m":2,"c":2,"lit":1,"ww":103,"x":1177,"y":152,"w":150,"h":150},{"m":2,"c":3,"lit":0,"ww":103,"x":1329,"y":152,"w":150,"h":150},{"m":2,"c":3,"lit":1,"ww":103,"x":1481,"y":152,"w":150,"h":150}];
+
+// ---- 06d-gevels.js
+// Gevels uit het Quaternius-pakket (assets/facades.webp) als herhalend patroon op de muren
+const FAC_IMG=new Image();let FAC_PAT=null;
+FAC_IMG.onload=()=>{FAC_PAT=FAC_META.map(m=>{const c=document.createElement('canvas');c.width=m.w;c.height=m.h;c.getContext('2d').drawImage(FAC_IMG,m.x,m.y,m.w,m.h,0,0,m.w,m.h);return wctx.createPattern(c,'repeat');});if(typeof markDirty==='function')markDirty();};
+FAC_IMG.src='assets/facades.webp';
+const FAC_BY={};FAC_META.forEach((m,i)=>{(FAC_BY[m.m+'_'+m.lit]=FAC_BY[m.m+'_'+m.lit]||[]).push(i);});
+const FAC_MX=new DOMMatrix();
+function pickFacade(b,h){
+  if(b.kind==='church'||b.kind==='civic'||b.kind==='tower'||b.kind==='pylon'||b.kind==='gate'||b.kind==='houseboat'||b.pass||b.ht<20)return;
+  const a=(b.bb[2]-b.bb[0])*(b.bb[3]-b.bb[1]),r=(h>>>3)%100;let m;
+  if(b.ws||b.gen)m=r<74?0:1;else if(b.flat||a>14000)m=r<50?2:1;else m=r<55?0:(r<92?1:2);
+  const L=FAC_BY[m+'_'+((h>>>9)%100<45?1:0)];b.fac=L[(h>>>12)%L.length];
+  if(m===2)b.roof=['#4a3a2e','#55402f','#3f3631'][(h>>>4)%3];
+}
+// muur a→q met dakrand-verschuiving d (=r[i]-a), gevulde quad is al als pad gezet
+function fillFacade(b,a,q,d,ln){const m=FAC_META[b.fac],pat=FAC_PAT[b.fac],n=Math.max(1,Math.round(ln/m.ww)),sx=ln/n/m.w,ex=(q[0]-a[0])/ln,ey=(q[1]-a[1])/ln;
+  FAC_MX.a=ex*sx;FAC_MX.b=ey*sx;FAC_MX.c=-d[0]/m.h;FAC_MX.d=-d[1]/m.h;FAC_MX.e=a[0]+d[0];FAC_MX.f=a[1]+d[1];pat.setTransform(FAC_MX);ctx.fillStyle=pat;ctx.fill();}
 
 // ---- 07-ai.js
 // ====================== AI ======================
@@ -4906,11 +4929,14 @@ function drawCables(vx0,vy0,vx1,vy1,cx,cy){if(!BRIDGE||!BRIDGE.py)return;const k
     for(let i=1;i<=9;i++)for(const dir of [-1,1]){const d=i*44*dir,ex=b.cx+ux*d,ey=b.cy+uy*d;ctx.beginPath();ctx.moveTo(tx,ty);ctx.lineTo(ex,ey);ctx.stroke();}
     ctx.fillStyle=(frameN>>5)&1?'#ff3030':'#7a1010';ctx.beginPath();ctx.arc(tx,ty,4,0,TAU);ctx.fill();q.top=[tx,ty];}}
 function drawBuildings(vx0,vy0,vx1,vy1,cx,cy){
-  const k=.0016,vis=[];for(const b of BUILDINGS){if(b.bb[2]<vx0-160||b.bb[0]>vx1+160||b.bb[3]<vy0-160||b.bb[1]>vy1+160)continue;b._d=(b.cx-cx)**2+(b.cy-cy)**2;vis.push(b);}
+  const k=.0022,vis=[];for(const b of BUILDINGS){if(b.bb[2]<vx0-160||b.bb[0]>vx1+160||b.bb[3]<vy0-160||b.bb[1]>vy1+160)continue;b._d=(b.cx-cx)**2+(b.cy-cy)**2;vis.push(b);}
   vis.sort((a,b)=>b._d-a._d);
   for(const b of vis){const f=Math.min(b.ht,180)*k,p=b.p,n=p.length,r=new Array(n);for(let i=0;i<n;i++)r[i]=[p[i][0]+(p[i][0]-cx)*f,p[i][1]+(p[i][1]-cy)*f];
-    for(let i=0;i<n-1;i++){const a=p[i],q=p[i+1],nx=q[1]-a[1],ny=a[0]-q[0];ctx.fillStyle=Math.abs(nx)>Math.abs(ny)?(nx>0?b.wE:b.wW):(ny>0?b.wS:b.wN);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(q[0],q[1]);ctx.lineTo(r[i+1][0],r[i+1][1]);ctx.lineTo(r[i][0],r[i][1]);ctx.closePath();ctx.fill();
-      const th=Math.hypot(r[i][0]-a[0],r[i][1]-a[1]),ln=Math.hypot(q[0]-a[0],q[1]-a[1]);if(th>7&&ln>16&&b.kind!=='tower'){const fl=Math.max(1,Math.min(5,Math.round(b.ht/15)));ctx.strokeStyle=(hsh(i,b.bb[0]|0)%3)?'rgba(255,206,130,.85)':'rgba(40,30,40,.55)';ctx.lineWidth=Math.min(4,th/fl*.38);ctx.setLineDash([3.5,4.5]);
+    for(let i=0;i<n-1;i++){const a=p[i],q=p[i+1],nx=q[1]-a[1],ny=a[0]-q[0];ctx.fillStyle=Math.abs(nx)>Math.abs(ny)?(nx>0?b.wE:b.wW):(ny>0?b.wS:b.wN);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(q[0],q[1]);ctx.lineTo(r[i+1][0],r[i+1][1]);ctx.lineTo(r[i][0],r[i][1]);ctx.closePath();
+      const th=Math.hypot(r[i][0]-a[0],r[i][1]-a[1]),ln=Math.hypot(q[0]-a[0],q[1]-a[1]);
+      if(b.fac!=null&&FAC_PAT&&th>2.5&&ln>6){fillFacade(b,a,q,[r[i][0]-a[0],r[i][1]-a[1]],ln);ctx.fillStyle=Math.abs(nx)>Math.abs(ny)?(nx>0?'rgba(20,14,30,.12)':'rgba(20,14,30,.26)'):(ny>0?'rgba(0,0,0,0)':'rgba(20,14,30,.4)');ctx.fill();continue;}
+      ctx.fill();
+      if(th>7&&ln>16&&b.kind!=='tower'){const fl=Math.max(1,Math.min(5,Math.round(b.ht/15)));ctx.strokeStyle=(hsh(i,b.bb[0]|0)%3)?'rgba(255,206,130,.85)':'rgba(40,30,40,.55)';ctx.lineWidth=Math.min(4,th/fl*.38);ctx.setLineDash([3.5,4.5]);
         for(let j=0;j<fl;j++){const tt=(j+.55)/(fl+.3);ctx.beginPath();ctx.moveTo(a[0]+(r[i][0]-a[0])*tt+(q[0]-a[0])*.08,a[1]+(r[i][1]-a[1])*tt+(q[1]-a[1])*.08);ctx.lineTo(q[0]+(r[i+1][0]-q[0])*tt-(q[0]-a[0])*.08,q[1]+(r[i+1][1]-q[1])*tt-(q[1]-a[1])*.08);ctx.stroke();}ctx.setLineDash([]);}}
     ctx.beginPath();ctx.moveTo(r[0][0],r[0][1]);for(let i=1;i<n;i++)ctx.lineTo(r[i][0],r[i][1]);ctx.closePath();ctx.fillStyle=b.roof;ctx.fill();ctx.strokeStyle='rgba(0,0,0,.28)';ctx.lineWidth=1.2;ctx.stroke();
     const rcx=b.cx+(b.cx-cx)*f,rcy=b.cy+(b.cy-cy)*f;

@@ -97,11 +97,14 @@ function drawCables(vx0,vy0,vx1,vy1,cx,cy){if(!BRIDGE||!BRIDGE.py)return;const k
     for(let i=1;i<=9;i++)for(const dir of [-1,1]){const d=i*44*dir,ex=b.cx+ux*d,ey=b.cy+uy*d;ctx.beginPath();ctx.moveTo(tx,ty);ctx.lineTo(ex,ey);ctx.stroke();}
     ctx.fillStyle=(frameN>>5)&1?'#ff3030':'#7a1010';ctx.beginPath();ctx.arc(tx,ty,4,0,TAU);ctx.fill();q.top=[tx,ty];}}
 function drawBuildings(vx0,vy0,vx1,vy1,cx,cy){
-  const k=.0016,vis=[];for(const b of BUILDINGS){if(b.bb[2]<vx0-160||b.bb[0]>vx1+160||b.bb[3]<vy0-160||b.bb[1]>vy1+160)continue;b._d=(b.cx-cx)**2+(b.cy-cy)**2;vis.push(b);}
+  const k=.0022,vis=[];for(const b of BUILDINGS){if(b.bb[2]<vx0-160||b.bb[0]>vx1+160||b.bb[3]<vy0-160||b.bb[1]>vy1+160)continue;b._d=(b.cx-cx)**2+(b.cy-cy)**2;vis.push(b);}
   vis.sort((a,b)=>b._d-a._d);
   for(const b of vis){const f=Math.min(b.ht,180)*k,p=b.p,n=p.length,r=new Array(n);for(let i=0;i<n;i++)r[i]=[p[i][0]+(p[i][0]-cx)*f,p[i][1]+(p[i][1]-cy)*f];
-    for(let i=0;i<n-1;i++){const a=p[i],q=p[i+1],nx=q[1]-a[1],ny=a[0]-q[0];ctx.fillStyle=Math.abs(nx)>Math.abs(ny)?(nx>0?b.wE:b.wW):(ny>0?b.wS:b.wN);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(q[0],q[1]);ctx.lineTo(r[i+1][0],r[i+1][1]);ctx.lineTo(r[i][0],r[i][1]);ctx.closePath();ctx.fill();
-      const th=Math.hypot(r[i][0]-a[0],r[i][1]-a[1]),ln=Math.hypot(q[0]-a[0],q[1]-a[1]);if(th>7&&ln>16&&b.kind!=='tower'){const fl=Math.max(1,Math.min(5,Math.round(b.ht/15)));ctx.strokeStyle=(hsh(i,b.bb[0]|0)%3)?'rgba(255,206,130,.85)':'rgba(40,30,40,.55)';ctx.lineWidth=Math.min(4,th/fl*.38);ctx.setLineDash([3.5,4.5]);
+    for(let i=0;i<n-1;i++){const a=p[i],q=p[i+1],nx=q[1]-a[1],ny=a[0]-q[0];ctx.fillStyle=Math.abs(nx)>Math.abs(ny)?(nx>0?b.wE:b.wW):(ny>0?b.wS:b.wN);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(q[0],q[1]);ctx.lineTo(r[i+1][0],r[i+1][1]);ctx.lineTo(r[i][0],r[i][1]);ctx.closePath();
+      const th=Math.hypot(r[i][0]-a[0],r[i][1]-a[1]),ln=Math.hypot(q[0]-a[0],q[1]-a[1]);
+      if(b.fac!=null&&FAC_PAT&&th>2.5&&ln>6){fillFacade(b,a,q,[r[i][0]-a[0],r[i][1]-a[1]],ln);ctx.fillStyle=Math.abs(nx)>Math.abs(ny)?(nx>0?'rgba(20,14,30,.12)':'rgba(20,14,30,.26)'):(ny>0?'rgba(0,0,0,0)':'rgba(20,14,30,.4)');ctx.fill();continue;}
+      ctx.fill();
+      if(th>7&&ln>16&&b.kind!=='tower'){const fl=Math.max(1,Math.min(5,Math.round(b.ht/15)));ctx.strokeStyle=(hsh(i,b.bb[0]|0)%3)?'rgba(255,206,130,.85)':'rgba(40,30,40,.55)';ctx.lineWidth=Math.min(4,th/fl*.38);ctx.setLineDash([3.5,4.5]);
         for(let j=0;j<fl;j++){const tt=(j+.55)/(fl+.3);ctx.beginPath();ctx.moveTo(a[0]+(r[i][0]-a[0])*tt+(q[0]-a[0])*.08,a[1]+(r[i][1]-a[1])*tt+(q[1]-a[1])*.08);ctx.lineTo(q[0]+(r[i+1][0]-q[0])*tt-(q[0]-a[0])*.08,q[1]+(r[i+1][1]-q[1])*tt-(q[1]-a[1])*.08);ctx.stroke();}ctx.setLineDash([]);}}
     ctx.beginPath();ctx.moveTo(r[0][0],r[0][1]);for(let i=1;i<n;i++)ctx.lineTo(r[i][0],r[i][1]);ctx.closePath();ctx.fillStyle=b.roof;ctx.fill();ctx.strokeStyle='rgba(0,0,0,.28)';ctx.lineWidth=1.2;ctx.stroke();
     const rcx=b.cx+(b.cx-cx)*f,rcy=b.cy+(b.cy-cy)*f;
