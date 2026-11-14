@@ -35,12 +35,13 @@ function playerStep(){
       c.stS=(c.stS||0)+(st-(c.stS||0))*.35;st=c.stS;}
     c.ctl=[th,st,k.act?1:0];
   }else{let mx=(k.right?1:0)-(k.left?1:0),my=(k.down?1:0)-(k.up?1:0),run=k.run;
-    if(k.jump&&!(P.jz>0)&&!swimming()){P.jv=4.2;P.jz=.01;sfx('jump');}
-    if(P.jz>0){P.jz+=P.jv;P.jv-=.32;if(P.jz<=0){P.jz=0;P.jv=0;sfx('step',1);buzz(10);P.squash=9;for(let i=0;i<6;i++){const a=rr(0,TAU);parts.push({x:P.x,y:P.y,vx:Math.cos(a)*1.2,vy:Math.sin(a)*1.2,l:20,ml:20,s:2,k:'d'});}}}
+    if(k.jump&&!(P.jz>0)&&!swimming()){P.jv=4.2;P.jz=.01;P.dj=0;sfx('jump');}
+    else if(k.jump&&P.jz>0&&!P.dj){P.dj=1;P.jv=Math.max(P.jv,0)*.5+3.8;sfx('jump',1.3);ring(P.x,P.y,20,'rgba(255,255,255,.8)');for(let i=0;i<8;i++){const a=i/8*TAU;parts.push({x:P.x,y:P.y,vx:Math.cos(a)*1.6,vy:Math.sin(a)*1.6,l:16,ml:16,s:2,k:'d'});}}
+    if(P.jz>0){P.jz+=P.jv;P.jv-=.32;if(P.jz<=0){P.jz=0;P.jv=0;P.dj=0;sfx('step',1);buzz(10);P.squash=9;for(let i=0;i<6;i++){const a=rr(0,TAU);parts.push({x:P.x,y:P.y,vx:Math.cos(a)*1.2,vy:Math.sin(a)*1.2,l:20,ml:20,s:2,k:'d'});}}}
     if(touch.on&&(Math.abs(touch.jx)>.12||Math.abs(touch.jy)>.12)){mx=touch.jx;my=touch.jy;run=Math.hypot(mx,my)>.92;}
     const sw=swimming();if(sw&&frameN%14===0)parts.push({x:P.x,y:P.y,vx:0,vy:0,l:40,ml:40,s:6,k:'p'});
     const m=Math.hypot(mx,my);P.moving=m>.1;P.running=P.moving&&run;if(m>.1){const rk=P.ch?P.ch.perk.run:1,sp=(sw?1.45:run?3.3:2.3)*rk*Math.min(1,m)*(P.jz>0?1.15:1)*(P.high>0?1.3:1)*(P.boost>0?1.3:1)*(P.drunk>=4?.85:1);mx/=m;my/=m;if(P.drunk>=2){const w=Math.sin(frameN*.045)*Math.min(1,P.drunk/6)*.9;const c2=Math.cos(w),s2=Math.sin(w);[mx,my]=[mx*c2-my*s2,mx*s2+my*c2];}P.a=Math.atan2(my,mx);const nx=P.x+mx*sp,ny=P.y+my*sp;if(!footBlocked(nx,P.y))P.x=nx;if(!footBlocked(P.x,ny))P.y=ny;const ph=Math.floor(P.anim/Math.PI);P.anim+=sp*.28;if(Math.floor(P.anim/Math.PI)!==ph&&!(P.jz>0)){if(sw){if(ph%2===0)sfx('swim');}else{const gt=cellAt(P.x,P.y);sfx('step',run?1:0,(gt===GRASS||gt===PARK||gt===SAND)?1:0);}}}
-    pushOutOfCars(P,6);
+    if(!(P.jz>7))pushOutOfCars(P,6);
     if(k.act&&P.throwCd<=0&&!sw){if(P.weapon===1&&P.gun)fireGun();else throwBalloon();}
     if(heat<.5&&P.hp<P.maxhp)P.hp=Math.min(P.maxhp,P.hp+.03);}
 }

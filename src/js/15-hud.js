@@ -54,7 +54,7 @@ function hud(){
   // hint
   let hint='';if(!P.dead){if(P.car)hint=IS_TOUCH?'':'E: uitstappen · Spatie: handrem · S: remmen';else if(carNear())hint=IS_TOUCH?'Tik IN STAP om in te stappen':'E: instappen';else if(swimming())hint='Je zwemt! Zoek de kant op';else if(frameN<1500)hint=IS_TOUCH?'💧 = waterballon gooien':'Spatie: waterballon gooien';}
   if(hint)txt(hint,CW/2,CH-(IS_TOUCH?175:40),13.5*U,'#fff','center','Inter, sans-serif');
-  if(!IS_TOUCH)txt('E in/uit/actie · Spatie gooien/schieten/handrem · Q wapen · R radio · J springen · M kaart · P pauze',16,CH-24,12,'rgba(255,255,255,.55)','left','Inter, sans-serif');
+  if(!IS_TOUCH)txt('E in/uit/actie · Spatie gooien/schieten/handrem · Q wapen · R radio · J springen (2× = dubbel) · M kaart · Tab menu',16,CH-24,12,'rgba(255,255,255,.55)','left','Inter, sans-serif');
   if(P.hurtF>0){const a=P.hurtF/18,g3=ctx.createRadialGradient(CW/2,CH/2,Math.min(CW,CH)*.3,CW/2,CH/2,Math.max(CW,CH)*.75);g3.addColorStop(0,'rgba(255,0,40,0)');g3.addColorStop(1,`rgba(255,0,40,${.55*a})`);ctx.fillStyle=g3;ctx.fillRect(0,0,CW,CH);}
   if(P.car&&speedOf(P.car)>5.2&&!MG.on){const k=clamp((speedOf(P.car)-5.2)/3,0,1);ctx.strokeStyle=`rgba(255,255,255,${.25*k})`;ctx.lineWidth=1.5;for(let i=0;i<14;i++){const a=(i*2.399+frameN*.07)%TAU,r0=Math.max(CW,CH)*(.42+((i*37+frameN*3)%40)/100);ctx.beginPath();ctx.moveTo(CW/2+Math.cos(a)*r0,CH/2+Math.sin(a)*r0);ctx.lineTo(CW/2+Math.cos(a)*(r0+60*k),CH/2+Math.sin(a)*(r0+60*k));ctx.stroke();}}
   drawCarName();statueHint();henkieMarker();actHint();progHud();jobHud();netHud();drawNotes();

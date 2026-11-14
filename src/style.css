@@ -81,3 +81,5 @@ button{font-family:inherit}
 #bX{right:calc(var(--sr) + 126px);bottom:calc(var(--sb) + 112px);width:58px;height:58px;font-size:22px;background:rgba(255,107,61,.4);display:none}
 
 .card .wis{margin-top:8px;padding:9px 12px;border-radius:12px;border:2px solid rgba(255,90,110,.7);background:rgba(40,8,20,.75);color:#ff8a9a;font:800 13px Inter,sans-serif;letter-spacing:1px;cursor:pointer}
+
+#bPause,#bSave,#bRestart{display:none!important}
