@@ -20,7 +20,7 @@ function exitCar(){const c=P.car,s=c.t.w/2+10,L=[c.x+Math.sin(c.a)*s,c.y-Math.co
 function addMoney(v){P.money=Math.max(0,P.money+v);P.moneyF=20;popTxt(me().x,me().y-20,(v>0?'+':'-')+'€'+Math.abs(v).toFixed(2).replace('.',','),v>0?'#7dff6a':'#ff6b6b',1.2);}
 function hurt(d){if(P.dead)return;P.hp-=d;P.hurtF=18;buzz(30);shake=Math.max(shake,5);if(P.hp<=0){P.hp=0;wasted('WASTED',P.lastHit);}P.lastHit='';}
 function wasted(t,why){if(P.dead)return;P.dead=220;P.deadKind='wasted';P.deadWhy=why||'';if(P.car){P.car.driver=null;P.car=null;}sfx('sting');buzz([60,40,120]);}
-function busted(){if(P.dead)return;if(P.car){P.car.driver=null;P.car.keep=0;P.car=null;}P.dead=220;P.deadKind='bust';const hadGun=P.gun;P.deadWhy=hadGun?'Al je wapens zijn in beslag genomen':'Een nachtje in de cel, morgen weer vrij';P.gun=false;P.weapon=0;if(typeof PRG!=='undefined'){PRG.gun=false;PRG.dirty=true;try{progSave();}catch(e){}}noteAdd('BUSTED',hadGun?'Opgepakt! De politie heeft al je wapens afgepakt':'Een nachtje in de cel, morgen weer vrij','#4d8dff',260);sfx('sting');buzz([60,40,120]);}
+function busted(){if(P.dead)return;if(P.car){P.car.driver=null;P.car.keep=0;P.car=null;}P.dead=220;P.deadKind='bust';const hadGun=loseWeapons();P.deadWhy=hadGun?'Al je wapens zijn in beslag genomen':'Een nachtje in de cel, morgen weer vrij';noteAdd('BUSTED',hadGun?'Opgepakt! De politie heeft al je wapens afgepakt':'Een nachtje in de cel, morgen weer vrij','#4d8dff',260);sfx('sting');buzz([60,40,120]);}
 let SPAWN=[0,0];
 function respawn(){const s=snap(SPAWN[0],SPAWN[1]);P.x=s[0];P.y=s[1];P.hp=P.maxhp;P.car=null;P.bust=0;heat=0;stars=0;P.lastHit='';P.deadKind='';
   cars=cars.filter(c=>!(c.driver==='cop'&&c.ai&&c.ai.mode==='pursuit'));peds=peds.filter(p=>p.kind!=='cop');camX=P.x;camY=P.y;}

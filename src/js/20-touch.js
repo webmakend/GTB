@@ -1,22 +1,21 @@
 // ====================== touch-bediening ======================
 function placeTopBtns(){const tb=document.getElementById('topBtns');if(tb){const S=Math.round(clamp(Math.min(CW,CH)*.27,96,150));const m=HUDX.mini;const mx=m?m.x:CW-S-16,my=m?m.y:uiTop().top+22,MS=m?m.S:S;const bm=document.getElementById('bMenu'),bn=document.getElementById('bNet');if(bm){bm.style.left=Math.round(mx-10)+'px';bm.style.top=Math.round(my-14)+'px';}if(bn){bn.style.left=Math.round(mx+MS-24)+'px';bn.style.top=Math.round(my-14)+'px';}}const sb=document.getElementById('sideBtns');if(!sb)return;const S=Math.round(clamp(Math.min(CW,CH)*.28,100,180)),top=uiTop().bottom+8+S+12;sb.style.top=top+'px';sb.style.flexDirection=(CH-top<260)?'row':'column';}
 function buzz(ms){if(Array.isArray(ms)){try{if(IS_TOUCH&&navigator.vibrate)navigator.vibrate(ms);}catch(e){}return;}try{if(IS_TOUCH&&navigator.vibrate)navigator.vibrate(ms);}catch(e){}}
-const ICO={drop:'<svg viewBox="0 0 24 24"><path fill="#9fe0ff" d="M12 2C9 7 6 10.5 6 14a6 6 0 0 0 12 0c0-3.5-3-7-6-12z"/><path fill="#fff" opacity=".7" d="M9.5 14.5a2.5 2.5 0 0 0 2.5 2.5v1.6A4.1 4.1 0 0 1 7.9 14.5z"/></svg>',
- run:'<svg viewBox="0 0 24 24" fill="#5ff0cf"><circle cx="15" cy="4" r="2.2"/><path d="M9.8 8.6l3.4-1.2c.7-.2 1.4.1 1.8.7l1.6 2.6 2.6.8-.6 1.8-3.3-1-1-1.5-1.1 3.4 2.6 2.5V22h-2v-4.6l-2.6-2.3-.9 2.6-4.3 2.2-.9-1.8 3.6-1.8 2.2-6.4-1.4.5-1.3 2.9-1.8-.8z"/></svg>',
- car:'<svg viewBox="0 0 24 24" fill="#ffb347"><path d="M5 11l1.6-4.3A2 2 0 0 1 8.5 5.3h7a2 2 0 0 1 1.9 1.4L19 11a2 2 0 0 1 2 2v4.5a1 1 0 0 1-1 1h-1.2a1 1 0 0 1-1-1V16H6.2v1.5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V13a2 2 0 0 1 2-2zm2.2 0h9.6l-1.1-3.2a.8.8 0 0 0-.8-.5H9.1a.8.8 0 0 0-.8.5zM6.5 14.6a1.3 1.3 0 1 0 0-2.6 1.3 1.3 0 0 0 0 2.6zm11 0a1.3 1.3 0 1 0 0-2.6 1.3 1.3 0 0 0 0 2.6z"/></svg>',
- gun:'<svg viewBox="0 0 24 24" fill="#ffd0e8"><path d="M3 8h15l1 -1h2v4h-3v1.5c0 .8-.7 1.5-1.5 1.5H13l-1 1v4.5a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1.2L8 13H4a1 1 0 0 1-1-1z"/></svg>',
- radio:'<svg viewBox="0 0 24 24" fill="#ffb3dd"><path d="M4 8h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1zm1-1.5L16 3l.6 1.4L7.8 8z"/><circle cx="8" cy="14" r="3" fill="#2a1030"/><rect x="13" y="11.5" width="6" height="1.6" rx=".8" fill="#2a1030"/><rect x="13" y="15" width="6" height="1.6" rx=".8" fill="#2a1030"/></svg>',
- brake:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#ff6b6b" stroke-width="2.4"/><rect x="10.8" y="6.5" width="2.4" height="7" rx="1.2" fill="#ff6b6b"/><circle cx="12" cy="16.6" r="1.4" fill="#ff6b6b"/></svg>',
- exit:'<svg viewBox="0 0 24 24" fill="#ffb347"><path d="M4 4h9v3h-2V6H6v12h5v-1h2v3H4z"/><path d="M14 8l5 4-5 4v-3H9v-2h5z"/></svg>',
- balloon:'<svg viewBox="0 0 24 24"><path fill="#7fc8ff" d="M12 2c4 0 7 3.2 7 7.6 0 4.4-3.6 8.4-7 8.4s-7-4-7-8.4C5 5.2 8 2 12 2z"/><path fill="#fff" opacity=".55" d="M9 6.5c.8-1.2 2-1.8 3.2-1.8-.3.9-1.4 2.2-3.2 3.4z"/><path d="M12 18l-1.3 2.4h2.6z" fill="#7fc8ff"/></svg>'};
+const ICO={drop:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C9 7.5 6.5 10.5 6.5 14a5.5 5.5 0 0 0 11 0c0-3.5-2.5-6.5-5.5-11z"/></svg>',
+ run:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="15" cy="4.5" r="1.8"/><path d="M8 21l3-5.5 3 2.5v4M11 15.5l1.5-5.5 3.5 3 3 .5M12.5 10l-3.5 1-2 3"/></svg>',
+ car:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14l1.8-4.6A2 2 0 0 1 7.7 8h8.6a2 2 0 0 1 1.9 1.4L20 14v4h-2.5v-1.5h-11V18H4z"/><path d="M4 14h16"/><circle cx="7.5" cy="15.2" r=".6"/><circle cx="16.5" cy="15.2" r=".6"/></svg>',
+ exit:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg>',
+ brake:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M8 8.5v7M16 8.5v7"/><text x="12" y="14.6" fill="#fff" stroke="none" font-size="7" font-family="Inter,sans-serif" font-weight="900" text-anchor="middle">!</text></svg>',
+ radio:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="8" width="17" height="11" rx="2"/><path d="M7 8l9-4"/><circle cx="15.5" cy="13.5" r="2.6"/><path d="M6.5 12h4M6.5 15h4"/></svg>',
+ gun:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h15l1 2.5h2v2H11l-1.5 6H5.5L7 12.5H3z"/></svg>',
+ balloon:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5c3.6 0 6 2.8 6 6.3 0 3.8-3 6.9-6 6.9s-6-3.1-6-6.9c0-3.5 2.4-6.3 6-6.3z"/><path d="M12 16.7l-1 1.6h2l-1-1.6M12 18.3c0 1.5-1 1.8-1 3"/><path d="M9 7.5a3.5 3.5 0 0 1 2.3-1.6"/></svg>'};
 const tbL=(ic,t)=>ICO[ic]+'<span>'+t+'</span>';
-function setWeapon(w){if(!P.gun||P.car)return;w=((w%2)+2)%2;if(w===P.weapon)return;P.weapon=w;buzz(12);sfx('blip');noteAdd(P.weapon?'🔫 PISTOOL':'🎈 WATERBALLONNEN','','#ffffff',70,'wapen');}
 function updTouchUI(){if(frameN%30===0){const jb=document.getElementById('joyBase');if(jb&&!jb.classList.contains('drag'))JOYIDLE();}
   const bJ=document.getElementById('bJump');if(bJ._t!==1){bJ.innerHTML=ICO.run;bJ._t=1;}bJ.style.display=P.car||P.dead||swimming()?'none':'flex';const base=lvlBase(PRG.lvl),pr=clamp((PRG.xp-base)/need(PRG.lvl),0,1);bJ.style.setProperty('--p',(pr*100).toFixed(1)+'%');
   const bA=document.getElementById('bAct'),bC=document.getElementById('bCar'),bX=document.getElementById('bX');
-  const ac=P.car?ICO.brake:P.weapon===1&&P.gun?ICO.gun:ICO.balloon;if(bA._t!==ac){bA.innerHTML=ac;bA._t=ac;}
+  const ac=P.car?'car':P.wid;if(bA._t!==ac){bA._t=ac;const W=WPN[P.wid];bA.innerHTML=P.car?ICO.brake:(W&&W.ic>=0?`<i class="wico" style="background-position:0 ${(W.ic/8*100).toFixed(3)}%"></i>`:ICO.balloon);}
   const xs=P.car&&!P.car.t.bike;bX.style.display=xs&&!P.dead?'flex':'none';if(bX._t!==1){bX.innerHTML=ICO.radio;bX._t=1;}
-  const ws=!!P.gun&&!P.car&&!P.dead&&!swimming();for(const id of ['wPrev','wNext']){const e=document.getElementById(id);if(e)e.style.display=ws?'flex':'none';}
+  const ws=P.inv.length>1&&!P.car&&!P.dead&&!swimming();for(const id of ['wPrev','wNext']){const e=document.getElementById(id);if(e)e.style.display=ws?'flex':'none';}
   const show=(!!P.car||!!carNear())&&!P.dead,ct=P.car?ICO.exit:ICO.car;bC.style.display=show?'flex':'none';if(bC._t!==ct){bC.innerHTML=ct;bC._t=ct;}bC.classList.toggle('pulse',!P.car);}
 let JOYIDLE=()=>{};let PINCH=null,joyCancel=()=>{};
 function setupPinch(){const isBtn=t=>t&&t.closest&&t.closest('.tb,.sb,#mus');let first=null;
@@ -52,9 +51,9 @@ function setupTouch(){
   const end=e=>{if(e.pointerId!==jid)return;jid=null;touch.jx=touch.jy=0;joyIdle();};
   zone.addEventListener('pointerup',end);zone.addEventListener('pointercancel',end);
   const bA=document.getElementById('bAct');let sw0=null;bA.addEventListener('pointerdown',e=>{e.preventDefault();touch.act=true;bA.classList.add('on');sw0={x:e.clientX,y:e.clientY,done:false};try{bA.setPointerCapture(e.pointerId);}catch(_){}});
-  bA.addEventListener('pointermove',e=>{if(!sw0||sw0.done||!P.gun||P.car)return;const dx=e.clientX-sw0.x;if(Math.abs(dx)>38&&Math.abs(dx)>Math.abs(e.clientY-sw0.y)*1.3){sw0.done=true;touch.act=false;setWeapon(P.weapon+(dx>0?1:-1));}});
+  bA.addEventListener('pointermove',e=>{if(!sw0||sw0.done||!P.gun||P.car)return;const dx=e.clientX-sw0.x;if(Math.abs(dx)>38&&Math.abs(dx)>Math.abs(e.clientY-sw0.y)*1.3){sw0.done=true;touch.act=false;setWeapon(dx>0?1:-1);}});
   ['pointerup','pointercancel','lostpointercapture'].forEach(t=>bA.addEventListener(t,()=>{touch.act=false;sw0=null;bA.classList.remove('on');}));
-  for(const [id,d] of [['wPrev',-1],['wNext',1]]){const e2=document.getElementById(id);if(e2)e2.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();setWeapon(P.weapon+d);});}
+  for(const [id,d] of [['wPrev',-1],['wNext',1]]){const e2=document.getElementById(id);if(e2)e2.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();setWeapon(d);});}
   document.getElementById('bCar').addEventListener('pointerdown',e=>{e.preventDefault();touch.enter=true;buzz(15);});
   const bX=document.getElementById('bX');bX.addEventListener('pointerdown',e=>{e.preventDefault();buzz(12);if(P.car)touch.radio=true;});
   document.getElementById('bJump').innerHTML=tbL('run','SPRING');

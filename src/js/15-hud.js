@@ -24,7 +24,7 @@ function hud(){
    ctx.restore();const rg=ctx.createLinearGradient(ax-ar,ay-ar,ax+ar,ay+ar);rg.addColorStop(0,'#b07cff');rg.addColorStop(1,'#4fb6ff');ctx.strokeStyle=rg;ctx.lineWidth=3.5*U;ctx.beginPath();ctx.arc(ax,ay,ar+1.5*U,0,TAU);ctx.stroke();
    const bx2=ax+ar*.72,by2=ay+ar*.72,br=10*U;ctx.fillStyle='#16182a';ctx.beginPath();ctx.arc(bx2,by2,br,0,TAU);ctx.fill();ctx.strokeStyle='#b07cff';ctx.lineWidth=2*U;ctx.stroke();txt(String(PRG.lvl),bx2,by2-7*U,12*U,'#fff','center','Inter, sans-serif');
    const tx=ax+ar+16*U,tr=L0+pw-14*U;
-   ctx.font=`900 ${18*U}px Inter, sans-serif`;ctx.fillStyle='#fff';ctx.textAlign='left';ctx.textBaseline='top';ctx.fillText((P.ch?P.ch.name:'').toUpperCase(),tx,y+11*U);
+   ctx.font=`900 ${18*U}px Inter, sans-serif`;ctx.fillStyle='#fff';ctx.textAlign='left';ctx.textBaseline='top';{let nm=String(netName()).toUpperCase();while(nm.length>3&&ctx.measureText(nm).width>pw-170*U)nm=nm.slice(0,-1);ctx.fillText(nm,tx,y+11*U);}
    const mf=P.moneyF>0?1+.2*Math.sin(P.moneyF/20*Math.PI):1;if(P.moneyF>0)P.moneyF--;const ms='€ '+Math.round(P.money).toLocaleString('nl-NL');ctx.save();ctx.font=`800 ${18*U}px Inter, sans-serif`;const mw=ctx.measureText(ms).width;ctx.translate(tr-mw/2,y+21*U);ctx.scale(mf,mf);ctx.fillStyle='#f5c542';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(ms,0,0);ctx.restore();
    ctx.font=`600 ${12*U}px Inter, sans-serif`;ctx.fillStyle='#a9acc4';ctx.textAlign='left';ctx.textBaseline='top';ctx.fillText(rankOf(PRG.lvl),tx,y+33*U);
    const vw=30*U,bar=(by,k,c0,c1,val,ic)=>{const bx=tx+18*U,bw=tr-vw-bx;ic(tx+6*U,by+3.5*U);ctx.fillStyle='rgba(255,255,255,.1)';rrect(ctx,bx,by,bw,7*U,3.5*U);ctx.fill();const g=ctx.createLinearGradient(bx,0,bx+bw,0);g.addColorStop(0,c0);g.addColorStop(1,c1);ctx.fillStyle=g;rrect(ctx,bx,by,Math.max(4*U,bw*k),7*U,3.5*U);ctx.fill();ctx.font=`700 ${12*U}px Inter, sans-serif`;ctx.fillStyle=c1;ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText(String(val),tr,by+4*U);};
@@ -55,7 +55,7 @@ function hud(){
   // hint
   let hint='';if(!P.dead){if(P.car)hint=IS_TOUCH?'':'E: uitstappen · Spatie: handrem · S: remmen';else if(carNear())hint=IS_TOUCH?'':'E: instappen';else if(swimming())hint='Je zwemt! Zoek de kant op';else if(frameN<1500&&!IS_TOUCH)hint='Spatie: waterballon gooien';}
   if(hint)txt(hint,CW/2,CH-(IS_TOUCH?175:40),13.5*U,'#fff','center','Inter, sans-serif');
-  if(!IS_TOUCH)txt('E in/uit/actie · Spatie gooien/schieten/handrem · Q wapen · R radio · J springen (2× = dubbel) · M kaart · Tab menu',16,CH-24,12,'rgba(255,255,255,.55)','left','Inter, sans-serif');
+  if(!IS_TOUCH)txt('E in/uit/actie · Spatie gooien/schieten/handrem · Q wapen wisselen · R radio · J springen (2× = dubbel) · M kaart · Tab menu',16,CH-24,12,'rgba(255,255,255,.55)','left','Inter, sans-serif');
   if(P.hurtF>0){const a=P.hurtF/18,g3=ctx.createRadialGradient(CW/2,CH/2,Math.min(CW,CH)*.3,CW/2,CH/2,Math.max(CW,CH)*.75);g3.addColorStop(0,'rgba(255,0,40,0)');g3.addColorStop(1,`rgba(255,0,40,${.55*a})`);ctx.fillStyle=g3;ctx.fillRect(0,0,CW,CH);}
   if(P.car&&speedOf(P.car)>5.2&&!MG.on){const k=clamp((speedOf(P.car)-5.2)/3,0,1);ctx.strokeStyle=`rgba(255,255,255,${.25*k})`;ctx.lineWidth=1.5;for(let i=0;i<14;i++){const a=(i*2.399+frameN*.07)%TAU,r0=Math.max(CW,CH)*(.42+((i*37+frameN*3)%40)/100);ctx.beginPath();ctx.moveTo(CW/2+Math.cos(a)*r0,CH/2+Math.sin(a)*r0);ctx.lineTo(CW/2+Math.cos(a)*(r0+60*k),CH/2+Math.sin(a)*(r0+60*k));ctx.stroke();}}
   drawCarName();statueHint();henkieMarker();actHint();progHud();jobHud();netHud();drawNotes();

@@ -23,9 +23,10 @@ function speak(txt,ch){try{const ss=window.speechSynthesis;if(!ss)return;ss.canc
 let chosen=false;
 function choose(i){if(chosen)return;chosen=true;clearInterval(autoIv);const pc=PICK[i]||CHARS[0],ch=pc.save?pc.base:pc;P.ch=ch;const SV=pc.save||null;P.maxhp=100;P.hp=P.maxhp;const line=SV?('Daar ben ik weer!'):(LINES[ch.id]||"Yeah, let's go!");
   const L2=document.getElementById('lets'),T2=document.getElementById('letsT');L2.style.setProperty('--c',ch.c);T2.style.setProperty('--c',ch.c);T2.textContent=line.toUpperCase();L2.style.display='flex';T2.style.animation='none';void T2.offsetWidth;T2.style.animation='';
-  speak(line,ch);sfx('sting');setTimeout(()=>{L2.style.display='none';chosen=false;document.getElementById('pick').style.display='none';document.getElementById('intro').style.display='none';clearInterval(slideTimer);startPlay();if(SV)applySave(SV);},1700);}
+  speak(line,ch);sfx('sting');const go=()=>{document.getElementById('pick').style.display='none';document.getElementById('intro').style.display='none';clearInterval(slideTimer);startPlay();if(SV)applySave(SV);};
+  setTimeout(()=>{L2.style.display='none';chosen=false;if(SV)go();else askName(go,go,lsGet('gtb_name')||'');},1700);}
 if(window.speechSynthesis){try{speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();}catch(e){}}
 document.getElementById('pPrev').addEventListener('click',()=>scrollToCard(Math.max(0,pickIdx-1),true));
 document.getElementById('pNext').addEventListener('click',()=>scrollToCard(Math.min(PICK.length-1,pickIdx+1),true));
 function deleteSave(){try{localStorage.removeItem(SAVE_KEY);localStorage.removeItem('gtb_name');localStorage.removeItem(PRG_KEY);}catch(e){}
-  Object.assign(PRG,{hist:[],xp:0,lvl:1,coins:[],ach:[],day:'',streak:0,gun:false,robs:0,jobs:0,races:0,dirty:false});P.gun=false;P.weapon=0;buildPick();sfx('slap');}
+  Object.assign(PRG,{hist:[],xp:0,lvl:1,coins:[],ach:[],day:'',streak:0,gun:false,robs:0,jobs:0,races:0,dirty:false});P.inv=['balloon'];P.wid='balloon';syncWpn();PRG.inv=['balloon'];buildPick();sfx('slap');}

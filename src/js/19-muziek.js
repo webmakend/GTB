@@ -15,5 +15,5 @@ function restartGame(){paused=false;bigMap=false;P.stats={nat:0,omver:0,gejat:0}
 let restartArm=0;function askRestart(){if(performance.now()-restartArm<2500){restartArm=0;restartGame();}else{restartArm=performance.now();msg('OPNIEUW BEGINNEN?','Tik nog een keer op ⟲','#ffd166',140);}}
 function startPlay(){MODE='play';radio.volume=.45;musicPlay();try{renderWorld();}catch(e){}
   if(IS_TOUCH)document.getElementById('touch').style.display='block';
-  document.getElementById('topBtns').style.display='flex';placeTopBtns();msg(P.ch?P.ch.name+' IN BOMMEL':'WELKOM IN BOMMEL','','#ffd166',150);setTimeout(()=>{if(MODE==='play'&&MIS.stage===1&&!MIS.done)missionBanner('MISSIE 1: DE KERK','Breng een bezoek aan de Sint-Maartenskerk op het Kerkplein. Volg de gele pijl en de gele stip op de kaart. Je krijgt een beloning!');},2600);last=performance.now();}
+  document.getElementById('topBtns').style.display='flex';placeTopBtns();msg(netName().toUpperCase()+' IN BOMMEL','','#ffd166',150);setTimeout(()=>{if(MODE==='play'&&MIS.stage===1&&!MIS.done)missionBanner('MISSIE 1: DE KERK','Breng een bezoek aan de Sint-Maartenskerk op het Kerkplein. Volg de gele pijl en de gele stip op de kaart. Je krijgt een beloning!');},2600);last=performance.now();}
 document.getElementById('play').addEventListener('click',showPick);

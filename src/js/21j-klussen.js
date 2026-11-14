@@ -26,11 +26,11 @@ const JOBDEF=[
     JOB.d.rid=['"Waar de rivier de stad binnenkwam, ligt mijn eerste aanwijzing." (de Waterpoort)','"Waar zieken eens werden verpleegd, bid ik verder." (de Gasthuiskapel)','"Onder de hoogste toren van Bommel." (de Sint-Maartenskerk)','"Waar het water hoog werd bewaard." (de oude watertoren)','"Keer terug naar mijn huis, de schat ligt in de kelder." (het Stadskasteel)'];
     JOB.i=0;JOB.tgt=JOB.d.cps[0];JOB.T=0;return JOB.d.rid[0];},
   step(){if(near(JOB.tgt,40)){JOB.i++;sfx('organ');if(JOB.i>=JOB.d.cps.length){const first=!PRG.ach.includes('schat');unlock('schat');jobWin(first?150:50,first?200:60,first?'Een kist vol oude munten! De schat is van jou.':'Weer een paar muntjes gevonden.');}else{JOB.tgt=JOB.d.cps[JOB.i];jobText(JOB.d.rid[JOB.i]);}}}},
- {id:'pistool',n:'Het gerucht',ic:'❓',col:'#c77dff',giver:()=>ACT.zw?[ACT.zw.x+30,ACT.zw.y+30]:null,avail:()=>!P.gun,desc:'De zwerver weet iets over een verloren pistool',
+ {id:'pistool',n:'Het gerucht',ic:'❓',col:'#c77dff',giver:()=>ACT.zw?[ACT.zw.x+30,ACT.zw.y+30]:null,avail:()=>!P.inv.includes('pistol'),desc:'De zwerver weet iets over een verloren pistool',
   start(){JOB.tgt=WTOWER?WTOWER.gun.slice():null;JOB.d.zone=1;JOB.T=0;return 'Zwerver: "In het park bij de oude watertoren ligt iets dat glinstert. Zoek goed!"';},
-  step(){if(P.gun)jobWin(0,40,'Gevonden. Wees er voorzichtig mee…');}},
+  step(){if(P.inv.includes('pistol'))jobWin(0,40,'Gevonden. Wees er voorzichtig mee…');}},
  {id:'schiet',n:'Flessen schieten',ic:'🎯',col:'#7dff6a',giver:()=>WTOWER?walkNear(WTOWER.x+120,WTOWER.y+60,0,200,8)||[WTOWER.x+120,WTOWER.y+60]:null,avail:()=>P.gun,desc:'Schiet alle flessen in het park om binnen 35 seconden',
-  start(){TARGETS=[];for(let i=0;i<8;i++){const a=i/8*TAU+rr(-.2,.2),d=rr(90,180);TARGETS.push({x:WTOWER.x+Math.cos(a)*d,y:WTOWER.y+Math.sin(a)*d,hit:0});}P.weapon=1;JOB.tgt=null;JOB.T=60*35;return 'Schiet alle 8 flessen om (Spatie / actieknop).';},
+  start(){TARGETS=[];for(let i=0;i<8;i++){const a=i/8*TAU+rr(-.2,.2),d=rr(90,180);TARGETS.push({x:WTOWER.x+Math.cos(a)*d,y:WTOWER.y+Math.sin(a)*d,hit:0});}if(P.inv.includes('pistol')){P.wid='pistol';syncWpn();}JOB.tgt=null;JOB.T=60*35;return 'Schiet alle 8 flessen om (Spatie / actieknop).';},
   step(){const left=TARGETS.filter(t=>!t.hit).length;JOB.d.left=left;if(left===0){TARGETS=[];unlock('schutter');jobWin(50,80,'Alle flessen aan gruzelementen!');}},end(){TARGETS=[];}}
 ];
 function near(p,r){if(!p)return false;const o=me();return Math.hypot(o.x-p[0],o.y-p[1])<r;}
