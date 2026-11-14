@@ -74,12 +74,15 @@ function genWorld(){
   const MR=ROADS.filter(r=>MAIN.has(r.n)),AR=ROADS.filter(r=>r.k!=='service'),nearR=(L,x,y,lim)=>{for(const r of L){if(x<r.bb[0]-lim||x>r.bb[2]+lim||y<r.bb[1]-lim||y>r.bb[3]+lim)continue;for(let i=0;i<r.p.length-1;i++){const a=r.p[i],q=r.p[i+1],dx=q[0]-a[0],dy=q[1]-a[1],L2=dx*dx+dy*dy||1;let t=clamp(((x-a[0])*dx+(y-a[1])*dy)/L2,0,1);if(Math.hypot(a[0]+dx*t-x,a[1]+dy*t-y)<lim)return true;}}return false;},nearMain=(x,y,lim)=>nearR(MR,x,y,lim);
   const edgeD=(x,y)=>{let d=1e9;for(let i=0;i<FORT.length;i++){const a=FORT[i],q=FORT[(i+1)%FORT.length],dx=q[0]-a[0],dy=q[1]-a[1],L2=dx*dx+dy*dy||1,t=clamp(((x-a[0])*dx+(y-a[1])*dy)/L2,0,1);d=Math.min(d,Math.hypot(a[0]+dx*t-x,a[1]+dy*t-y));}return d;};
   const bizB=new Set();for(const z of WD.biz){let best=-1,bd=1e9;WD.buildings.forEach((ob,k)=>{const c=centroid(ob.p);if(Math.abs(c[0]-z.x)>300||Math.abs(c[1]-z.y)>300)return;const d=pip(z.x,z.y,ob.p)?0:Math.hypot(c[0]-z.x,c[1]-z.y);if(d<bd){bd=d;best=k;}});if(best>=0&&bd<200)bizB.add(best);}
-  WD.buildings.forEach((ob,k)=>{const c=centroid(ob.p),h0=hsh(ob.p[0][0],ob.p[0][1]);const front=nearR(AR,c[0],c[1],125),edge=edgeD(c[0],c[1]);ob.keep=!!(bizB.has(k)||ob.n||ob.b==='church'||ob.b==='civic'||(front&&edge>300&&(nearMain(c[0],c[1],175)||h0%100<72)));});
+  // Waterstraat: in het echt een smalle straat vol hoge, smalle panden (geen groen)
+  const WSTR=ROADS.filter(r=>r.n==='Waterstraat'),segD=(x,y,A,B)=>{const dx=B[0]-A[0],dy=B[1]-A[1],t=clamp(((x-A[0])*dx+(y-A[1])*dy)/(dx*dx+dy*dy||1),0,1);return Math.hypot(x-A[0]-t*dx,y-A[1]-t*dy);},
+    nearWS=(x,y,d)=>WSTR.some(r=>{for(let i=0;i<r.p.length-1;i++)if(segD(x,y,r.p[i],r.p[i+1])<d)return true;return false;});
+  WD.buildings.forEach((ob,k)=>{const c=centroid(ob.p),h0=hsh(ob.p[0][0],ob.p[0][1]);const front=nearR(AR,c[0],c[1],125),edge=edgeD(c[0],c[1]);ob.ws=nearWS(c[0],c[1],190);ob.keep=!!(ob.ws||bizB.has(k)||ob.n||ob.b==='church'||ob.b==='civic'||(front&&edge>300&&(nearMain(c[0],c[1],175)||h0%100<72)));});
   for(const ob of WD.buildings){
     if(!ob.keep)continue;
     const b={p:ob.p,n:ob.n,kind:ob.b};const a=polyArea(ob.p),h=hsh(ob.p[0][0],ob.p[0][1]);
     let m=(ob.b==='apartments'?14:ob.b==='house'?8+(h%4):ob.b==='church'?22:ob.b==='retail'||ob.b==='commercial'?10:ob.b==='shed'||ob.b==='roof'||a<1200?4:9+(h%5));
-    if(ob.b==='civic')m=16;if(ob.b==='houseboat')m=4;
+    if(ob.b==='civic')m=16;if(ob.b==='houseboat')m=4;if(ob.ws&&ob.b!=='church')m=Math.max(m,13+(h%5));
     b.ht=m*3.2;b.flat=(ob.b==='retail'||ob.b==='commercial'||ob.b==='industrial'||ob.b==='apartments'||a>25000)&&ob.b!=='church';
     if(b.flat)b.roof=RP(['#9a9c9e','#86898c','#b3b3ae','#7a7d80','#c4c3bd']);
     if(ob.b==='church'){b.roof='#5d636a';b.wall='#b8ab95';b.label=ob.n;}
@@ -90,6 +93,17 @@ function genWorld(){
     if(b.label)LANDMARKS.push({n:b.label,x:b.cx,y:b.cy});
   }
   // toren van de Grote Kerk aan de westkant
+  // gaten langs de Waterstraat opvullen met smalle, hoge gevels (± 5–7 m breed)
+  {const inB=(x,y)=>BUILDINGS.some(b=>x>b.bb[0]-4&&x<b.bb[2]+4&&y>b.bb[1]-4&&y<b.bb[3]+4&&pip(x,y,b.p)),onRoad=(x,y)=>ROADS.some(r=>{if(x<r.bb[0]-r.w||x>r.bb[2]+r.w||y<r.bb[1]-r.w||y>r.bb[3]+r.w)return false;for(let i=0;i<r.p.length-1;i++)if(segD(x,y,r.p[i],r.p[i+1])<r.w/2+12)return true;return false;}),
+     inPl=(x,y)=>WD.plaza.some(p=>pip(x,y,p));let rs=7;const rnd2=()=>((rs=(rs*16807)%2147483647)/2147483647);
+   const wallC=['#8b4a35','#a0563c','#c9b79c','#e8e0d0','#7a4a3a','#b8664a','#d9cbb0','#6e3f30','#efe6d6','#a77b5a'],roofC=['#4a3a34','#5d4a40','#3d3a3a','#6b4a3a'];
+   for(const r of WSTR)for(let i=0;i<r.p.length-1;i++){const A=r.p[i],B=r.p[i+1],L=Math.hypot(B[0]-A[0],B[1]-A[1]);if(L<40)continue;const ux=(B[0]-A[0])/L,uy=(B[1]-A[1])/L,nx=-uy,ny=ux;
+     for(const sd of [-1,1]){let t=4;while(t<L-24){const w=44+rnd2()*22,fo=r.w/2+18;if(t+w>L-4)break;let ok=false;
+       for(const D of [115,90,68,48]){const p0=[A[0]+ux*t+nx*sd*fo,A[1]+uy*t+ny*sd*fo],p1=[p0[0]+ux*w,p0[1]+uy*w],p2=[p1[0]+nx*sd*D,p1[1]+ny*sd*D],p3=[p0[0]+nx*sd*D,p0[1]+ny*sd*D],cxx=(p0[0]+p2[0])/2,cyy=(p0[1]+p2[1])/2;
+         const pts=[p0,p1,p2,p3,[cxx,cyy],[(p0[0]+p1[0])/2,(p0[1]+p1[1])/2],[(p2[0]+p3[0])/2,(p2[1]+p3[1])/2]];
+         if(pts.every(q=>pip(q[0],q[1],FORT)&&!inB(q[0],q[1])&&!onRoad(q[0],q[1])&&!inPl(q[0],q[1])&&cellAt(q[0],q[1])!==WATER)){const h=hsh(p0[0]|0,p0[1]|0);
+           prepBuilding({p:sd>0?[p0,p1,p2,p3]:[p0,p3,p2,p1],ht:(14+h%6)*3.2,kind:'house',wall:wallC[h%wallC.length],roof:roofC[h%roofC.length],ridge:true,gen:1});ok=true;break;}}
+       t+=ok?w+1:10;}}}}
   const gk=BUILDINGS.find(b=>b.n==='Grote of Sint-Maartenskerk');
   if(gk){const x0=gk.bb[0],ys=gk.p.filter(q=>q[0]<x0+150).map(q=>q[1]),cy=(Math.min(...ys)+Math.max(...ys))/2,s=60;
     prepBuilding({p:[[x0-6,cy-s],[x0+2*s-6,cy-s],[x0+2*s-6,cy+s],[x0-6,cy+s]],ht:200,kind:'tower',roof:'#6b6e70',wall:'#b3a58d',ridge:false,spire:1});}
