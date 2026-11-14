@@ -10,7 +10,7 @@ function frSet(o){lsSet('gtb_friends',JSON.stringify(o));}
 function isFriend(pub){return !!frGet()[pub];}
 function pvpSend(k,to,d){PVP.out.push({k,to,i:++PVP.seq,d:Math.round(d||0),t:performance.now()});if(PVP.out.length>12)PVP.out.shift();NET.lastSent='';}
 function pvpEv(){const now=performance.now();PVP.out=PVP.out.filter(e=>now-e.t<5000);return PVP.out.map(e=>({k:e.k,to:e.to,i:e.i,d:e.d}));}
-function pvpGhosts(){return netOthers().map(p=>p.presence).filter(s=>s.pid&&s.pid!==pvpPub());}
+function pvpGhosts(){return netOthers().map(p=>p.presence).filter(s=>s.pid&&s.pid!==pvpPub()).map(s=>Object.assign({},s,{x:s.gx??s.x,y:s.gy??s.y}));}
 function pvpByPub(pub){return pvpGhosts().find(s=>s.pid===pub);}
 function pvpTarget(s){return !s.dead&&!isFriend(s.pid)&&!P.dead&&MODE==='play';}
 function pvpHit(s,dmg){const now=performance.now();if((PVP.hitCd[s.pid]||0)>now)return false;PVP.hitCd[s.pid]=now+90;pvpSend('hit',s.pid,dmg);popTxt(s.x,s.y-18,'-'+Math.round(dmg),'#ff4f6d',1);for(let i=0;i<6;i++)parts.push({x:s.x,y:s.y,vx:rr(-2,2),vy:rr(-2,2),l:14,ml:14,s:1.4,k:'f'});return true;}
@@ -53,3 +53,22 @@ function friendsOpen(){const ov=ovEl('menuOv'),b=boxEl();b.appendChild(hEl('👥
   const others=G.filter(s=>!fr[s.pid]);if(others.length){sec('NU ONLINE');for(const s of others){const nm=String(s.nm||'Speler').slice(0,14);if(PVP.req[s.pid])continue;row(nm,'LV '+(s.lv|0)+' · € '+(s.eur|0),PVP.sent[s.pid]?'VERSTUURD…':'VRIEND WORDEN',PVP.sent[s.pid]?'#3a3a5a':'#2563eb',PVP.sent[s.pid]?null:()=>pvpAsk(s.pid),true);}}
   b.appendChild(btnEl('⟵  TERUG','#3a3a5a',menuRender));ov.replaceChildren(b);}
 setInterval(()=>{if(paused||CLUB.on||(typeof FPV!=='undefined'&&FPV.on))try{netStep();}catch(e){}},300);
+// ---- chat: kleine berichtknop, iedereen ziet het bericht links tussen de meldingen ----
+const CHAT={i:0,cur:null,seen:new Set()};
+function chatSend(t){t=String(t||'').replace(/[<>]/g,'').replace(/\s+/g,' ').trim().slice(0,80);if(!t)return;CHAT.cur={i:++CHAT.i,t,ts:performance.now()};NET.lastSent='';try{netStep();}catch(e){}
+  noteAdd('💬 JIJ',t,'#36d1ff',420);sfx('blip');}
+function chatPres(){const c=CHAT.cur;if(!c)return undefined;if(performance.now()-c.ts>8000){CHAT.cur=null;return undefined;}return {i:c.i,t:c.t};}
+function chatRecv(){for(const p of netOthers()){const s=p.presence,c=s.cm;if(!c||!c.t)continue;const k=(s.pid||p.peer)+':'+c.i;if(CHAT.seen.has(k))continue;CHAT.seen.add(k);
+  if(performance.now()<(CHAT.t0||0)+3000)continue;const fr=s.pid&&isFriend(s.pid);noteAdd('💬 '+String(s.nm||'Speler').slice(0,14).toUpperCase()+(fr?' ♥':''),String(c.t).slice(0,80),fr?'#4ade80':'#c77dff',480);sfx('blip');buzz(15);}}
+CHAT.t0=performance.now();
+function chatOpen(){if(MODE!=='play')return;let bar=document.getElementById('chatBar');if(!bar){bar=document.createElement('div');bar.id='chatBar';
+    bar.innerHTML='<input id="chatIn" maxlength="80" autocomplete="off" enterkeyhint="send" placeholder="Bericht aan iedereen…"><div id="chatGo"><svg viewBox="0 0 24 24"><path d="M3 11.5l17-8-6.5 17-2.5-7z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg></div><div id="chatX">✕</div>';document.body.appendChild(bar);
+    const inp=bar.querySelector('#chatIn'),go=()=>{chatSend(inp.value);inp.value='';chatClose();};
+    inp.addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter'){e.preventDefault();go();}if(e.key==='Escape')chatClose();});inp.addEventListener('keyup',e=>e.stopPropagation());
+    bar.querySelector('#chatGo').addEventListener('pointerdown',e=>{e.preventDefault();go();});bar.querySelector('#chatX').addEventListener('pointerdown',e=>{e.preventDefault();chatClose();});}
+  bar.style.display='flex';const inp=bar.querySelector('#chatIn');inp.value='';inp.focus();for(const k in keys)keys[k]=false;}
+function chatClose(){const bar=document.getElementById('chatBar');if(bar){bar.style.display='none';const i=bar.querySelector('#chatIn');if(i)i.blur();}}
+function chatBtn(){const tb=document.getElementById('topBtns');if(!tb||document.getElementById('bChat'))return;const b=document.createElement('div');b.className='sb';b.id='bChat';b.title='Bericht sturen (T)';
+  b.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 5h16v10H9l-4 4v-4H4z"/></svg>';b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();chatOpen();});tb.appendChild(b);placeTopBtns();}
+window.addEventListener('keydown',e=>{if(MODE==='play'&&e.code==='KeyT'&&!(document.activeElement&&document.activeElement.tagName==='INPUT')&&(NET.room||NET.http)){e.preventDefault();chatOpen();}});
+setInterval(()=>{if(NET.room||NET.http){chatBtn();chatRecv();}const b=document.getElementById('bChat');if(b)b.style.display=(NET.room||NET.http)&&MODE==='play'?'flex':'none';},300);

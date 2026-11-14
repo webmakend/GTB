@@ -18,6 +18,7 @@ Het spel is één `index.html` plus de map `assets/`. Met `api.php` erbij kun je
 ## Wat spelers dan zien
 - Andere spelers lopen of rijden live rond met hun eigen naam en level erboven, ook op de minikaart.
 - Je kunt andere spelers neerschieten. Wie neergaat, verliest geld (€50 + 15% van wat hij heeft) en dat gaat naar de schutter. Je kunt daardoor in het rood komen.
+- Met de berichtknop (💬, onder de minikaart, of T op de computer) stuur je een bericht naar iedereen; het verschijnt links tussen de meldingen.
 - Vrienden (dashboard → 👥 Vrienden) kunnen niet op elkaar schieten. Ontvrienden kan in hetzelfde scherm.
 - 🌐 met het aantal spelers online. Tik erop voor de ranglijst.
 - De ranglijst toont de **top 50 aller tijden** (op respect), met een groen bolletje bij wie nu online is.

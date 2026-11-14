@@ -122,6 +122,9 @@ button{font-family:inherit}
 #joyKnob{background:radial-gradient(circle at 38% 30%,#fdfdfd,#b9bdc8 45%,#6a6f7d 100%)!important;border:none!important;box-shadow:0 6px 14px rgba(0,0,0,.5),inset 0 -4px 8px rgba(0,0,0,.25)!important}
 #topBtns .sb{position:fixed;width:34px!important;height:34px!important;padding:0!important;display:flex;align-items:center;justify-content:center;background:rgba(18,20,34,.92)!important;border:1.5px solid rgba(255,255,255,.2)!important}
 #topBtns .sb svg{width:17px;height:17px;fill:#fff}
+#chatBar{position:fixed;left:calc(var(--sl) + 10px);right:calc(var(--sr) + 10px);bottom:calc(var(--sb) + 10px);z-index:70;display:none;gap:8px;align-items:center;padding:8px;border-radius:14px;background:rgba(14,8,30,.92);border:2px solid #36d1ff;box-shadow:0 0 18px rgba(54,209,255,.5)}
+#chatIn{flex:1;min-width:0;padding:11px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:#0b0418;color:#fff;font:700 16px Inter,sans-serif;outline:none}
+#chatGo,#chatX{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none}#chatGo{background:#ff2e88;box-shadow:0 0 10px #ff2e88}#chatGo svg{width:20px}#chatX{background:rgba(255,255,255,.1);color:#fff;font:800 16px Inter}
 #bNet .bdg{position:absolute;right:-5px;top:-5px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:#8b5cf6;color:#fff;font:800 10px/17px Inter,sans-serif;text-align:center;box-sizing:border-box}
 
 /* ===== filmische intro ===== */
@@ -152,3 +155,8 @@ button{font-family:inherit}
 @keyframes cfade{from{opacity:0;transform:translateY(10px)}to{opacity:1}}
 @keyframes cshake{20%{transform:translate(-8px,5px)}40%{transform:translate(7px,-6px)}60%{transform:translate(-5px,3px)}80%{transform:translate(3px,-2px)}}
 #cine .cskip{position:absolute;right:calc(var(--sr) + 18px);bottom:calc(var(--sb) + 18px);z-index:7;font:800 11px Inter,sans-serif;letter-spacing:2px;color:rgba(255,255,255,.55)}
+
+/* kleinere joystick */
+#joyBase{width:112px!important;height:112px!important;margin:-56px 0 0 -56px!important}
+#joyKnob{width:46px!important;height:46px!important}
+.card .srow{display:flex;gap:8px;margin-top:8px}.card .srow button{flex:1;padding:9px 8px;border-radius:12px;border:2px solid rgba(125,255,106,.7);background:rgba(10,30,14,.75);color:#7dff6a;font:800 12px Inter,sans-serif;letter-spacing:1px;cursor:pointer}
