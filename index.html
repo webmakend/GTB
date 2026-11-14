@@ -90,6 +90,8 @@ button{font-family:inherit}
 .sb:active{transform:scale(.92);background:#ff2e88}
 .sb:active{background:rgba(255,46,136,.6)}
 
+#bX{right:calc(var(--sr) + 126px);bottom:calc(var(--sb) + 112px);width:58px;height:58px;font-size:22px;background:rgba(255,107,61,.4);display:none}
+
 </style>
 </head>
 <body>
@@ -117,6 +119,7 @@ button{font-family:inherit}
   <div class="tb" id="bCar">IN<br>STAP</div>
   <div class="tb" id="bAct">💧<br>GOOI</div>
   <div class="tb" id="bJump">⤒<br>SPRING</div>
+  <div class="tb" id="bX">🔫</div>
 </div>
 <div id="topBtns"><div class="sb" id="bPause" title="Pauze"><svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/></svg></div><div class="sb" id="bSave" title="Opslaan"><svg viewBox="0 0 24 24"><path d="M5 4h11l3 3v12a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="8" y="4" width="7" height="5" fill="currentColor"/><rect x="8" y="13" width="8" height="5" rx="1" fill="none" stroke="currentColor" stroke-width="2"/></svg></div><div class="sb" id="bRestart" title="Opnieuw"><svg viewBox="0 0 24 24"><path d="M19 12a7 7 0 1 1-2.05-4.95" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M19 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
 <div id="sideBtns"></div>
@@ -4164,7 +4167,7 @@ const BUILDINGS=[],TREES=[],TERRACE=[];
 // kleuren naar de luchtfoto's: veel oranje pannen, leisteen-grijs, witte en bakstenen gevels
 const ROOFS=['#d0623a','#c85a33','#d97048','#bd5530','#cf6a43','#d0623a','#c85a33','#56595f','#4b4e54','#63666c','#7a3b2c'];
 const WALLS=['#ece6da','#e2d8c6','#f2eee6','#8a4a36','#9c5a42','#b98060','#d9cdb8','#7d4434','#e8e1d3'];
-const SIGNS={'Dubai Barbershop':['#0d0d0d','#d4af37'],'Kapsalon Saer':['#2b2b2b','#ffffff'],'Van Uffelen Mode':['#1f2a44','#ffffff'],'Suus Dames':['#f3e3d3','#b5523b'],'Stadskasteel':['#4a3b2a','#f0d58a'],'Perla di Cairo':['#0c5c3a','#ffffff'],'CinCin':['#5a0f2e','#ffd9e6'],'The Stone':['#141414','#f2f2f2'],'Xenos':['#e30613','#fff'],'Marktzicht Friet':['#ffcc00','#c8102e'],'IJssalon Hygge':['#f7c6d9','#7a1f3d'],'Máxima':['#0f5a3a','#ffd166'],'Huisarts':['#ffffff','#1a7f37'],'Kruidvat':['#e2001a','#fff'],'Intertoys':['#f26b0f','#fff'],'Bruna':['#0b4da2','#ffd200'],'Shoeby':['#111','#fff'],'HEMA':['#d6001c','#fff'],
+const SIGNS={'Albert Heijn':['#00a0e2','#ffffff'],'Lidl':['#0050aa','#fff000'],'Gall & Gall':['#7a1c2e','#ffffff'],'Het Zusje':['#2f2a26','#f5d7a1'],'Dubai Barbershop':['#0d0d0d','#d4af37'],'Kapsalon Saer':['#2b2b2b','#ffffff'],'Van Uffelen Mode':['#1f2a44','#ffffff'],'Suus Dames':['#f3e3d3','#b5523b'],'Stadskasteel':['#4a3b2a','#f0d58a'],'Perla di Cairo':['#0c5c3a','#ffffff'],'CinCin':['#5a0f2e','#ffd9e6'],'The Stone':['#141414','#f2f2f2'],'Xenos':['#e30613','#fff'],'Marktzicht Friet':['#ffcc00','#c8102e'],'IJssalon Hygge':['#f7c6d9','#7a1f3d'],'Máxima':['#0f5a3a','#ffd166'],'Huisarts':['#ffffff','#1a7f37'],'Kruidvat':['#e2001a','#fff'],'Intertoys':['#f26b0f','#fff'],'Bruna':['#0b4da2','#ffd200'],'Shoeby':['#111','#fff'],'HEMA':['#d6001c','#fff'],
  'Kapsalon Saer':['#2b2b2b','#e8c46a'],'Kapper Dubai':['#0d0d0d','#d4af37'],'LEF':['#1d6b4a','#fff'],'De Heeren van Bommel':['#5a1622','#f1dfb3'],'Xenos':['#e30613','#fff'],'Sport 2000':['#003da5','#fff'],
  'Toast & Tosti':['#f2b134','#3a2410'],'Zorba':['#1f5fa8','#fff'],'Máxima':['#6cace4','#fff'],'CinCin':['#7a1f3d','#fff'],"Kim's Kitchen":['#2e7d32','#fff'],'De Verdraagzaamheid':['#203a5c','#f1dfb3'],'De Eetgelegenheid':['#4e342e','#fff']};
 const CATC={'Winkel':[['#2d6cdf','#fff'],['#7b2cbf','#fff'],['#e76f51','#fff'],['#264653','#fff']],'Kapper / Barbershop':[['#111','#e8c46a'],['#3d3d3d','#fff']],'Restaurant':[['#7a1f3d','#fff'],['#1d6b4a','#fff'],['#4e342e','#ffd166']]};
@@ -4185,7 +4188,7 @@ function prepBuilding(b){
   BUILDINGS.push(b);
   if(!b.pass)polyFill(b.p,i=>{G[i]=BUILD;});
 }
-const SHOPS=[];let BEACH=null,BEACHERS=[],SWIMMERS=[],BWALK=[],BPROPS=[];
+const SHOPS=[];let WTOWER=null;let BEACH=null,BEACHERS=[],SWIMMERS=[],BWALK=[],BPROPS=[];
 const SAY_BEACH=['Ik heb nu al zand op plekken waar het zonlicht nog nooit is geweest.','Broodje kaas met een extra krokant laagje schelpengruis.','Ik kan Tuil zien liggen aan de overkant!','Het is heerlijk weer!','Wil je ook een pilsje?','Kun jij mijn rug even insmeren?'];
 function makeBeach(){const n=FORT.length,cyT=FORTBB[1]+(FORTBB[3]-FORTBB[1])*.32,c=centroid(FORT);let best=[],cur=[];
   for(let k=0;k<2*n;k++){const i=k%n;if(FORT[i][1]<cyT){cur.push(i);if(cur.length>best.length)best=cur.slice();if(cur.length>=n)break;}else cur=[];}
@@ -4253,9 +4256,33 @@ function genWorld(){
   if(wp){const ne=nearestRoadDir(wp.x,wp.y),ux=Math.cos(ne),uy=Math.sin(ne),a=48,b=78;
     prepBuilding({p:[[wp.x-ux*a-uy*b,wp.y-uy*a+ux*b],[wp.x+ux*a-uy*b,wp.y+uy*a+ux*b],[wp.x+ux*a+uy*b,wp.y+uy*a-ux*b],[wp.x-ux*a+uy*b,wp.y-uy*a-ux*b]],ht:78,kind:'gate',pass:1,roof:'#5a3a2e',wall:'#8b5a44',ridge:false,label:'Waterpoort'});
     LANDMARKS.push({n:'Waterpoort',x:wp.x,y:wp.y});}
+  // ---- extra: oude watertoren met park, supermarkten aan de Steenweg, Het Zusje op de Markt
+  {const clear=(x,y,r,bad)=>{for(let a=0;a<16;a++)for(const rr2 of [r*.35,r*.7,r]){const t=cellAt(x+Math.cos(a/16*TAU)*rr2,y+Math.sin(a/16*TAU)*rr2);if(bad.includes(t))return false;}return!bad.includes(cellAt(x,y));};
+   const spiral=(x0,y0,r,bad,maxR)=>{for(let R2=0;R2<=maxR;R2+=24)for(let k=0;k<Math.max(1,R2/12);k++){const a=k/Math.max(1,R2/12)*TAU,x=x0+Math.cos(a)*R2,y=y0+Math.sin(a)*R2;if(clear(x,y,r,bad))return[x,y];}return null;};
+   const box=(cx,cy,w,h,ang)=>{const c=Math.cos(ang),s2=Math.sin(ang),P2=[[-w/2,-h/2],[w/2,-h/2],[w/2,h/2],[-w/2,h/2]].map(([u,v])=>[cx+u*c-v*s2,cy+u*s2+v*c]);P2.push(P2[0].slice());return P2;};
+   // watertoren: in de uiterwaarden tussen de A2 en de vesting
+   const wt=spiral(8250,2560,120,[ROAD,WATER,BUILD,WALK],900);
+   if(wt){const [x,y]=wt,pp=[];for(let i=0;i<=20;i++){const a=i/20*TAU;pp.push([x+Math.cos(a)*34,y+Math.sin(a)*34]);}
+     for(let gy=-280;gy<=280;gy+=T)for(let gx=-280;gx<=280;gx+=T){if(gx*gx+gy*gy>280*280)continue;const cx=Math.floor((x+gx)/T),cy=Math.floor((y+gy)/T);if(cx<0||cy<0||cx>=GW||cy>=GH)continue;if(G[cy*GW+cx]===GRASS||G[cy*GW+cx]===SAND)G[cy*GW+cx]=PARK;}
+     let rs=11;const rn=()=>((rs=(rs*16807)%2147483647)/2147483647);
+     for(let i=0;i<70;i++){const a=rn()*TAU,d=70+rn()*200,tx=x+Math.cos(a)*d,ty=y+Math.sin(a)*d;if(cellAt(tx,ty)!==PARK)continue;if(TREES.some(q=>Math.abs(q.x-tx)<26&&Math.abs(q.y-ty)<26))continue;TREES.push({x:tx,y:ty,r:14+rn()*10,c:['#3a6b2f','#41752f','#335f2a','#4a7d36'][i%4]});}
+     prepBuilding({p:pp,ht:150,kind:'watertoren',wt:1,wall:'#9a4b32',roof:'#3b2f2a',ridge:false,flat:true,noFac:1});
+     WTOWER={x,y,door:null};LANDMARKS.push({n:'Oude Watertoren',x,y});
+     let gp=null;for(let i=0;i<60&&!gp;i++){const a=rn()*TAU,d=120+rn()*110,gx=x+Math.cos(a)*d,gy=y+Math.sin(a)*d;if(cellAt(gx,gy)===PARK&&!TREES.some(q=>Math.hypot(q.x-gx,q.y-gy)<18))gp=[gx,gy];}
+     WTOWER.gun=gp||[x+150,y];}
+   // supermarkten aan de Steenweg (Albert Heijn + Gall & Gall onder één dak, Lidl ernaast)
+   const sw=ROADS.filter(r=>r.n==='Steenweg');let sa=-.75;if(sw.length){const r=sw[0];sa=Math.atan2(r.p[r.p.length-1][1]-r.p[0][1],r.p[r.p.length-1][0]-r.p[0][0]);}
+   const s1=spiral(1640,4760,130,[ROAD,WATER,BUILD],700);
+   if(s1){const [x,y]=s1,c=Math.cos(sa),sn=Math.sin(sa);
+     const ah=box(x,y,170,110,sa),gg=box(x+c*122,y+sn*122,70,110,sa);
+     prepBuilding({p:ah,ht:28,kind:'retail',flat:true,noFac:1,wall:'#e9ecef',roof:'#b9c2cb',ridge:false});prepBuilding({p:gg,ht:28,kind:'retail',flat:true,noFac:1,wall:'#e9ecef',roof:'#a9b3bd',ridge:false});
+     WD.biz.push({n:'Albert Heijn',c:'Super',cat:'Supermarkt',adr:'Steenweg 8a',x,y},{n:'Gall & Gall',c:'Super',cat:'Slijterij',adr:'Steenweg 8a',x:x+c*122,y:y+sn*122});
+     const s2=spiral(x-sn*230,y+c*230,120,[ROAD,WATER,BUILD],600)||spiral(x+c*330,y+sn*330,120,[ROAD,WATER,BUILD],600);
+     if(s2){prepBuilding({p:box(s2[0],s2[1],170,110,sa),ht:26,kind:'retail',flat:true,noFac:1,wall:'#f4f4f4',roof:'#c9cfd6',ridge:false});WD.biz.push({n:'Lidl',c:'Super',cat:'Supermarkt',adr:'Steenweg 10',x:s2[0],y:s2[1]});}}
+   WD.biz.push({n:'Het Zusje',c:'Restaurant',cat:'Restaurant',adr:'Markt',x:4180,y:3010});}
   // winkels en horeca
   const used=new Set();
-  const signOn=(name,x,y,cat,adr)=>{let best=null,bd=1e9;for(const b of BUILDINGS){if(b.pass||b.kind==='tower'||used.has(b))continue;if(Math.abs(b.cx-x)>260||Math.abs(b.cy-y)>260)continue;const d=pip(x,y,b.p)?0:Math.hypot(b.cx-x,b.cy-y);if(d<bd){bd=d;best=b;}}
+  const signOn=(name,x,y,cat,adr)=>{let best=null,bd=1e9;for(const b of BUILDINGS){if(b.pass||b.kind==='tower'||b.wt||used.has(b))continue;if(Math.abs(b.cx-x)>260||Math.abs(b.cy-y)>260)continue;const d=pip(x,y,b.p)?0:Math.hypot(b.cx-x,b.cy-y);if(d<bd){bd=d;best=b;}}
     if(best){used.add(best);SHOPS.push({b:best,n:name,c:cat,rob:0});best.sign=name;best.signC=signCol(name,cat);best.sa=nearestRoadDir(best.cx,best.cy);LANDMARKS.push({n:name,x:best.cx,y:best.cy,shop:1,c:best.signC[0],cat,adr});}};
   for(const z of WD.biz)signOn(z.n,z.x,z.y,z.c,z.adr);
   // terrassen
@@ -4507,7 +4534,7 @@ FAC_IMG.src='assets/facades.webp';
 const FAC_BY={};FAC_META.forEach((m,i)=>{(FAC_BY[m.m+'_'+m.lit]=FAC_BY[m.m+'_'+m.lit]||[]).push(i);});
 const FAC_MX=new DOMMatrix();
 function pickFacade(b,h){
-  if(b.castle||b.kind==='church'||b.kind==='civic'||b.kind==='tower'||b.kind==='pylon'||b.kind==='gate'||b.kind==='houseboat'||b.pass||b.ht<20)return;
+  if(b.castle||b.noFac||b.wt||b.kind==='church'||b.kind==='civic'||b.kind==='tower'||b.kind==='pylon'||b.kind==='gate'||b.kind==='houseboat'||b.pass||b.ht<20)return;
   const a=(b.bb[2]-b.bb[0])*(b.bb[3]-b.bb[1]),r=(h>>>3)%100;let m;
   if(b.ws||b.gen)m=r<74?0:1;else if(b.flat||a>14000)m=r<50?2:1;else m=r<55?0:(r<92?1:2);
   const L=FAC_BY[m+'_'+((h>>>9)%100<45?1:0)];b.fac=L[(h>>>12)%L.length];
@@ -4623,7 +4650,7 @@ function flee(p,x,y,t){if(p.state==='down')return;p.state='flee';p.fx=x;p.fy=y;p
 function pedOk(p,t){if(t===BUILD||t===WATER)return false;if(p.state==='walk'&&p.cross<=0)return t===WALK||t===PLAZA||t===PARK||t===PATH||t===SAND;return true;}
 function knockDown(p,byPlayer,dir){if(p.state==='down')return;if(byPlayer){hitStop=Math.max(hitStop,4);popTxt(p.x,p.y-10,rpick(['OMVER!','BAM!','OEPS!','STRIKE!']),'#ff4f6d',1.1);ring(p.x,p.y,34,'rgba(255,90,110,.9)');shake=Math.max(shake,4);buzz(25);}if(byPlayer||Math.hypot(p.x-me().x,p.y-me().y)<450)sfx('hit',byPlayer?1:.5);p.state='down';p.downT=rr(130,220)|0;p.a=dir;p.x+=Math.cos(dir)*10;p.y+=Math.sin(dir)*10;say(p,rpick(SAY_HIT));panic(p.x,p.y,180);
   for(let i=0;i<5;i++)parts.push({x:p.x,y:p.y-6,vx:rr(-1,1),vy:rr(-1.5,-.3),l:30,ml:30,s:3,k:'st'});
-  if(byPlayer){P.stats.omver++;if(p.kind==='cop')addHeat(1.5);else addHeat(copNear(650)?1:.35);}}
+  if(byPlayer){P.stats.omver++;addXP(3);if(p.kind==='cop')addHeat(1.5);else addHeat(copNear(650)?1:.35);}}
 function soak(p,byPlayer){p.wet=900;if(byPlayer){popTxt(p.x,p.y-12,rpick(['+1 💧','NAT!','SPLASH!','PLONS!']),'#5cc8ff',.9);hitStop=Math.max(hitStop,2);}if(p.kind==='cop'){if(byPlayer)addHeat(1.1);say(p,rpick(['Staan blijven!','Dat ga je bezuren!','Ho! Politie!']));p.state='chase';}else{flee(p,P.x,P.y,rr(200,350));say(p,rpick(SAY_WET));}if(byPlayer)P.stats.nat++;}
 function pushOutOfCars(e,rad){for(const c of cars){if(c.dead)continue;const dx=e.x-c.x,dy=e.y-c.y;if(Math.abs(dx)>50||Math.abs(dy)>50)continue;const fx=Math.cos(c.a),fy=Math.sin(c.a);let lx=dx*fx+dy*fy,ly=-dx*fy+dy*fx;const hx=c.t.l/2+rad,hy=c.t.w/2+rad;
   if(Math.abs(lx)<hx&&Math.abs(ly)<hy){const px=hx-Math.abs(lx),py=hy-Math.abs(ly);if(px<py)lx+=Math.sign(lx||1)*px;else ly+=Math.sign(ly||1)*py;const nx=c.x+lx*fx-ly*fy,ny=c.y+lx*fy+ly*fx,t=cellAt(nx,ny);if(t!==BUILD&&t!==WATER){e.x=nx;e.y=ny;}}}}
@@ -4718,7 +4745,7 @@ function carNear(){let best=null,bd=1e9;for(const c of cars){if(c.dead||c.state!
   if(Math.abs(lx)<c.t.l/2+18&&Math.abs(ly)<c.t.w/2+20){const d=Math.hypot(dx,dy);if(d<bd){bd=d;best=c;}}}return best;}
 function tryEnter(){const best=carNear();if(!best)return;
   if(best.driver==='npc')ejectDriver(best);else if(best.driver==='cop'){exitCops(best);addHeat(1.2);}else if(best.type==='police')addHeat(1);
-  best.driver='player';best.ai=null;best.keep=1;P.car=best;P.stats.gejat++;showCarName(best);popTxt(best.x,best.y-16,'GEJAT!','#ffd166',1.1);sfx('door');msg(best.t.n.toUpperCase(),'','#ffffff',70);stoleBike(best);}
+  best.driver='player';best.ai=null;best.keep=1;P.car=best;P.stats.gejat++;showCarName(best);popTxt(best.x,best.y-16,'GEJAT!','#ffd166',1.1);sfx('door');msg(best.t.n.toUpperCase(),'','#ffffff',70);stoleBike(best);addXP(4);}
 function exitCar(){const c=P.car,s=c.t.w/2+10,L=[c.x+Math.sin(c.a)*s,c.y-Math.cos(c.a)*s],Rt=[c.x-Math.sin(c.a)*s,c.y+Math.cos(c.a)*s];
   const p=!footBlocked(L[0],L[1])?L:!footBlocked(Rt[0],Rt[1])?Rt:[c.x,c.y];P.x=p[0];P.y=p[1];P.a=c.a;c.driver=null;c.keep=0;c.ctl=[0,0,1];P.car=null;sfx('door');}
 function addMoney(v){P.money=Math.max(0,P.money+v);P.moneyF=20;popTxt(me().x,me().y-20,(v>0?'+':'-')+'€'+Math.abs(v).toFixed(2).replace('.',','),v>0?'#7dff6a':'#ff6b6b',1.2);}
@@ -4743,9 +4770,9 @@ function playerStep(){
     if(P.jz>0){P.jz+=P.jv;P.jv-=.32;if(P.jz<=0){P.jz=0;P.jv=0;sfx('step',1);buzz(10);P.squash=9;for(let i=0;i<6;i++){const a=rr(0,TAU);parts.push({x:P.x,y:P.y,vx:Math.cos(a)*1.2,vy:Math.sin(a)*1.2,l:20,ml:20,s:2,k:'d'});}}}
     if(touch.on&&(Math.abs(touch.jx)>.12||Math.abs(touch.jy)>.12)){mx=touch.jx;my=touch.jy;run=Math.hypot(mx,my)>.92;}
     const sw=swimming();if(sw&&frameN%14===0)parts.push({x:P.x,y:P.y,vx:0,vy:0,l:40,ml:40,s:6,k:'p'});
-    const m=Math.hypot(mx,my);P.moving=m>.1;P.running=P.moving&&run;if(m>.1){const rk=P.ch?P.ch.perk.run:1,sp=(sw?1.45:run?3.3:2.3)*rk*Math.min(1,m)*(P.jz>0?1.15:1)*(P.high>0?1.3:1)*(P.drunk>=4?.85:1);mx/=m;my/=m;if(P.drunk>=2){const w=Math.sin(frameN*.045)*Math.min(1,P.drunk/6)*.9;const c2=Math.cos(w),s2=Math.sin(w);[mx,my]=[mx*c2-my*s2,mx*s2+my*c2];}P.a=Math.atan2(my,mx);const nx=P.x+mx*sp,ny=P.y+my*sp;if(!footBlocked(nx,P.y))P.x=nx;if(!footBlocked(P.x,ny))P.y=ny;const ph=Math.floor(P.anim/Math.PI);P.anim+=sp*.28;if(Math.floor(P.anim/Math.PI)!==ph&&!(P.jz>0)){if(sw){if(ph%2===0)sfx('swim');}else{const gt=cellAt(P.x,P.y);sfx('step',run?1:0,(gt===GRASS||gt===PARK||gt===SAND)?1:0);}}}
+    const m=Math.hypot(mx,my);P.moving=m>.1;P.running=P.moving&&run;if(m>.1){const rk=P.ch?P.ch.perk.run:1,sp=(sw?1.45:run?3.3:2.3)*rk*Math.min(1,m)*(P.jz>0?1.15:1)*(P.high>0?1.3:1)*(P.boost>0?1.3:1)*(P.drunk>=4?.85:1);mx/=m;my/=m;if(P.drunk>=2){const w=Math.sin(frameN*.045)*Math.min(1,P.drunk/6)*.9;const c2=Math.cos(w),s2=Math.sin(w);[mx,my]=[mx*c2-my*s2,mx*s2+my*c2];}P.a=Math.atan2(my,mx);const nx=P.x+mx*sp,ny=P.y+my*sp;if(!footBlocked(nx,P.y))P.x=nx;if(!footBlocked(P.x,ny))P.y=ny;const ph=Math.floor(P.anim/Math.PI);P.anim+=sp*.28;if(Math.floor(P.anim/Math.PI)!==ph&&!(P.jz>0)){if(sw){if(ph%2===0)sfx('swim');}else{const gt=cellAt(P.x,P.y);sfx('step',run?1:0,(gt===GRASS||gt===PARK||gt===SAND)?1:0);}}}
     pushOutOfCars(P,6);
-    if(k.act&&P.throwCd<=0&&!sw)throwBalloon();
+    if(k.act&&P.throwCd<=0&&!sw){if(P.weapon===1&&P.gun)fireGun();else throwBalloon();}
     if(heat<.5&&P.hp<P.maxhp)P.hp=Math.min(P.maxhp,P.hp+.03);}
 }
 function beachHits(){for(const c of cars){if(c.dead)continue;const sp=speedOf(c);if(sp<1.6)continue;for(let i=BEACHERS.length-1;i>=0;i--){const b=BEACHERS[i];if(Math.abs(b.x-c.x)>26||Math.abs(b.y-c.y)>26)continue;if(b.special)continue;BEACHERS.splice(i,1);const p=makePed(b.x,b.y,'civ');p.col=b.suit;p.hair=b.hair;peds.push(p);knockDown(p,c===P.car,Math.atan2(c.vy,c.vx));}}
@@ -4803,7 +4830,7 @@ function manage(){
     placeName=swimming()?(o.y<H*.25?'Zwemmen in de Waal':'Zwemmen in de stadsgracht'):[lm,rn].filter(Boolean).join(' · ')||(inFort(o.x,o.y)?'Vesting Zaltbommel':'Zaltbommel');}
 }
 function step(){
-  frameN++;playerStep();actStep();
+  frameN++;playerStep();actStep();gunStep();radioStep();progStep();jobStep();
   for(const c of cars){if(c.dead)continue;if(c===P.car){}else if(c.driver==='npc'&&c.ai)c.ctl=aiCivil(c);else if(c.driver==='cop'&&c.ai)c.ctl=c.ai.mode==='pursuit'?aiCop(c):aiCivil(c);else c.ctl=[0,0,1];carStep(c);}
   carCollisions();carPedHits();for(const p of peds)pedStep(p);missionStep();balloonStep();bargeStep();wantedStep();manage();
   for(const m of msgs)m.life--;while(msgs.length&&msgs[0].life<=0)msgs.shift();
@@ -4948,7 +4975,7 @@ function drawBuildings(vx0,vy0,vx1,vy1,cx,cy){
     else if(b.kind==='tower'){ctx.strokeStyle='rgba(0,0,0,.4)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(r[0][0],r[0][1]);ctx.lineTo(r[2][0],r[2][1]);ctx.moveTo(r[1][0],r[1][1]);ctx.lineTo(r[3][0],r[3][1]);ctx.stroke();ctx.fillStyle='#d8b54a';ctx.beginPath();ctx.arc(rcx,rcy,4,0,TAU);ctx.fill();}
     else if(b.kind==='gate'){ctx.fillStyle='rgba(0,0,0,.22)';ctx.beginPath();ctx.moveTo(r[0][0]*.85+rcx*.15,r[0][1]*.85+rcy*.15);for(let i=1;i<n;i++)ctx.lineTo(r[i][0]*.85+rcx*.15,r[i][1]*.85+rcy*.15);ctx.fill();}
     else{ctx.strokeStyle='rgba(0,0,0,.18)';ctx.lineWidth=2;ctx.stroke();}
-    if(b.castle)drawCastleTop(b,r,f,cx,cy);
+    if(b.castle)drawCastleTop(b,r,f,cx,cy);if(b.wt)drawWaterTop(b,f,cx,cy);
     if(b.sign){const sg=b.signC;let a=b.sa;if(a>Math.PI/2)a-=Math.PI;if(a<-Math.PI/2)a+=Math.PI;ctx.save();ctx.translate(rcx,rcy);ctx.rotate(a);ctx.font='800 13px Inter, sans-serif';const tw=ctx.measureText(b.sign).width+12;
       ctx.shadowColor=sg[0];ctx.shadowBlur=14;ctx.fillStyle=sg[0];ctx.fillRect(-tw/2,-10,tw,20);ctx.shadowBlur=0;ctx.strokeStyle='rgba(255,255,255,.7)';ctx.lineWidth=1.2;ctx.strokeRect(-tw/2+1.5,-8.5,tw-3,17);ctx.fillStyle=sg[1];ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(b.sign,0,1);ctx.restore();}}
 }
@@ -4981,7 +5008,7 @@ function renderWorld(){
   drawSkids(vx0,vy0,vx1,vy1);drawBeach(vx0,vy0,vx1,vy1);drawBarges();
   for(const p of peds)if(p.state==='down'&&inV(p.x,p.y,20))drawPed(p);
   for(const p of peds)if(p.dog&&inV(p.dog.x,p.dog.y,20)){ctx.strokeStyle='rgba(30,20,20,.55)';ctx.lineWidth=.8;if(p.state!=='down'){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.dog.x+Math.cos(p.dog.a)*6,p.dog.y+Math.sin(p.dog.a)*6);ctx.stroke();}drawDog(p.dog);}
-  drawActs();
+  drawActs();drawCoins();drawJobsWorld();drawGunWorld();
   for(const p of peds)if(p.state!=='down'&&inV(p.x,p.y,20))drawPed(p);
   if(!P.car&&!P.dead){if(swimming())drawSwimmer();else{const jz=P.jz||0;if(jz>0){ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(P.x+2,P.y+3,6-jz*.05,8-jz*.06,0,0,TAU);ctx.fill();ctx.save();ctx.translate(P.x-jz*.25,P.y-jz*.6);ctx.scale(1+jz/45,1+jz/45);ctx.translate(-P.x,-P.y);}
     if(P.squash>0&&!(jz>0)){const q=P.squash/9;ctx.save();ctx.translate(P.x,P.y);ctx.scale(1+.3*q,1-.22*q);ctx.translate(-P.x,-P.y);}
@@ -5018,6 +5045,14 @@ function drawCastleTop(b,r,f,cx,cy){const n=r.length;ctx.save();
   ctx.strokeStyle='#ddd';ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(b.cx+(b.cx-cx)*f,b.cy+(b.cy-cy)*f);ctx.lineTo(mx,my);ctx.stroke();
   ctx.fillStyle='#c8102e';ctx.beginPath();ctx.moveTo(mx,my);ctx.quadraticCurveTo(mx+9,my-3+w*2,mx+18,my+w*3);ctx.lineTo(mx+18,my+7+w*3);ctx.quadraticCurveTo(mx+9,my+4+w*2,mx,my+7);ctx.closePath();ctx.fill();
   ctx.fillStyle='#ffd166';ctx.fillRect(mx+2,my+2.5,12,2);ctx.restore();}
+function drawWaterTop(b,f,cx,cy){const tx=b.cx+(b.cx-cx)*f,ty=b.cy+(b.cy-cy)*f,ex=b.cx+(b.cx-cx)*f*1.18,ey=b.cy+(b.cy-cy)*f*1.18;ctx.save();
+  // waterbak: bredere ring met rondboogvensters
+  ctx.fillStyle='#7e3d28';ctx.beginPath();ctx.arc(tx,ty,42,0,TAU);ctx.fill();ctx.strokeStyle='#c9b79c';ctx.lineWidth=3;ctx.beginPath();ctx.arc(tx,ty,40,0,TAU);ctx.stroke();
+  ctx.fillStyle='#2a2422';for(let i=0;i<12;i++){const a=i/12*TAU;ctx.beginPath();ctx.arc(tx+Math.cos(a)*36,ty+Math.sin(a)*36,3,0,TAU);ctx.fill();}
+  // kegeldak met leien
+  const g=ctx.createRadialGradient(ex-8,ey-8,2,tx,ty,40);g.addColorStop(0,'#6b5a52');g.addColorStop(1,'#2e2624');ctx.fillStyle=g;ctx.beginPath();ctx.arc(tx,ty,35,0,TAU);ctx.fill();
+  ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=1;for(let i=0;i<16;i++){const a=i/16*TAU;ctx.beginPath();ctx.moveTo(tx+Math.cos(a)*35,ty+Math.sin(a)*35);ctx.lineTo(ex,ey);ctx.stroke();}
+  ctx.fillStyle='#d8b54a';ctx.beginPath();ctx.arc(ex,ey,3.5,0,TAU);ctx.fill();ctx.strokeStyle='#d8b54a';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(ex,ey);ctx.lineTo(ex+(ex-tx)*.25,ey+(ey-ty)*.25);ctx.stroke();ctx.restore();}
 
 // ---- 14a-licht.js
 // ====================== licht (PixiJS / WebGL-lichtkaart) ======================
@@ -5156,6 +5191,7 @@ function hud(){
   if(MAPC)ctx.drawImage(MAPC,(o.x-span/2)*MAPS,(o.y-span/2)*MAPS,span*MAPS,span*MAPS,mx,my,S,S);
   const mp=(x,y)=>[mx+S/2+(x-o.x)*S/span,my+S/2+(y-o.y)*S/span];
   if(MIS.on&&!MIS.done){let [x,y]=mp(MIS.x,MIS.y);const dx=x-(mx+S/2),dy=y-(my+S/2),dd=Math.hypot(dx,dy);if(dd>S/2-7){x=mx+S/2+dx/dd*(S/2-7);y=my+S/2+dy/dd*(S/2-7);}ctx.fillStyle='#ffd166';ctx.beginPath();ctx.arc(x,y,5.5,0,TAU);ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=1.5;ctx.stroke();}
+  jobMinimap(mp,mx+S/2,my+S/2,S);progMinimap(mp,mx+S/2,my+S/2,S);
   for(const c of cars)if(c.driver==='cop'){const [x,y]=mp(c.x,c.y);ctx.fillStyle=(frameN>>3)&1?'#ff3b30':'#4d8dff';ctx.beginPath();ctx.arc(x,y,3,0,TAU);ctx.fill();}
   ctx.save();ctx.translate(mx+S/2,my+S/2);ctx.rotate(P.car?P.car.a:P.a);ctx.fillStyle='#fff';ctx.beginPath();ctx.moveTo(8,0);ctx.lineTo(-5,-6);ctx.lineTo(-2,0);ctx.lineTo(-5,6);ctx.closePath();ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=1.5;ctx.stroke();ctx.restore();
   ctx.restore();ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=3;ctx.beginPath();ctx.arc(mx+S/2,my+S/2,S/2,0,TAU);ctx.stroke();txt('N',mx+S/2,my+3,10,'#fff','center','Inter, sans-serif');
@@ -5163,10 +5199,10 @@ function hud(){
   let hint='';if(!P.dead){if(P.car)hint=IS_TOUCH?'':'E: uitstappen · Spatie: handrem · S: remmen';else if(carNear())hint=IS_TOUCH?'Tik IN STAP om in te stappen':'E: instappen';else if(swimming())hint='Je zwemt! Zoek de kant op';else if(frameN<1500)hint=IS_TOUCH?'💧 = waterballon gooien':'Spatie: waterballon gooien';}
   if(hint)txt(hint,CW/2,CH-(IS_TOUCH?175:40),13.5*U,'#fff','center','Inter, sans-serif');
   msgs.forEach(m=>{const a=clamp(Math.min(m.life/25,(m.ml-m.life)/8+.2),0,1);ctx.globalAlpha=a;const big=Math.min((sm?36:56)*U,CW*.11);txt(m.t,CW/2,CH*.3,big,m.col,'center');if(m.sub)txt(m.sub,CW/2,CH*.3+big+6,(sm?13:16)*U,'#fff','center','Inter, sans-serif');ctx.globalAlpha=1;});
-  if(!IS_TOUCH)txt('E in/uit · Spatie gooien/handrem · J springen · M kaart · muiswiel zoom · P pauze',16,CH-24,12,'rgba(255,255,255,.55)','left','Inter, sans-serif');
+  if(!IS_TOUCH)txt('E in/uit/actie · Spatie gooien/schieten/handrem · Q wapen · R radio · J springen · M kaart · P pauze',16,CH-24,12,'rgba(255,255,255,.55)','left','Inter, sans-serif');
   if(P.hurtF>0){const a=P.hurtF/18,g3=ctx.createRadialGradient(CW/2,CH/2,Math.min(CW,CH)*.3,CW/2,CH/2,Math.max(CW,CH)*.75);g3.addColorStop(0,'rgba(255,0,40,0)');g3.addColorStop(1,`rgba(255,0,40,${.55*a})`);ctx.fillStyle=g3;ctx.fillRect(0,0,CW,CH);}
   if(P.car&&speedOf(P.car)>5.2&&!MG.on){const k=clamp((speedOf(P.car)-5.2)/3,0,1);ctx.strokeStyle=`rgba(255,255,255,${.25*k})`;ctx.lineWidth=1.5;for(let i=0;i<14;i++){const a=(i*2.399+frameN*.07)%TAU,r0=Math.max(CW,CH)*(.42+((i*37+frameN*3)%40)/100);ctx.beginPath();ctx.moveTo(CW/2+Math.cos(a)*r0,CH/2+Math.sin(a)*r0);ctx.lineTo(CW/2+Math.cos(a)*(r0+60*k),CH/2+Math.sin(a)*(r0+60*k));ctx.stroke();}}
-  drawCarName();statueHint();henkieMarker();actHint();
+  drawCarName();statueHint();henkieMarker();actHint();progHud();jobHud();radioHud();
   drawMissionBanner();
   mapOverlay();
   if(paused){ctx.fillStyle='rgba(10,0,25,.65)';ctx.fillRect(0,0,CW,CH);txt('PAUZE',CW/2,CH/2-50,60,'#ffd166','center');txt(IS_TOUCH?'Tik op ▶ om verder te spelen':'Druk op P om verder te spelen',CW/2,CH/2+26,16,'#fff','center','Inter, sans-serif');}
@@ -5190,6 +5226,7 @@ function drawBigMap(){
     const tw=ctx.measureText(l.n).width;let ly=y-fs;if(placed.some(q=>Math.abs(q[0]-x)<(q[2]+tw)/2+2&&Math.abs(q[1]-ly)<fs+1))ly=y+fs;if(placed.some(q=>Math.abs(q[0]-x)<(q[2]+tw)/2+2&&Math.abs(q[1]-ly)<fs+1))continue;placed.push([x,ly,tw]);
     ctx.lineWidth=3;ctx.strokeStyle='rgba(0,0,0,.75)';ctx.strokeText(l.n,x,ly);ctx.fillStyle='#fff';ctx.fillText(l.n,x,ly);}
   if(MIS.on&&!MIS.done){const [qx,qy]=mp(MIS.x,MIS.y),r=9+3*Math.sin(frameN*.15);ctx.strokeStyle='#ffd166';ctx.lineWidth=3;ctx.beginPath();ctx.arc(qx,qy,r,0,TAU);ctx.stroke();ctx.lineWidth=3;ctx.strokeStyle='rgba(0,0,0,.8)';ctx.strokeText('MISSIE',qx,qy-r-8);ctx.fillStyle='#ffd166';ctx.fillText('MISSIE',qx,qy-r-8);}
+  jobBigMap(mp,fs);progBigMap(mp,fs);
   const [px,py]=mp(me().x,me().y);ctx.fillStyle=(frameN>>4)&1?'#fff':'#ff2e88';ctx.beginPath();ctx.arc(px,py,7,0,TAU);ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.stroke();
   txt('KAART · VESTING ZALTBOMMEL',CW/2,top-30,clamp(CW/22,16,22),'#ffd166','center');txt('tik ergens om te sluiten · ✕ rechtsboven',CW/2,top-10,11,'rgba(255,255,255,.7)','center','Inter, sans-serif');txt('Kaartdata © OpenStreetMap-bijdragers',x0+w,y0+h+4,10,'rgba(255,255,255,.6)','right','Inter, sans-serif');}
 
@@ -5342,7 +5379,7 @@ document.getElementById('play').addEventListener('click',showPick);
 // ====================== touch-bediening ======================
 function placeTopBtns(){const tb=document.getElementById('topBtns');if(tb){const S=Math.round(clamp(Math.min(CW,CH)*.27,96,150));tb.style.top=(uiTop().top+S+8)+'px';tb.style.right='calc(var(--sr) + '+(12+S/2-52)+'px)';}const sb=document.getElementById('sideBtns');if(!sb)return;const S=Math.round(clamp(Math.min(CW,CH)*.28,100,180)),top=uiTop().bottom+8+S+12;sb.style.top=top+'px';sb.style.flexDirection=(CH-top<260)?'row':'column';}
 function buzz(ms){if(Array.isArray(ms)){try{if(IS_TOUCH&&navigator.vibrate)navigator.vibrate(ms);}catch(e){}return;}try{if(IS_TOUCH&&navigator.vibrate)navigator.vibrate(ms);}catch(e){}}
-function updTouchUI(){document.getElementById('bJump').style.display=P.car||P.dead||swimming()?'none':'flex';const bA=document.getElementById('bAct'),bC=document.getElementById('bCar');const ac=P.car?'REM':'💧<br>GOOI';if(bA._t!==ac){bA.innerHTML=ac;bA._t=ac;}
+function updTouchUI(){document.getElementById('bJump').style.display=P.car||P.dead||swimming()?'none':'flex';const bA=document.getElementById('bAct'),bC=document.getElementById('bCar');const ac=P.car?'REM':P.weapon===1&&P.gun?'🔫<br>SCHIET':'💧<br>GOOI';const bX=document.getElementById('bX'),xs=(P.car&&!P.car.t.bike)||(P.gun&&!P.car),xt=P.car?'📻':P.weapon?'💧':'🔫';bX.style.display=xs&&!P.dead?'flex':'none';if(bX._t!==xt){bX.innerHTML=xt;bX._t=xt;}if(bA._t!==ac){bA.innerHTML=ac;bA._t=ac;}
   const ac2=!P.car&&ACT.cur&&!ACT.cur.off?ACT.cur:null,show=!!P.car||!!carNear()||!!ac2,ct=P.car?'UIT<br>STAP':ac2?ac2.btn:'IN<br>STAP';bC.style.display=show&&!P.dead?'flex':'none';if(bC._t!==ct){bC.innerHTML=ct;bC._t=ct;}}
 let PINCH=null,joyCancel=()=>{};
 function setupPinch(){const isBtn=t=>t&&t.closest&&t.closest('.tb,.sb,#mus');let first=null;
@@ -5378,6 +5415,7 @@ function setupTouch(){
   zone.addEventListener('pointerup',end);zone.addEventListener('pointercancel',end);
   const bA=document.getElementById('bAct');bA.addEventListener('pointerdown',e=>{e.preventDefault();touch.act=true;bA.classList.add('on');});['pointerup','pointercancel','pointerleave'].forEach(t=>bA.addEventListener(t,()=>{touch.act=false;bA.classList.remove('on');}));
   document.getElementById('bCar').addEventListener('pointerdown',e=>{e.preventDefault();touch.enter=true;buzz(15);});
+  const bX=document.getElementById('bX');bX.addEventListener('pointerdown',e=>{e.preventDefault();buzz(12);if(P.car)touch.radio=true;else if(P.gun){P.weapon=P.weapon?0:1;sfx('blip');msg(P.weapon?'🔫 PISTOOL':'💧 WATERBALLONNEN','','#fff',50);}});
   const bJ=document.getElementById('bJump');bJ.addEventListener('pointerdown',e=>{e.preventDefault();touch.jump=true;bJ.classList.add('on');buzz(12);});['pointerup','pointercancel','pointerleave'].forEach(t=>bJ.addEventListener(t,()=>bJ.classList.remove('on')));
   document.getElementById('bPause').addEventListener('pointerdown',e=>{e.preventDefault();paused=!paused;document.getElementById('bPause').textContent=paused?'▶':'❚❚';});
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&MODE==='play'){paused=true;document.getElementById('bPause').textContent='▶';}if(AU.c){if(document.hidden)AU.c.suspend();else AU.c.resume();}});
@@ -5572,7 +5610,7 @@ function askName(cb){const wasP=paused;paused=true;let m=document.getElementById
   document.getElementById('nameOk').onclick=ok;inp.onkeydown=e=>{e.stopPropagation();if(e.key==='Enter')ok();};}
 function savedCard(){const s=getSave();if(!s)return null;const b=CHARS.find(c=>c.id===s.base)||CHARS[0];
   return Object.assign({},b,{id:'save',save:s,base:b,name:s.name.toUpperCase(),c:'#7dff6a',sub:`VERDER SPELEN · MISSIE ${Math.min(3,s.stage===4?3:s.stage===3?2:s.stage===2?2:1)}${s.done&&s.stage>=4?' ✓':''} · €${s.money.toFixed(2).replace('.',',')}`});}
-function applySave(s){P.x=s.x;P.y=s.y;camX=P.x;camY=P.y;P.money=s.money||0;P.stats=Object.assign({nat:0,omver:0,gejat:0},s.stats||{});P.hp=s.hp||P.maxhp;
+function applySave(s){const sp=snap(SPAWN[0],SPAWN[1]);P.x=sp[0];P.y=sp[1];camX=P.x;camY=P.y;P.money=s.money||0;P.stats=Object.assign({nat:0,omver:0,gejat:0},s.stats||{});P.hp=s.hp||P.maxhp;
   MIS.gold=!!s.gold;setStage(s.stage||1);if(s.done)MIS.done=true;MBAN=null;
   const s2=snap(P.x,P.y);if(footBlocked(P.x,P.y)){P.x=s2[0];P.y=s2[1];}
   setTimeout(()=>{if(MODE==='play')missionBanner('WELKOM TERUG, '+s.name.toUpperCase(),MIS.done?'Alle missies zijn klaar. Verken Bommel op je eigen manier!':(MIS_DO[MIS.stage]||''),'#7dff6a',300);},1200);}
@@ -5624,8 +5662,8 @@ function drawCarName(){if(!CARNAME||MG.on)return;if(--CARNAME.life<=0||!P.car){C
 // Zwerver met 'spul', fietsen stelen uit de rekken, winkels overvallen, bier bij Café Henkie en daarna
 // wildplassen, eten (friet, ijs, Máxima) en de huisarts voor nieuwe health.
 const ACT={cur:null,zw:null,racks:[],hintA:0,lowWarn:0};
-P.drunk=0;P.bladder=0;P.bladP=0;P.high=0;P.peeT=0;
-const FOOD={'Perla di Cairo':{p:8,hp:50,t:'Pizza bij Perla di Cairo',e:'🍕',say:'Pizza quattro formaggi, bellissimo!'},'Marktzicht Friet':{p:3,hp:35,t:'Patatje oorlog',e:'🍟',say:'Patatje oorlog, lekker vet!'},'IJssalon Hygge':{p:2,hp:15,t:'IJsje',e:'🍦',say:'Aardbei met slagroom!'},'Máxima':{p:12,hp:70,t:'Eten bij Máxima',e:'🌮',say:'Burrito en een biefstuk, smullen!'}};
+P.drunk=0;P.bladder=0;P.bladP=0;P.high=0;P.peeT=0;P.boost=0;
+const FOOD={'Het Zusje':{p:15,hp:80,t:'Diner bij Het Zusje',e:'🍽️',say:'Shared dining: alles proeven!'},'Perla di Cairo':{p:8,hp:50,t:'Pizza bij Perla di Cairo',e:'🍕',say:'Pizza quattro formaggi, bellissimo!'},'Marktzicht Friet':{p:3,hp:35,t:'Patatje oorlog',e:'🍟',say:'Patatje oorlog, lekker vet!'},'IJssalon Hygge':{p:2,hp:15,t:'IJsje',e:'🍦',say:'Aardbei met slagroom!'},'Máxima':{p:12,hp:70,t:'Eten bij Máxima',e:'🌮',say:'Burrito en een biefstuk, smullen!'}};
 const MODE_SHOPS=new Set(['The Stone','Van Uffelen Mode','Suus Dames','Elliz in company','Shoetime','Durlinger Schoenen']);
 const CASTLE_FACTS=['Gebouwd in 1535 voor Maarten van Rossum, de beruchtste veldheer van Gelre.','Maarten van Rossum plunderde half Holland. Bommel was zijn thuisbasis.','Binnen: kruisgewelven, schouwen en tegeltableaus van eeuwen oud.','Het Stadskasteel is nu het museum van Zaltbommel.'];
 const ZW_SAY=['Psst… wil je wat spul?','Heb je een euro voor me?','Bommel is mijn huiskamer, vriend.','Niet zeggen tegen de wouten, hè.','Ik ken iedereen hier. Iedereen!'];
@@ -5639,13 +5677,16 @@ function initActs(){
 }
 function nearShop(){let best=null,bd=34;for(const s of SHOPS){const b=s.b;if(P.x<b.bb[0]-40||P.x>b.bb[2]+40||P.y<b.bb[1]-40||P.y>b.bb[3]+40)continue;const d=ptPolyD(P.x,P.y,b.p);if(d<bd){bd=d;best=s;}}return best;}
 function actFind(){
-  if(P.car||P.dead||CLUB.on||MG.on||P.peeT>0||swimming())return null;
+  if(P.car||P.dead||CLUB.on||MG.on||P.peeT>0||swimming()||FPV.on)return null;
+  const ja=jobAct();if(ja)return ja;
+  if(WTOWER&&Math.hypot(P.x-WTOWER.x,P.y-WTOWER.y)<64)return{k:'fpv',sc:'toren',t:'🗼 Beklim de oude watertoren',btn:'🗼<br>KLIM'};
   if(P.bladder>=100&&!carNear())return{k:'pee',t:'',btn:'💦<br>PLAS'};
   const z=ACT.zw;if(z&&Math.hypot(P.x-z.x,P.y-z.y)<46)return{k:'zw',t:P.high>0?'De zwerver: "Rustig aan, maat"':'Spul kopen bij de zwerver (€5)',btn:'💊<br>€5',off:P.high>0};
   const s=nearShop();
   if(s){if(s.n==='Café Henkie')return null;
     if(s.n==='Huisarts')return{k:'doc',s,t:P.hp>=P.maxhp?'Huisarts: je bent kerngezond':'Naar de dokter: volle health (€2)',btn:'🩺<br>€2',off:P.hp>=P.maxhp};
     const f=FOOD[s.n];if(f)return{k:'eat',s,f,t:`${f.t} (€${f.p})`,btn:`${f.e}<br>€${f.p}`};
+    const SC={'Albert Heijn':'ah','Lidl':'lidl','Gall & Gall':'gall'}[s.n];if(SC)return{k:'fpv',sc:SC,t:'Naar binnen bij '+s.n,btn:'🛒<br>BINNEN'};
     if(s.n==='CinCin')return{k:'wine',s,t:'Glaasje wijn bij CinCin (€4)',btn:'🍷<br>€4'};
     if(s.c==='Kapper / Barbershop')return{k:'cut',s,t:`Knippen bij ${s.n} (€15)`,btn:'💈<br>€15'};
     if(s.n==='Stadskasteel')return{k:'castle',s,t:'Stadskasteel bezoeken (€3)',btn:'🏰<br>€3'};
@@ -5654,30 +5695,32 @@ function actFind(){
   if(P.bladder+P.bladP>=20&&!carNear())return{k:'pee',t:'',btn:'💦<br>PLAS'};
   return null;}
 function actTry(){const a=ACT.cur;if(!a)return false;if(a.off)return true;
+  if(a.k==='job'){startJob(a.j);return true;}
+  if(a.k==='fpv'){fpvEnter(a.sc);return true;}
   if(a.k==='zw'){if(P.money<5){say(ACT.zw,'Geen geld, geen spul.');sfx('blip');return true;}addMoney(-5);P.high=60*45;say(ACT.zw,'Niet alles tegelijk, hè!');sfx('whoosh');msg('ZO… DAT IS STERK SPUL','Alles kleurt en je rent harder','#c77dff',170);if(copNear(320))addHeat(1.1);return true;}
   if(a.k==='doc'){if(P.money<2){msg('GEEN GELD','Een consult kost €2','#ff6b6b',110);return true;}addMoney(-2);P.hp=P.maxhp;P.high=0;P.drunk=Math.max(0,P.drunk-2);sfx('reward');msg('WEER HELEMAAL FIT','De huisarts plakt je weer aan elkaar','#7dff6a',140);for(let i=0;i<14;i++)parts.push({x:P.x,y:P.y,vx:rr(-1.5,1.5),vy:rr(-2,-.4),l:40,ml:40,s:1,k:'h'});return true;}
   if(a.k==='eat'){const f=a.f;if(P.money<f.p){msg('GEEN GELD','Dat kost €'+f.p,'#ff6b6b',110);return true;}addMoney(-f.p);P.hp=Math.min(P.maxhp,P.hp+f.hp);sfx('mmm');popTxt(P.x,P.y-30,'+'+f.hp+' health','#7dff6a',1.1);msg(f.t.toUpperCase(),f.say,'#ffd166',120);return true;}
-  if(a.k==='rob'){const v=Math.round(rr(35,140));a.s.rob=60*240;addMoney(v);addHeat(2.3);sfx('kassa');sfx('bell');camHit(6);msg('OVERVAL!',`€${v} uit de kassa van ${a.s.n}. De politie komt eraan!`,'#ff4d4d',170);
+  if(a.k==='rob'){const v=Math.round(rr(35,140));a.s.rob=60*240;addMoney(v);addHeat(2.3);PRG.robs++;PRG.dirty=true;unlock('overval');if(PRG.robs>=5)unlock('overval5');addXP(25);sfx('kassa');sfx('bell');camHit(6);msg('OVERVAL!',`€${v} uit de kassa van ${a.s.n}. De politie komt eraan!`,'#ff4d4d',170);
     for(const p of peds)if(p.state!=='down'&&p.kind!=='cop'&&Math.hypot(p.x-P.x,p.y-P.y)<200)say(p,rpick(['Help! Overval!','Bel de politie!','Ik heb je gezien hoor!']));return true;}
   if(a.k==='wine'){if(P.money<4){msg('GEEN GELD','Een glas wijn kost €4','#ff6b6b',110);return true;}addMoney(-4);P.drunk=Math.min(8,P.drunk+1);P.bladP+=26;sfx('kassa');msg('SANTÉ!','Een glaasje rood bij CinCin','#ff9ec4',110);return true;}
   if(a.k==='cut'){if(P.money<15){msg('GEEN GELD','Knippen kost €15','#ff6b6b',110);return true;}addMoney(-15);ACT.fresh=60*90;sfx('reward');msg('STRAK GEKNIPT!',a.s.n==='Dubai Barbershop'?'Fade met scherpe lijntjes':'Helemaal fris','#d4af37',150);return true;}
-  if(a.k==='castle'){if(P.money<3){msg('GEEN GELD','Een kaartje kost €3','#ff6b6b',110);return true;}addMoney(-3);sfx('organ');missionBanner('STADSKASTEEL ZALTBOMMEL',rpick(CASTLE_FACTS),'#f0d58a',300);return true;}
+  if(a.k==='castle'){if(P.money<3){msg('GEEN GELD','Een kaartje kost €3','#ff6b6b',110);return true;}addMoney(-3);sfx('organ');fpvEnter('kasteel');return true;}
   if(a.k==='outfit'){if(P.money<20){msg('GEEN GELD','Een outfit kost €20','#ff6b6b',110);return true;}addMoney(-20);heat=0;stars=0;for(const c of cars)if(c.driver==='cop'&&c.ai)c.ai.mode='patrol';sfx('whoosh');msg('NIEUWE OUTFIT!','De politie herkent je niet meer','#7dff6a',160);return true;}
   if(a.k==='pee'){if(P.car)return false;P.peeT=150;P.peeX=P.x;P.peeY=P.y;sfx('splash');return true;}
   return false;}
 function buyBeer(){if(P.money<2){msg('GEEN GELD','Een biertje kost €2','#ff6b6b',110);return;}addMoney(-2);P.drunk=Math.min(8,P.drunk+1);P.bladP+=34;sfx('kassa');
   const l=['PROOST!','NOG EENTJE!','GEZELLIG!','HUP, ADTJE!','IK BEN NIET DRONKEN!','WAAR IS DE WC?'];msg(l[Math.min(l.length-1,P.drunk-1)],P.drunk>=4?'De vloer begint te bewegen…':'Lekker koud biertje','#ffd166',110);}
 function actStep(){
-  for(const s of SHOPS)if(s.rob>0)s.rob--;
+  for(const s of SHOPS)if(s.rob>0)s.rob--;if(P.boost>0)P.boost--;
   // drank, plasnood en spul
   if(P.bladP>0){const d=Math.min(P.bladP,.06);P.bladP-=d;P.bladder+=d;}
   if(P.drunk>0&&frameN%(60*12)===0)P.drunk=Math.max(0,P.drunk-1);
-  if(P.bladder>=145&&P.peeT<=0&&!CLUB.on){P.bladder=0;P.bladP=0;decals.push({x:P.x,y:P.y,r:13,c:'rgba(225,205,60,.55)'});hurt(5);msg('OEPS… BROEK NAT!','Had je maar eerder moeten wildplassen','#ffd166',170);for(const p of peds)if(p.state!=='down'&&Math.hypot(p.x-P.x,p.y-P.y)<180)say(p,rpick(['Haha, kijk die broek!','Gatver!','Pampers nodig?']));}
+  if(P.bladder>=145&&P.peeT<=0&&!CLUB.on){P.bladder=0;P.bladP=0;decals.push({x:P.x,y:P.y,r:13,c:'rgba(225,205,60,.55)'});hurt(5);unlock('broek');msg('OEPS… BROEK NAT!','Had je maar eerder moeten wildplassen','#ffd166',170);for(const p of peds)if(p.state!=='down'&&Math.hypot(p.x-P.x,p.y-P.y)<180)say(p,rpick(['Haha, kijk die broek!','Gatver!','Pampers nodig?']));}
   if(P.high>0){P.high--;const h=(frameN*1.6)%360;if(frameN%3===0||P.high===0)cv.style.filter=P.high>0?`hue-rotate(${h|0}deg) saturate(${1.5+Math.sin(frameN*.05)*.4})`:'';if(P.high===0){cv.style.filter='';msg('HET SPUL IS UITGEWERKT','Je voelt je een beetje brak','#c77dff',130);hurt(6);}}
   // wildplassen
   if(P.peeT>0){P.peeT--;P.x=P.peeX;P.y=P.peeY;P.moving=false;const fx=Math.cos(P.a),fy=Math.sin(P.a);if(frameN%2===0)parts.push({x:P.x+fx*8,y:P.y+fy*8,vx:fx*rr(1.2,2)+rr(-.2,.2),vy:fy*rr(1.2,2)+rr(-.2,.2),l:14,ml:14,s:1.4,k:'y'});
     if(P.peeT===110){if(copNear(280)){addHeat(1.2);msg('BOETE! WILDPLASSEN','De politie heeft je gezien','#4d8dff',150);}else for(const p of peds)if(p.state!=='down'&&p.kind!=='cop'&&Math.hypot(p.x-P.x,p.y-P.y)<150){say(p,rpick(['Gadverdamme!','Doe normaal, man!','Dat is mijn voordeur!']));break;}}
-    if(P.peeT===0){P.bladder=0;P.bladP=0;decals.push({x:P.x+Math.cos(P.a)*20,y:P.y+Math.sin(P.a)*20,r:12,c:'rgba(225,205,60,.5)'});msg('AAAH…','Dat lucht op','#7dff6a',100);}}
+    if(P.peeT===0){P.bladder=0;P.bladP=0;decals.push({x:P.x+Math.cos(P.a)*20,y:P.y+Math.sin(P.a)*20,r:12,c:'rgba(225,205,60,.5)'});msg('AAAH…','Dat lucht op','#7dff6a',100);unlock('plas');addXP(5);}}
   // fietsenrekken vullen
   if(frameN%30===0)for(const r of ACT.racks){const d=Math.hypot(r.x-P.x,r.y-P.y);if(r.c&&(r.c.dead||!cars.includes(r.c)||Math.hypot(r.c.x-r.x,r.c.y-r.y)>60)){r.c=null;r.cd=60*90;}
     if(r.cd>0)r.cd-=30;if(!r.c&&r.cd<=0&&d<900&&d>220){const c=makeCar('fiets',r.x,r.y,r.a+Math.PI/2,null);c.rack=r;r.c=c;cars.push(c);}}
@@ -5688,7 +5731,7 @@ function actStep(){
   if(ACT.fresh>0){ACT.fresh--;if(frameN%240===0)for(const p of peds)if(p.state!=='down'&&p.kind!=='cop'&&Math.hypot(p.x-P.x,p.y-P.y)<120){say(p,rpick(['Lekker kapsel!','Zo, fris geknipt!','Waar heb jij je laten knippen?']));break;}}
   ACT.cur=actFind();
 }
-function stoleBike(c){if(c.type!=='fiets')return;msg('FIETS GEJAT!','Trappen maar','#ffd166',90);for(const p of peds)if(p.state!=='down'&&p.kind!=='cop'&&Math.hypot(p.x-c.x,p.y-c.y)<140){say(p,rpick(['Hé! Mijn fiets!','Fietsendief!','Die staat niet op slot hoor… o wacht.']));addHeat(.6);break;}}
+function stoleBike(c){if(c.type!=='fiets')return;unlock('fiets');msg('FIETS GEJAT!','Trappen maar','#ffd166',90);for(const p of peds)if(p.state!=='down'&&p.kind!=='cop'&&Math.hypot(p.x-c.x,p.y-c.y)<140){say(p,rpick(['Hé! Mijn fiets!','Fietsendief!','Die staat niet op slot hoor… o wacht.']));addHeat(.6);break;}}
 function drawActs(){
   const z=ACT.zw;
   for(const r of ACT.racks){if(Math.abs(r.x-CAM.x)>1400||Math.abs(r.y-CAM.y)>1400)continue;ctx.save();ctx.translate(r.x,r.y);ctx.rotate(r.a);ctx.strokeStyle='#8a9198';ctx.lineWidth=2;for(let i=-2;i<=2;i++){ctx.beginPath();ctx.moveTo(i*7,-11);ctx.lineTo(i*7,11);ctx.stroke();}ctx.restore();}
@@ -5703,7 +5746,7 @@ function drawActs(){
 }
 function actHint(){if(MG.on||bigMap||CLUB.on)return;ctx=fctx;const a=ACT.cur;ACT.hintA+=((a?1:0)-ACT.hintA)*.2;
   // status: drank / plasnood / spul
-  const chips=[];if(P.drunk>0)chips.push(['🍺 '+(P.drunk>=5?'Lam':P.drunk>=3?'Dronken':'Aangeschoten'),'#ffd166']);if(P.bladder+P.bladP>=20)chips.push(['🚽 Plasnood '+Math.min(100,P.bladder|0)+'%'+(IS_TOUCH?'':' · E'),P.bladder>=100&&(frameN>>4)%2?'#ff4d4d':'#7fd4ff']);if(P.high>0)chips.push(['🌀 Spul '+Math.ceil(P.high/60)+'s','#c77dff']);
+  const chips=[];if(P.drunk>0)chips.push(['🍺 '+(P.drunk>=5?'Lam':P.drunk>=3?'Dronken':'Aangeschoten'),'#ffd166']);if(P.bladder+P.bladP>=20)chips.push(['🚽 Plasnood '+Math.min(100,P.bladder|0)+'%'+(IS_TOUCH?'':' · E'),P.bladder>=100&&(frameN>>4)%2?'#ff4d4d':'#7fd4ff']);if(P.high>0)chips.push(['🌀 Spul '+Math.ceil(P.high/60)+'s','#c77dff']);if(P.boost>0)chips.push(['⚡ '+Math.ceil(P.boost/60)+'s','#36d1ff']);if(P.gun&&!P.car)chips.push([(P.weapon?'🔫 Pistool':'💧 Ballonnen')+(IS_TOUCH?'':' · Q'),P.weapon?'#ff6b3d':'#5cc8ff']);
   if(chips.length){ctx.font='800 13px Inter, sans-serif';let w=0;const ws=chips.map(c=>ctx.measureText(c[0]).width+20);w=ws.reduce((s,x)=>s+x,0)+(chips.length-1)*6;let x=CW/2-w/2;const y=uiTop().top+44;
     chips.forEach((c,i)=>{ctx.fillStyle='rgba(12,8,24,.78)';rrect(ctx,x,y,ws[i],26,13);ctx.fill();ctx.strokeStyle=c[1];ctx.lineWidth=1.5;rrect(ctx,x,y,ws[i],26,13);ctx.stroke();ctx.fillStyle=c[1];ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(c[0],x+10,y+13.5);x+=ws[i]+6;});}
   if(a&&a.k==='pee'){ACT.hintA=0;ACT.lastT='';}
@@ -5711,18 +5754,324 @@ function actHint(){if(MG.on||bigMap||CLUB.on)return;ctx=fctx;const a=ACT.cur;ACT
     ctx.fillStyle='rgba(12,8,24,.82)';rrect(ctx,CW/2-w/2,y,w,34,17);ctx.fill();ctx.strokeStyle=a&&a.k==='rob'?'#ff4d4d':'#ffd166';ctx.lineWidth=2;rrect(ctx,CW/2-w/2,y,w,34,17);ctx.stroke();ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(t,CW/2,y+17.5);ctx.globalAlpha=1;}
   ctx=wctx;}
 
+// ---- 21f-fpv.js
+// ====================== first-person scènes (panorama om je heen, rondkijken en tikken) ======================
+// Albert Heijn, Lidl, Gall & Gall, boven op de oude watertoren en binnen in het Stadskasteel.
+const FPV={on:false,sc:null,yaw:0,pitch:0,pano:{},rects:[],t:0,drag:null,once:{}};
+const PW=3600,PH=1000;
+function fpvBuy(p,fn){if(P.money<p){msg('TE WEINIG GELD','Dat kost €'+p.toFixed(2).replace('.',','),'#ff6b6b',110);sfx('blip');return;}addMoney(-p);sfx('kassa');fn();}
+function fpvRob(min,max,h){const v=Math.round(rr(min,max));addMoney(v);addHeat(h);PRG.robs++;PRG.dirty=true;unlock('overval');if(PRG.robs>=5)unlock('overval5');addXP(40);sfx('bell');camHit(8);msg('OVERVAL!',`€${v} uit de kassa. Wegwezen!`,'#ff4d4d',150);setTimeout(()=>{if(FPV.on)fpvExit();},900);}
+function heal(n,t){P.hp=Math.min(P.maxhp,P.hp+n);msg(t,'+'+n+' health','#7dff6a',100);}
+const SCENES={
+  ah:{t:'ALBERT HEIJN',c:'#00a0e2',draw:g=>superPano(g,'#00a0e2','#ffffff','Albert Heijn','#00a0e2'),hs:[
+    {a:0,y:.52,l:'🥪 Broodje kaas',p:2,f:()=>heal(20,'BROODJE KAAS')},{a:.85,y:.6,l:'🥔 Chips',p:1.5,f:()=>heal(8,'CHIPS!')},{a:-.85,y:.6,l:'⚡ Energiedrank',p:2,f:()=>{P.boost=60*40;msg('ENERGIEDRANK','40 seconden sneller rennen','#36d1ff',110);}},
+    {a:1.75,y:.62,l:'🍺 Krat bier',p:12,f:()=>{P.drunk=Math.min(8,P.drunk+3);P.bladP+=80;msg('HELE KRAT OP?!','Dat gaat hard…','#ffd166',120);}},{a:-1.75,y:.55,l:'💐 Bos bloemen',p:5,f:()=>{addXP(15);msg('VOOR JE MOEDER','Wat lief van je','#ff7ab6',110);}},
+    {a:Math.PI,y:.6,l:'🔫 KASSA OVERVALLEN',p:0,rob:1,f:()=>fpvRob(80,220,3.2)}]},
+  lidl:{t:'LIDL',c:'#0050aa',draw:g=>superPano(g,'#0050aa','#fff000','Lidl','#e60a14'),hs:[
+    {a:0,y:.52,l:'🥐 Croissantjes',p:1,f:()=>heal(14,'CROISSANTJES')},{a:.85,y:.6,l:'🍕 Diepvriespizza',p:2.5,f:()=>heal(30,'PIZZA!')},{a:-.85,y:.6,l:'⚡ Energiedrank',p:1,f:()=>{P.boost=60*40;msg('ENERGIEDRANK','40 seconden sneller rennen','#36d1ff',110);}},
+    {a:1.75,y:.62,l:'🍺 Sixpack bier',p:4,f:()=>{P.drunk=Math.min(8,P.drunk+2);P.bladP+=50;msg('SIXPACK!','Proost','#ffd166',100);}},{a:-1.75,y:.55,l:'🛠️ Gereedschapskist',p:15,f:()=>{addXP(20);msg('KLUSJESMAN','Lekker gekocht in de middenpad','#36d1ff',110);}},
+    {a:Math.PI,y:.6,l:'🔫 KASSA OVERVALLEN',p:0,rob:1,f:()=>fpvRob(70,200,3.2)}]},
+  gall:{t:'GALL & GALL',c:'#7a1c2e',draw:g=>gallPano(g),hs:[
+    {a:0,y:.55,l:'🍷 Fles rode wijn',p:8,f:()=>{P.drunk=Math.min(8,P.drunk+2);P.bladP+=40;msg('SANTÉ!','Hele fles achterover','#ff9ec4',110);}},{a:.9,y:.55,l:'🥚 Advocaat',p:9,f:()=>{JOBX.advocaat=true;msg('ADVOCAAT','Oma zal blij zijn','#ffd166',110);}},
+    {a:-.9,y:.55,l:'🥃 Whisky',p:25,f:()=>{P.drunk=8;P.bladP+=30;msg('WHISKY…','Alles draait','#ffd166',120);}},{a:Math.PI,y:.6,l:'🔫 KASSA OVERVALLEN',p:0,rob:1,f:()=>fpvRob(60,160,2.6)}]},
+  toren:{t:'OUDE WATERTOREN',c:'#ffb36b',draw:g=>torenPano(g),hs:[{a:0,y:.4,l:'🔭 Verrekijker: zoek een Gouden Bommel',p:0,f:()=>{if(revealCoin()){msg('DAAR GLINSTERT IETS!','De dichtstbijzijnde Gouden Bommel staat 90 sec. op je kaart','#ffd34d',190);}else msg('NIETS MEER TE ZIEN','Je hebt alle Gouden Bommels al','#ffd34d',140);}}]},
+  kasteel:{t:'STADSKASTEEL ZALTBOMMEL',c:'#f0d58a',draw:g=>kasteelPano(g),hs:[
+    {a:0,y:.42,l:'🖼️ Maarten van Rossum',p:0,f:()=>missionBanner('MAARTEN VAN ROSSUM',CASTLE_FACTS[1],'#f0d58a',260)},{a:1.2,y:.42,l:'🖼️ Het huis',p:0,f:()=>missionBanner('HET STADSKASTEEL',CASTLE_FACTS[0],'#f0d58a',260)},
+    {a:-1.2,y:.42,l:'🖼️ De zalen',p:0,f:()=>missionBanner('KRUISGEWELVEN',CASTLE_FACTS[2],'#f0d58a',260)},{a:Math.PI,y:.55,l:'⚔️ Zwaard van Maarten',p:0,f:()=>{if(!FPV.once.zwaard){FPV.once.zwaard=1;addXP(40);}msg('NIET AANKOMEN!','De suppoost kijkt je boos aan','#ff6b6b',120);}}]}
+};
+function panoCanvas(){const c=document.createElement('canvas');c.width=PW;c.height=PH;return c;}
+const atA=a=>((a/TAU)%1+1)%1*PW;
+function superPano(g0,c1,c2,logo,lc){const c=panoCanvas(),g=c.getContext('2d');
+  const wall=g.createLinearGradient(0,0,0,PH);wall.addColorStop(0,'#f2f4f6');wall.addColorStop(.62,'#dfe3e8');wall.addColorStop(.63,'#b9c0c8');wall.addColorStop(1,'#8d959e');g.fillStyle=wall;g.fillRect(0,0,PW,PH);
+  for(let x=0;x<PW;x+=90){g.fillStyle='rgba(255,255,255,.9)';g.fillRect(x+10,40,60,8);}// tl-lampen
+  g.fillStyle=c1;g.fillRect(0,170,PW,26);
+  // schappen met producten
+  let rs=7;const rn=()=>((rs=(rs*16807)%2147483647)/2147483647);const cols=['#e53935','#fdd835','#43a047','#1e88e5','#fb8c00','#8e24aa','#ffffff','#6d4c41','#00acc1','#f06292'];
+  for(let s=0;s<8;s++){const x0=s*PW/8+40,w=PW/8-80;if(Math.abs(s*PW/8+PW/16-atA(Math.PI))<PW/10)continue;g.fillStyle='#cfd5db';g.fillRect(x0-6,230,w+12,400);
+    for(let r=0;r<5;r++){const y=250+r*76;g.fillStyle='#9aa3ad';g.fillRect(x0-6,y+62,w+12,8);let x=x0;while(x<x0+w-14){const pw2=14+rn()*26,ph2=30+rn()*28;g.fillStyle=cols[(rn()*cols.length)|0];g.fillRect(x,y+62-ph2,pw2-3,ph2);g.fillStyle='rgba(255,255,255,.35)';g.fillRect(x+2,y+62-ph2+4,pw2-8,5);x+=pw2;}}
+    g.fillStyle=c1;g.fillRect(x0,205,w,22);g.fillStyle=c2;g.font='900 18px Inter, sans-serif';g.textAlign='center';g.fillText(['BROOD','CHIPS & SNOEP','ZUIVEL','DRANKEN','DIEPVRIES','GROENTE','HUISHOUDEN','BIER'][s],x0+w/2,222);}
+  // kassa achter je
+  const kx=atA(Math.PI);g.fillStyle='#37474f';g.fillRect(kx-320,520,640,140);g.fillStyle='#263238';g.fillRect(kx-320,500,640,24);for(let i=-1;i<=1;i++){g.fillStyle='#111';g.fillRect(kx+i*200-30,430,60,70);g.fillStyle='#4caf50';g.fillRect(kx+i*200-24,438,48,30);}
+  g.fillStyle=c1;g.fillRect(kx-260,300,520,80);g.fillStyle=c2;g.font='900 46px Inter, sans-serif';g.textAlign='center';g.fillText('KASSA',kx,355);
+  // logo boven de ingang
+  const lx=atA(0);g.fillStyle=lc;g.fillRect(lx-260,80,520,90);g.fillStyle='#fff';g.font='900 64px Inter, sans-serif';g.fillText(logo,lx,148);
+  // vloertegels
+  g.strokeStyle='rgba(0,0,0,.08)';for(let x=0;x<PW;x+=60){g.beginPath();g.moveTo(x,630);g.lineTo(x,PH);g.stroke();}for(let y=660;y<PH;y+=50){g.beginPath();g.moveTo(0,y);g.lineTo(PW,y);g.stroke();}
+  return c;}
+function gallPano(){const c=panoCanvas(),g=c.getContext('2d');const bg=g.createLinearGradient(0,0,0,PH);bg.addColorStop(0,'#2b1a14');bg.addColorStop(.65,'#4a2c1e');bg.addColorStop(.66,'#3a2418');bg.addColorStop(1,'#1d120c');g.fillStyle=bg;g.fillRect(0,0,PW,PH);
+  const wc=['#4a0d1a','#6b1426','#2e5a1c','#d7c37a','#7a3e12','#1a1a1a'];for(let s=0;s<10;s++){const x0=s*PW/10+30,w=PW/10-60;if(Math.abs(x0+w/2-atA(Math.PI))<PW/12)continue;g.fillStyle='#6d4c33';g.fillRect(x0-8,200,w+16,440);
+    for(let r=0;r<6;r++){const y=215+r*70;g.fillStyle='#3e2a1c';g.fillRect(x0-8,y+58,w+16,6);for(let x=x0;x<x0+w-10;x+=16){g.fillStyle=wc[(x*7+r*3+s)%wc.length];g.fillRect(x,y+8,10,50);g.fillRect(x+3,y,4,10);g.fillStyle='rgba(255,255,255,.25)';g.fillRect(x+2,y+14,2,30);g.fillStyle='#f3e9d2';g.fillRect(x+1,y+30,8,10);}}}
+  const kx=atA(Math.PI);g.fillStyle='#3e2a1c';g.fillRect(kx-260,520,520,140);g.fillStyle='#7a1c2e';g.fillRect(kx-220,300,440,80);g.fillStyle='#fff';g.font='900 46px Inter, sans-serif';g.textAlign='center';g.fillText('KASSA',kx,355);
+  const lx=atA(0);g.fillStyle='#7a1c2e';g.fillRect(lx-250,70,500,90);g.fillStyle='#fff';g.font='italic 900 60px Inter, sans-serif';g.fillText('Gall & Gall',lx,135);
+  for(let x=0;x<PW;x+=110){const gr=g.createRadialGradient(x,40,2,x,40,90);gr.addColorStop(0,'rgba(255,214,150,.6)');gr.addColorStop(1,'rgba(255,214,150,0)');g.fillStyle=gr;g.fillRect(x-90,0,180,140);}return c;}
+function torenPano(){const c=panoCanvas(),g=c.getContext('2d');const sky=g.createLinearGradient(0,0,0,PH*.62);sky.addColorStop(0,'#3a2a6b');sky.addColorStop(.5,'#e3769a');sky.addColorStop(1,'#ffc988');g.fillStyle=sky;g.fillRect(0,0,PW,PH);
+  const sx=atA(-.6);const sun=g.createRadialGradient(sx,520,10,sx,520,260);sun.addColorStop(0,'rgba(255,240,200,1)');sun.addColorStop(.15,'rgba(255,210,140,.9)');sun.addColorStop(1,'rgba(255,170,120,0)');g.fillStyle=sun;g.fillRect(sx-260,260,520,520);
+  // Waal (noord) en uiterwaarden
+  g.fillStyle='#6d8f5a';g.fillRect(0,600,PW,PH);const wx=atA(.4);g.fillStyle='#8fb6d6';g.beginPath();g.moveTo(wx-1300,610);g.quadraticCurveTo(wx,580,wx+1300,610);g.lineTo(wx+1500,700);g.quadraticCurveTo(wx,660,wx-1500,700);g.closePath();g.fill();
+  // brug (A2) met pylonen
+  const bx=atA(.75);g.strokeStyle='#efe6d4';g.lineWidth=10;g.beginPath();g.moveTo(bx-700,640);g.lineTo(bx+600,560);g.stroke();for(const o of [-250,200]){g.fillStyle='#efe6d4';g.fillRect(bx+o-8,380,16,240);g.lineWidth=2;for(let i=-5;i<=5;i++){g.beginPath();g.moveTo(bx+o,385);g.lineTo(bx+o+i*45,600-(o+i*45)*.06);g.stroke();}}
+  // vesting met kerktoren (zuidwest)
+  const kx=atA(Math.PI+.3);let rs=3;const rn=()=>((rs=(rs*16807)%2147483647)/2147483647);for(let i=0;i<70;i++){const x=kx-900+i*26,h=30+rn()*50;g.fillStyle=['#7a3e2e','#5d4037','#6d4c41','#8d5a44'][i%4];g.fillRect(x,620-h,24,h);g.fillStyle='#3b2f2a';g.beginPath();g.moveTo(x-2,620-h);g.lineTo(x+12,600-h);g.lineTo(x+26,620-h);g.fill();}
+  g.fillStyle='#5b4a3a';g.fillRect(kx-40,330,80,290);g.fillRect(kx-28,270,56,70);g.beginPath();g.moveTo(kx-30,272);g.lineTo(kx,210);g.lineTo(kx+30,272);g.fill();g.fillStyle='#2a221c';for(let i=0;i<3;i++)g.fillRect(kx-10,380+i*60,20,36);
+  // borstwering van de toren (voorgrond)
+  g.fillStyle='#7e3d28';g.fillRect(0,820,PW,PH-820);for(let x=0;x<PW;x+=120){g.fillStyle='#6a3322';g.fillRect(x,760,70,70);}g.fillStyle='rgba(0,0,0,.25)';g.fillRect(0,820,PW,10);return c;}
+function kasteelPano(){const c=panoCanvas(),g=c.getContext('2d');g.fillStyle='#8c8072';g.fillRect(0,0,PW,PH);
+  for(let y=0;y<PH;y+=40)for(let x=(y/40)%2*45;x<PW;x+=90){g.fillStyle=`rgba(0,0,0,${.05+((x*y)%7)/100})`;g.fillRect(x,y,88,38);}
+  g.fillStyle='#5d4a3a';g.fillRect(0,0,PW,90);for(let x=0;x<PW;x+=300){g.strokeStyle='#4a3a2c';g.lineWidth=14;g.beginPath();g.arc(x+150,90,150,Math.PI,0);g.stroke();}
+  g.fillStyle='#6b4a2e';g.fillRect(0,700,PW,PH-700);for(let x=0;x<PW;x+=80){g.fillStyle='rgba(0,0,0,.12)';g.fillRect(x,700,4,PH);}
+  const frame=(a,title,col)=>{const x=atA(a);g.fillStyle='#c9a227';g.fillRect(x-150,200,300,360);g.fillStyle='#3b2a1e';g.fillRect(x-130,220,260,320);const bg=g.createLinearGradient(0,220,0,540);bg.addColorStop(0,col);bg.addColorStop(1,'#1d140e');g.fillStyle=bg;g.fillRect(x-126,224,252,312);
+    g.fillStyle='#e0b48a';g.beginPath();g.ellipse(x,330,40,52,0,0,TAU);g.fill();g.fillStyle='#2a1d14';g.beginPath();g.ellipse(x,300,46,26,0,Math.PI,0);g.fill();g.fillStyle='#1a1a1a';g.fillRect(x-80,385,160,150);g.fillStyle='#d8d8d8';g.fillRect(x-60,385,120,18);
+    g.fillStyle='#f0d58a';g.font='700 22px Georgia, serif';g.textAlign='center';g.fillText(title,x,590);};
+  frame(0,'Maarten van Rossum','#5a3d2a');frame(1.2,'Bommel, 1535','#2e4a5a');frame(-1.2,'De Veldheer','#4a2e2e');
+  const ax=atA(Math.PI);g.fillStyle='#9e9e9e';g.fillRect(ax-30,300,60,200);g.beginPath();g.arc(ax,280,34,0,TAU);g.fill();g.fillStyle='#616161';g.fillRect(ax-12,268,24,6);g.strokeStyle='#cfd8dc';g.lineWidth=8;g.beginPath();g.moveTo(ax+70,250);g.lineTo(ax+70,560);g.stroke();g.fillStyle='#c9a227';g.fillRect(ax+50,300,40,10);
+  for(const a of [.6,-.6,2.1,-2.1]){const x=atA(a);g.fillStyle='#7a1c1c';g.fillRect(x-70,120,140,420);g.fillStyle='#c9a227';for(let i=0;i<5;i++)g.fillRect(x-60,150+i*80,120,6);}
+  return c;}
+function fpvEnter(id){const sc=SCENES[id];if(!sc)return;FPV.on=true;FPV.sc=id;FPV.yaw=0;FPV.pitch=0;FPV.t=0;if(!FPV.pano[id])FPV.pano[id]=sc.draw();bigMap=false;
+  document.getElementById('touch').style.display='none';document.getElementById('topBtns').style.display='none';document.getElementById('lightc').style.display='none';GL.shown=false;fpvExitBtn(true);sfx('door');
+  if(id==='toren'){unlock('uitzicht');if(!FPV.once.toren){FPV.once.toren=1;addXP(30);}}if(id==='kasteel')unlock('kasteel');}
+function fpvExit(){FPV.on=false;fpvExitBtn(false);if(IS_TOUCH)document.getElementById('touch').style.display='block';document.getElementById('topBtns').style.display='flex';sfx('door');}
+function fpvExitBtn(show){let b=document.getElementById('fpvExit');if(!b){b=document.createElement('div');b.id='fpvExit';b.textContent='⟵ NAAR BUITEN';b.style.cssText='position:fixed;z-index:40;left:calc(var(--sl) + 14px);top:calc(var(--st) + 14px);padding:10px 16px;border-radius:12px;background:rgba(10,4,24,.75);border:2px solid #ffd166;color:#fff;font:800 14px Inter,sans-serif;letter-spacing:1px;cursor:pointer;pointer-events:auto';b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();fpvExit();});document.body.appendChild(b);}b.style.display=show?'block':'none';}
+function fpvActivate(h){if(h.rob)h.f();else if(h.p>0)fpvBuy(h.p,h.f);else{sfx('blip');h.f();}}
+function fpvStep(){FPV.t++;frameN++;const k=keys;if(k.ArrowLeft||k.KeyA)FPV.yaw-=.035;if(k.ArrowRight||k.KeyD)FPV.yaw+=.035;if(k.ArrowUp||k.KeyW)FPV.pitch=Math.min(CH*.2,FPV.pitch+6);if(k.ArrowDown||k.KeyS)FPV.pitch=Math.max(-CH*.2,FPV.pitch-6);
+  if(pressed.KeyE||pressed.Escape){for(const kk in pressed)delete pressed[kk];fpvExit();return;}
+  if(pressed.Enter||pressed.Space){const sc=SCENES[FPV.sc];let best=null,bd=.3;for(const h of sc.hs){const d=Math.abs(wrap(h.a-FPV.yaw));if(d<bd){bd=d;best=h;}}if(best)fpvActivate(best);}
+  for(const kk in pressed)delete pressed[kk];
+  for(const m of msgs)m.life--;while(msgs.length&&msgs[0].life<=0)msgs.shift();}
+function drawFpv(){const g=fctx;g.setTransform(DPR,0,0,DPR,0,0);const sc=SCENES[FPV.sc],pano=FPV.pano[FPV.sc],k=CH*1.12/PH,Wk=PW*k,ppr=Wk/TAU,top=(CH-PH*k)/2+FPV.pitch;
+  g.fillStyle='#000';g.fillRect(0,0,CW,CH);const off=((FPV.yaw/TAU*Wk)%Wk+Wk)%Wk;let x0=CW/2-off;while(x0>0)x0-=Wk;for(let x=x0;x<CW;x+=Wk)g.drawImage(pano,x,top,Wk,PH*k);
+  const vg=g.createRadialGradient(CW/2,CH/2,Math.min(CW,CH)*.4,CW/2,CH/2,Math.max(CW,CH)*.75);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.55)');g.fillStyle=vg;g.fillRect(0,0,CW,CH);
+  FPV.rects=[];ctx=fctx;
+  for(const h of sc.hs){const dx=wrap(h.a-FPV.yaw)*ppr;if(Math.abs(dx)>CW/2+140)continue;const x=CW/2+dx,y=top+h.y*PH*k,lab=h.l+(h.p>0?'  €'+h.p.toFixed(2).replace('.',','):'');g.font='800 15px Inter, sans-serif';const w=g.measureText(lab).width+28,cen=Math.abs(dx)<ppr*.3,pu=cen?1+.04*Math.sin(FPV.t*.2):1;
+    g.save();g.translate(x,y);g.scale(pu,pu);g.fillStyle=h.rob?'rgba(140,10,20,.9)':'rgba(10,4,24,.82)';rrect(g,-w/2,-19,w,38,19);g.fill();g.strokeStyle=h.rob?'#ff4d4d':sc.c;g.lineWidth=cen?3:1.5;rrect(g,-w/2,-19,w,38,19);g.stroke();g.fillStyle='#fff';g.textAlign='center';g.textBaseline='middle';g.fillText(lab,0,1);g.restore();FPV.rects.push({x:x-w/2,y:y-19,w,h:38,h2:h});}
+  const tf=clamp(CW/16,20,32);txt(sc.t,CW/2,CH-110-tf,tf,sc.c,'center');txt(IS_TOUCH?'Sleep om rond te kijken · tik op iets om het te kopen':'Pijltjes of muis slepen om rond te kijken · Enter = kopen · E = naar buiten',CW/2,CH-100,12,'rgba(255,255,255,.85)','center','Inter, sans-serif');
+  txt('€ '+P.money.toFixed(2).replace('.',',')+'   ·   ♥ '+Math.round(P.hp),CW/2,CH-46,16,'#7dff6a','center','Inter, sans-serif');
+  msgs.forEach(m=>{const a=clamp(Math.min(m.life/25,(m.ml-m.life)/8+.2),0,1);g.globalAlpha=a;txt(m.t,CW/2,CH*.68,Math.min(40,CW*.09),m.col,'center');if(m.sub)txt(m.sub,CW/2,CH*.68+Math.min(40,CW*.09)+6,14,'#fff','center','Inter, sans-serif');g.globalAlpha=1;});
+  drawMissionBanner();ctx=wctx;}
+(function fpvInput(){cv.addEventListener('pointerdown',e=>{if(!FPV.on)return;FPV.drag={x:e.clientX,y:e.clientY,yaw:FPV.yaw,pitch:FPV.pitch,m:0};});
+  window.addEventListener('pointermove',e=>{const d=FPV.drag;if(!FPV.on||!d)return;d.m=Math.max(d.m,Math.hypot(e.clientX-d.x,e.clientY-d.y));FPV.yaw=d.yaw-(e.clientX-d.x)*.006;FPV.pitch=clamp(d.pitch+(e.clientY-d.y)*.8,-CH*.2,CH*.2);});
+  window.addEventListener('pointerup',e=>{const d=FPV.drag;FPV.drag=null;if(!FPV.on||!d||d.m>10)return;const r=cv.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;for(const q of FPV.rects)if(x>=q.x&&x<=q.x+q.w&&y>=q.y&&y<=q.y+q.h){fpvActivate(q.h2);break;}});})();
+
+// ---- 21g-wapen.js
+// ====================== handpistool (verloren in het park bij de oude watertoren) ======================
+// Wissel met Q (of de 🔫-knop). Schieten met Spatie / de actieknop. Licht automatisch richten.
+P.gun=false;P.weapon=0;let BULLETS=[],TARGETS=[];
+function gunGlint(){return WTOWER&&WTOWER.gun&&!P.gun;}
+function gunStep(){
+  if(gunGlint()&&!P.car){const g=WTOWER.gun;if(Math.hypot(P.x-g[0],P.y-g[1])<22){P.gun=true;P.weapon=1;PRG.gun=true;PRG.dirty=true;progSave();sfx('reward');camHit(4);
+    missionBanner('HANDPISTOOL GEVONDEN!',IS_TOUCH?'Iemand is hier zijn pistool verloren. Wissel met de 🔫-knop en schiet met de actieknop.':'Iemand is hier zijn pistool verloren. Wissel met Q en schiet met Spatie.','#ff6b3d',330);unlock('pistool');addXP(60);}}
+  if(pressed.KeyQ&&P.gun&&!P.car){P.weapon=P.weapon?0:1;sfx('blip');msg(P.weapon?'🔫 PISTOOL':'💧 WATERBALLONNEN','','#ffffff',50);}
+  for(const b of BULLETS){for(let s=0;s<3;s++){b.x+=b.vx/3;b.y+=b.vy/3;b.l-=1/3;if(b.l<=0)break;
+      if(cellAt(b.x,b.y)===BUILD){b.l=0;for(let i=0;i<5;i++)parts.push({x:b.x,y:b.y,vx:rr(-1.5,1.5),vy:rr(-1.5,1.5),l:12,ml:12,s:1,k:'k'});break;}
+      let hit=false;
+      for(const t of TARGETS){if(t.hit)continue;if(Math.hypot(t.x-b.x,t.y-b.y)<9){t.hit=1;hit=true;sfx('splash');for(let i=0;i<12;i++)parts.push({x:t.x,y:t.y,vx:rr(-2.5,2.5),vy:rr(-2.5,2.5),l:rr(15,30),ml:30,s:1.5,k:'k'});popTxt(t.x,t.y-12,'RAAK!','#7dff6a',1);break;}}
+      if(!hit)for(const p of peds){if(p.state==='down')continue;if(Math.abs(p.x-b.x)<8&&Math.abs(p.y-b.y)<8){knockDown(p,true,Math.atan2(b.vy,b.vx));if(p.kind==='cop')addHeat(1.2);hit=true;break;}}
+      if(!hit)for(const c of cars){if(c===P.car||c.dead||c.state!=='ok')continue;const dx=b.x-c.x,dy=b.y-c.y,fx=Math.cos(c.a),fy=Math.sin(c.a),lx=dx*fx+dy*fy,ly=-dx*fy+dy*fx;if(Math.abs(lx)<c.t.l/2&&Math.abs(ly)<c.t.w/2){damageCar(c,12,true);parts.push({x:b.x,y:b.y,vx:0,vy:0,l:10,ml:10,s:1,k:'k'});if(c.driver==='cop')addHeat(.8);hit=true;break;}}
+      if(hit){b.l=0;break;}}}
+  BULLETS=BULLETS.filter(b=>b.l>0);
+}
+function fireGun(){if(P.throwCd>0)return;P.throwCd=13;let a=P.a,best=null,bd=1e9;
+  const cands=[...peds.filter(p=>p.state!=='down'),...TARGETS.filter(t=>!t.hit)];
+  for(const p of cands){const dx=p.x-P.x,dy=p.y-P.y,d=Math.hypot(dx,dy);if(d>420||d<6)continue;const da=Math.abs(wrap(Math.atan2(dy,dx)-P.a));if(da>.38)continue;const sc=d*(1+da*3);if(sc<bd){bd=sc;best=p;}}
+  if(best)a=Math.atan2(best.y-P.y,best.x-P.x);a+=rr(-.03,.03);
+  const sx=P.x+Math.cos(a)*10,sy=P.y+Math.sin(a)*10;BULLETS.push({x:sx,y:sy,vx:Math.cos(a)*16,vy:Math.sin(a)*16,l:34,sx,sy});P.a=a;
+  for(let i=0;i<4;i++)parts.push({x:sx+Math.cos(a)*4,y:sy+Math.sin(a)*4,vx:Math.cos(a+rr(-.5,.5))*rr(1,3),vy:Math.sin(a+rr(-.5,.5))*rr(1,3),l:7,ml:7,s:1,k:'k'});
+  P.flash=4;camHit(2.2);shotSfx();panic(P.x,P.y,260);if(copNear(420))addHeat(.35);}
+function shotSfx(){if(!AU.c)return;const t=AU.c.currentTime,S=[AU.sfx];noiseHit(t,.09,.6,'bandpass',1800,S,.8);noiseHit(t+.01,.22,.25,'lowpass',600,S);tone('square',160,t,.001,.01,.06,.12,S,900);}
+function drawGunWorld(){
+  if(gunGlint()){const g=WTOWER.gun,d=Math.hypot(P.x-g[0],P.y-g[1]);if(Math.abs(g[0]-CAM.x)<1300&&Math.abs(g[1]-CAM.y)<1300){
+    if(d<260||(frameN%90)<8){ctx.save();ctx.globalCompositeOperation='lighter';glow(g[0],g[1],d<260?18+6*Math.sin(frameN*.2):12,'rgba(255,255,255,.55)');ctx.restore();}
+    ctx.save();ctx.translate(g[0],g[1]);ctx.rotate(.6);ctx.fillStyle='#1d1d1f';ctx.fillRect(-6,-2,12,4);ctx.fillRect(-6,-2,4,8);ctx.fillStyle='#555';ctx.fillRect(2,-1.5,4,1.2);ctx.restore();}}
+  for(const t of TARGETS){if(t.hit)continue;ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(t.x+2,t.y+3,5,2.5,0,0,TAU);ctx.fill();ctx.fillStyle='#2e7d32';ctx.fillRect(t.x-3,t.y-9,6,11);ctx.fillStyle='#a5d6a7';ctx.fillRect(t.x-1.5,t.y-12,3,4);ctx.fillStyle='rgba(255,255,255,.5)';ctx.fillRect(t.x-2,t.y-7,1.5,6);}
+  ctx.strokeStyle='rgba(255,230,140,.95)';ctx.lineWidth=2;for(const b of BULLETS){ctx.beginPath();ctx.moveTo(b.x,b.y);ctx.lineTo(b.x-b.vx*.9,b.y-b.vy*.9);ctx.stroke();}
+  if(P.flash>0&&!P.car){P.flash--;ctx.save();ctx.globalCompositeOperation='lighter';glow(P.x+Math.cos(P.a)*14,P.y+Math.sin(P.a)*14,26,'rgba(255,200,80,.8)');ctx.restore();}
+  if(P.weapon===1&&!P.car&&!P.dead){ctx.save();ctx.translate(P.x,P.y);ctx.rotate(P.a);ctx.fillStyle='#1d1d1f';ctx.fillRect(7,2,9,3);ctx.restore();}
+}
+
+// ---- 21h-radio.js
+// ====================== autoradio ======================
+// In een auto: R (of de 📻-knop) wisselt van zender. Buiten de auto speelt gewoon de achtergrondmuziek.
+const RADIO={st:0,inCar:false,show:0,seq:null,talk:null,step:0};
+const STATIONS=[{n:'RADIO BOMMEL',s:'De hits van de Bommelerwaard',c:'#ffd166'},{n:'HENKIE FM',s:'Live uit Café Henkie, Waterstraat 4',c:'#ff7ad9'},{n:'WAAL WAVE 8-BIT',s:'Chiptunes van de dijk',c:'#36d1ff'},{n:'BOMMEL PRAAT',s:'Nieuws, weer en roddels',c:'#7dff6a'},{n:'RADIO UIT',s:'',c:'#aaaaaa'}];
+const PRAAT=['Goedenavond Bommel! Het is zomer, het is warm en de Waal ligt er prachtig bij.','Verkeersinformatie: druk op de Martinus Nijhoffbrug. Rij voorzichtig, of niet, dat moet u zelf weten.','De politie meldt een golf van fietsendiefstallen in de Boschstraat. Zet uw fiets op slot!','Bij Café Henkie in de Waterstraat draait vanavond weer de beste muziek van de vesting.','Het weer: droog en zonnig, ideaal voor een ijsje bij de ijssalon.','Gezocht: een gouden munt met een B erop. Er zouden er vijfentwintig verstopt liggen in de stad.','Een wandelaar meldt een glinstering in het park bij de oude watertoren. Wat zou dat zijn?','Maarten van Rossum zou trots zijn op deze stad. Of hij zou hem plunderen.','Reclame: Patatje oorlog bij de friettent op de Gamerschestraat. Lekker vet!','Dit was Bommel Praat. Blijf veilig, en blijf weg bij de wildplassers.'];
+function radioAllOff(){try{barMusic.pause();}catch(e){}if(RADIO.seq){clearInterval(RADIO.seq);RADIO.seq=null;}if(RADIO.talk){clearTimeout(RADIO.talk);RADIO.talk=null;}try{speechSynthesis.cancel();}catch(e){}}
+function radioPlay(){radioAllOff();const st=RADIO.st;
+  if(st===0){if(AU.on)musicPlay();radio.volume=.5;}
+  else{try{radio.pause();}catch(e){}}
+  if(st===1){barMusic.volume=.55;barMusic.play().catch(()=>{});}
+  if(st===2){auInit();RADIO.step=0;const S=[AU.sfx],mel=[0,4,7,12,7,4,9,7,5,9,12,9,7,4,2,4],bas=[0,0,-5,-5,-3,-3,-7,-7];RADIO.seq=setInterval(()=>{if(!AU.c)return;const t=AU.c.currentTime+.02,i=RADIO.step++;const f=k=>440*Math.pow(2,(k-9)/12);
+      tone('square',f(mel[i%16]+(Math.floor(i/32)%2?2:0)),t,.002,.05,.08,.05,S,2600);if(i%2===0)tone('triangle',f(bas[(i>>2)%8]-12),t,.002,.12,.1,.09,S);if(i%4===0)kick(t,AU.sfx);if(i%4===2)noiseHit(t,.05,.08,'highpass',6000,S);},125);}
+  if(st===3){const say=()=>{if(RADIO.st!==3||!RADIO.inCar)return;try{auInit();const t=AU.c.currentTime;tone('sine',880,t,.01,.08,.1,.08,[AU.sfx]);tone('sine',1320,t+.12,.01,.08,.15,.08,[AU.sfx]);
+      const u=new SpeechSynthesisUtterance(rpick(PRAAT));u.lang='nl-NL';const v=speechSynthesis.getVoices().find(v=>/^nl/i.test(v.lang));if(v)u.voice=v;u.rate=1.05;u.pitch=.9;setTimeout(()=>speechSynthesis.speak(u),500);}catch(e){}RADIO.talk=setTimeout(say,14000);};say();}
+}
+function radioStep(){const inCar=!!P.car&&!CLUB.on&&!(typeof FPV!=='undefined'&&FPV.on);
+  if(inCar&&!RADIO.inCar){RADIO.inCar=true;if(!P.car.t.bike){radioPlay();RADIO.show=150;}}
+  else if(!inCar&&RADIO.inCar){RADIO.inCar=false;radioAllOff();if(RADIO.st!==0&&AU.on&&!CLUB.on)musicPlay();radio.volume=.45;}
+  if(inCar&&!P.car.t.bike&&(pressed.KeyR||touch.radio)){touch.radio=false;RADIO.st=(RADIO.st+1)%STATIONS.length;radioPlay();RADIO.show=150;sfx('blip');}
+  if(RADIO.show>0)RADIO.show--;}
+function radioHud(){if(RADIO.show<=0||!P.car)return;ctx=fctx;const s=STATIONS[RADIO.st],a=Math.min(1,RADIO.show/30),y=CW<640?uiTop().top+(MINI_S||120)+60:uiTop().top+80;ctx.globalAlpha=a;
+  ctx.font='26px Anton, Impact, sans-serif';const w=Math.max(ctx.measureText('📻 '+s.n).width,140)+40;ctx.fillStyle='rgba(10,4,24,.85)';rrect(ctx,CW/2-w/2,y,w,s.s?62:44,14);ctx.fill();ctx.strokeStyle=s.c;ctx.lineWidth=2;rrect(ctx,CW/2-w/2,y,w,s.s?62:44,14);ctx.stroke();
+  txt('📻 '+s.n,CW/2,y+8,24,s.c,'center');if(s.s)txt(s.s+(IS_TOUCH?'':'   ·   R = volgende'),CW/2,y+40,11.5,'#fff','center','Inter, sans-serif');ctx.globalAlpha=1;ctx=wctx;}
+
+// ---- 21i-progressie.js
+// ====================== progressie: respect & levels, Gouden Bommels, prestaties, dagbonus ======================
+// Alles wordt los van het opslagslot bewaard (gtb_prog_v1), zodat je voortgang altijd blijft.
+const PROG_KEY='gtb_prog_v1';
+const PRG={xp:0,lvl:1,coins:[],ach:[],day:'',streak:0,gun:false,robs:0,jobs:0,races:0,dirty:false,combo:0,comboT:0,toasts:[],drift:0,lastStars:0,dailyDone:false,reveal:0,revealC:-1};
+const RANKS=['Toerist','Bommelaar','Straatschoffie','Kruimeldief','Gladjanus','Boef','Bendelid','Gangster','Baas van de Waterstraat','Peetvader van Bommel','Maarten van Rossum'];
+const ACH={fiets:['Fietsendief','Steel je eerste fiets'],overval:['Handen omhoog!','Je eerste overval'],overval5:['Kassakraker','5 overvallen'],lam:['Lam als een kanon','5 drankjes op'],plas:['Wildplasser','Plassen op straat'],broek:['Oeps','Broek nat geplast'],
+  pistool:['Gevonden voorwerp','Het pistool bij de watertoren gevonden'],omver10:['Kegelclub','10 mensen omver'],gejat10:['Autodief','10 voertuigen gejat'],ster3:['Gezocht','3 sterren'],ontsnapt:['Spoorloos','Ontsnapt aan de politie'],
+  missies:['Verhaal uit','Alle verhaalmissies klaar'],munt1:['Glinstering','Eerste Gouden Bommel'],munt10:['Spaarvarken','10 Gouden Bommels'],munt25:['Schatrijk','Alle 25 Gouden Bommels'],level5:['Op weg','Level 5'],level10:['Legende','Level 10'],
+  kasteel:['Cultuursnuiver','Het Stadskasteel bezocht'],uitzicht:['Hoog en droog','Boven op de oude watertoren'],klus3:['Klusjesman','3 klussen gedaan'],race:['Bommel GP','Straatrace gewonnen'],rijk:['Binnen!','€500 op zak'],schat:['Schatzoeker','De schat van Maarten van Rossum'],schutter:['Scherpschutter','Alle flessen geraakt']};
+const COINS=[];
+function progLoad(){try{const s=JSON.parse(lsGet(PROG_KEY)||'null');if(s)Object.assign(PRG,s,{toasts:[],combo:0,comboT:0,dirty:false,dailyDone:false,reveal:0});}catch(e){}PRG.lvl=lvlOf(PRG.xp);P.gun=!!PRG.gun;applyLevelPerks();}
+function progSave(){const o={xp:PRG.xp,coins:PRG.coins,ach:PRG.ach,day:PRG.day,streak:PRG.streak,gun:P.gun,robs:PRG.robs,jobs:PRG.jobs,races:PRG.races};lsSet(PROG_KEY,JSON.stringify(o));PRG.dirty=false;}
+function need(l){return Math.round(120*Math.pow(l,1.45));}
+function lvlOf(xp){let l=1,t=0;while(xp>=t+need(l)){t+=need(l);l++;}return l;}
+function lvlBase(l){let t=0;for(let i=1;i<l;i++)t+=need(i);return t;}
+function applyLevelPerks(){P.maxhp=100+Math.min(60,(PRG.lvl-1)*6);}
+function addXP(n,why){if(!n||MODE!=='play')return;const mult=1+Math.min(2,PRG.combo);PRG.combo=Math.min(2,PRG.combo+(PRG.comboT>0?1:0));PRG.comboT=200;const v=Math.round(n*mult);PRG.xp+=v;PRG.dirty=true;
+  popTxt(me().x,me().y-34,'+'+v+' RESPECT'+(mult>1?' ×'+mult:''),'#c77dff',1);
+  const L=lvlOf(PRG.xp);if(L>PRG.lvl){const old=PRG.lvl;PRG.lvl=L;applyLevelPerks();P.hp=P.maxhp;const cash=25*L;P.money+=cash;P.moneyF=20;
+    missionBanner('LEVEL '+L+': '+(RANKS[Math.min(RANKS.length-1,L-1)]).toUpperCase(),`Respect omhoog! Beloning: €${cash} en meer max. health (${P.maxhp}).`,'#c77dff',300);sfx('reward');
+    for(let i=0;i<40;i++){const a=rr(0,TAU),s=rr(1,4);parts.push({x:me().x,y:me().y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:rr(30,60),ml:60,s:1,k:'st'});}
+    if(L>=5)unlock('level5');if(L>=10)unlock('level10');}}
+function unlock(id){if(!ACH[id]||PRG.ach.includes(id))return;PRG.ach.push(id);PRG.dirty=true;PRG.toasts.push({id,t:0});sfx('sting');setTimeout(()=>{const c=PRG.combo;PRG.combo=0;addXP(50);PRG.combo=c;},400);}
+function makeCoins(){COINS.length=0;let rs=4242;const rn=()=>((rs=(rs*16807)%2147483647)/2147483647);const bb=FORTBB;let tries=0;
+  const extra=[];if(WTOWER)extra.push([WTOWER.x+60,WTOWER.y-170]);
+  for(const e of extra)COINS.push({x:e[0],y:e[1],i:COINS.length});
+  while(COINS.length<25&&tries<20000){tries++;const x=bb[0]+rn()*(bb[2]-bb[0]),y=bb[1]+rn()*(bb[3]-bb[1]);const t=cellAt(x,y);if(!(t===WALK||t===PLAZA||t===PARK||t===PATH||t===SAND))continue;if(!pip(x,y,FORT)&&t!==SAND)continue;if(COINS.some(c=>Math.hypot(c.x-x,c.y-y)<420))continue;
+    if([[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>cellAt(x+dx*14,y+dy*14)===BUILD))continue;COINS.push({x,y,i:COINS.length});}}
+function progStep(){
+  {const mh=100+Math.min(60,(PRG.lvl-1)*6);if(P.maxhp!==mh)P.maxhp=mh;}
+  if(!PRG.dailyDone&&MODE==='play'&&frameN>200){PRG.dailyDone=true;const d=new Date(),day=d.toISOString().slice(0,10),y=new Date(d-864e5).toISOString().slice(0,10);
+    if(PRG.day!==day){PRG.streak=PRG.day===y?PRG.streak+1:1;PRG.day=day;const cash=Math.min(70,10*PRG.streak);P.money+=cash;P.moneyF=20;PRG.dirty=true;setTimeout(()=>missionBanner('DAGBONUS · DAG '+PRG.streak,`Welkom terug in Bommel! €${cash} op je rekening. Kom morgen terug voor meer (max €70).`,'#7dff6a',300),3500);}}
+  if(PRG.comboT>0&&--PRG.comboT===0)PRG.combo=0;
+  if(PRG.reveal>0)PRG.reveal--;
+  // gouden bommels
+  const o=me();for(const c of COINS){if(PRG.coins.includes(c.i))continue;if(Math.abs(c.x-o.x)<26&&Math.abs(c.y-o.y)<26){PRG.coins.push(c.i);PRG.dirty=true;const n=PRG.coins.length;sfx('reward');
+      for(let i=0;i<24;i++){const a=rr(0,TAU),s=rr(1,3.5);parts.push({x:c.x,y:c.y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:rr(20,45),ml:45,s:1,k:'st'});}
+      let bonus=10;if(n%5===0)bonus=50;if(n===25)bonus=500;P.money+=bonus;P.moneyF=20;msg('GOUDEN BOMMEL '+n+'/25','+€'+bonus+(n%5===0&&n<25?' · bonus voor elke 5!':n===25?' · ALLES GEVONDEN!':''),'#ffd166',170);addXP(30);
+      if(n>=1)unlock('munt1');if(n>=10)unlock('munt10');if(n>=25)unlock('munt25');}}
+  // drift-bonus
+  const c=P.car;if(c&&!c.t.bike){const sp=speedOf(c),lat=Math.abs(-Math.sin(c.a)*c.vx+Math.cos(c.a)*c.vy);if(sp>3.5&&lat>1.6){PRG.drift+=lat;if(frameN%6===0)parts.push({x:c.x,y:c.y,vx:0,vy:0,l:30,ml:30,s:5,k:'s'});}else if(PRG.drift>0){if(PRG.drift>120){const v=Math.round(PRG.drift/25);popTxt(c.x,c.y-30,'DRIFT!','#36d1ff',1.3);addXP(v);}PRG.drift=0;}}
+  // ontsnapt aan de politie
+  if(PRG.lastStars>0&&stars===0&&!P.dead){addXP(PRG.lastStars*20);msg('ONTSNAPT!','De politie is je kwijt','#7dff6a',120);unlock('ontsnapt');}
+  if(!P.dead)PRG.lastStars=stars;else PRG.lastStars=0;
+  if(frameN%30===0){if(stars>=3)unlock('ster3');if(P.stats.omver>=10)unlock('omver10');if(P.stats.gejat>=10)unlock('gejat10');if(P.money>=500)unlock('rijk');if(MIS.allDone)unlock('missies');if(P.drunk>=5)unlock('lam');}
+  if(PRG.dirty&&frameN%300===0)progSave();
+}
+function drawCoins(){const t=frameN*.08,o=me();for(const c of COINS){if(PRG.coins.includes(c.i))continue;if(Math.abs(c.x-CAM.x)>1300||Math.abs(c.y-CAM.y)>1300)continue;
+  const d=Math.hypot(c.x-o.x,c.y-o.y),w=Math.abs(Math.cos(t+c.i)),bob=Math.sin(t*1.3+c.i)*2;
+  ctx.save();ctx.globalCompositeOperation='lighter';glow(c.x,c.y+bob,d<500?34:22,'rgba(255,210,80,.45)');ctx.restore();
+  ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(c.x+2,c.y+6,8,3,0,0,TAU);ctx.fill();
+  ctx.fillStyle='#b8860b';ctx.beginPath();ctx.ellipse(c.x,c.y+bob,9*w+1.5,9,0,0,TAU);ctx.fill();ctx.fillStyle='#ffd34d';ctx.beginPath();ctx.ellipse(c.x,c.y+bob,7.5*w+1,7.5,0,0,TAU);ctx.fill();
+  if(w>.4){ctx.fillStyle='#8a5a00';ctx.font='900 9px Inter, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.save();ctx.translate(c.x,c.y+bob);ctx.scale(w,1);ctx.fillText('B',0,.5);ctx.restore();}
+  if((frameN+c.i*7)%50<4){ctx.fillStyle='#fff';ctx.fillRect(c.x-1+5,c.y+bob-6,2,2);}}}
+function progHud(){ctx=fctx;const U=clamp(Math.min(CW,CH)/560,.75,1.25),ut=uiTop(),L0=14,S0=Math.round(clamp(Math.min(CW,CH)*.27,96,150)),pw=Math.min(CW-S0-40,236*U),ph=(stars>0?82:66)*U;
+  // XP-balk onderaan het statuspaneel
+  const base=lvlBase(PRG.lvl),nd=need(PRG.lvl),k=clamp((PRG.xp-base)/nd,0,1),bx=L0+10*U,bw=pw-20*U,by=ut.top+ph-5*U;
+  ctx.fillStyle='rgba(255,255,255,.1)';rrect(ctx,bx,by,bw,3.5*U,2);ctx.fill();const g=ctx.createLinearGradient(bx,0,bx+bw,0);g.addColorStop(0,'#7b2ff7');g.addColorStop(1,'#c77dff');ctx.fillStyle=g;rrect(ctx,bx,by,Math.max(3,bw*k),3.5*U,2);ctx.fill();
+  ctx.font=`900 ${10*U}px Inter, sans-serif`;const lt='LV '+PRG.lvl,lw=ctx.measureText(lt).width+10*U;ctx.fillStyle='#7b2ff7';rrect(ctx,L0+pw-lw-8*U,ut.top+43*U,lw,15*U,7*U);ctx.fill();ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(lt,L0+pw-lw/2-8*U,ut.top+51*U);
+  // combo
+  if(PRG.combo>0&&PRG.comboT>0){ctx.globalAlpha=Math.min(1,PRG.comboT/40);txt('COMBO ×'+(1+PRG.combo),CW/2,CH-(IS_TOUCH?250:120),clamp(CW/16,20,34),'#c77dff','center');ctx.globalAlpha=1;}
+  // prestatie-toasts
+  if(PRG.toasts.length){const q=PRG.toasts[0];q.t++;const a=q.t<20?q.t/20:q.t>200?Math.max(0,(240-q.t)/40):1,[n,d]=ACH[q.id],w=Math.min(CW-30,340),x=CW/2-w/2,y=CH-(IS_TOUCH?300:120)-(1-a)*30;
+    ctx.globalAlpha=a;ctx.fillStyle='rgba(20,8,36,.92)';rrect(ctx,x,y,w,54,14);ctx.fill();ctx.strokeStyle='#ffd166';ctx.lineWidth=2;rrect(ctx,x,y,w,54,14);ctx.stroke();
+    ctx.font='26px sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText('🏆',x+12,y+27);txt('PRESTATIE: '+n.toUpperCase(),x+50,y+8,15,'#ffd166','left');txt(d+'  ·  +50 respect',x+50,y+31,12,'#fff','left','Inter, sans-serif');ctx.globalAlpha=1;
+    if(q.t>240)PRG.toasts.shift();}
+  ctx=wctx;}
+function progMinimap(mp,cxm,cym,S){if(PRG.reveal>0&&PRG.revealC>=0){const c=COINS[PRG.revealC];if(c&&!PRG.coins.includes(c.i)){let [x,y]=mp(c.x,c.y);const dx=x-cxm,dy=y-cym,dd=Math.hypot(dx,dy);if(dd>S/2-7){x=cxm+dx/dd*(S/2-7);y=cym+dy/dd*(S/2-7);}ctx.fillStyle='#ffd34d';ctx.beginPath();ctx.arc(x,y,4.5,0,TAU);ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=1.2;ctx.stroke();}}}
+function progBigMap(mp,fs){const n=PRG.coins.length;txt(`LV ${PRG.lvl} · ${RANKS[Math.min(RANKS.length-1,PRG.lvl-1)]}   ·   Gouden Bommels ${n}/25   ·   Prestaties ${PRG.ach.length}/${Object.keys(ACH).length}   ·   Dagbonus: dag ${PRG.streak||1}`,CW/2,CH-22,12,'#c77dff','center','Inter, sans-serif');
+  if(PRG.reveal>0&&PRG.revealC>=0){const c=COINS[PRG.revealC];if(c&&!PRG.coins.includes(c.i)){const [x,y]=mp(c.x,c.y);ctx.fillStyle='#ffd34d';ctx.beginPath();ctx.arc(x,y,5,0,TAU);ctx.fill();ctx.strokeStyle='#000';ctx.stroke();}}}
+function revealCoin(){const o=me();let best=-1,bd=1e9;for(const c of COINS){if(PRG.coins.includes(c.i))continue;const d=Math.hypot(c.x-o.x,c.y-o.y);if(d<bd){bd=d;best=c.i;}}if(best<0)return false;PRG.revealC=best;PRG.reveal=60*90;return true;}
+
+// ---- 21j-klussen.js
+// ====================== klussen: extra missies, verspreid over de stad (herhaalbaar) ======================
+// Loop naar een gekleurd klus-icoon en druk op E. De straatrace start je door er met een auto in te rijden.
+const JOBX={advocaat:false};
+const JOB={cur:null,t:0,T:0,tgt:null,i:0,d:{},cd:0,list:[]};
+function shopDoor(n){const s=SHOPS.find(s=>s.n===n);if(!s)return null;return walkNear(s.b.cx,s.b.cy,30,220,12);}
+function randWalk(fx,fy,dmin,dmax){for(let i=0;i<400;i++){const a=rr(0,TAU),d=rr(dmin,dmax),x=fx+Math.cos(a)*d,y=fy+Math.sin(a)*d,t=cellAt(x,y);if((t===WALK||t===PLAZA)&&pip(x,y,FORT))return[x,y];}return snap(fx+dmin,fy);}
+function roadMid(n,k){const rs=ROADS.filter(r=>r.n===n);if(!rs.length)return null;const r=rs.reduce((a,b)=>a.p.length>=b.p.length?a:b),p=r.p[Math.floor((r.p.length-1)*(k==null?.5:k))];return[p[0],p[1]];}
+const JOBDEF=[
+ {id:'pizza',n:'Pizzakoerier',ic:'🍕',col:'#ff7043',giver:()=>shopDoor('Perla di Cairo'),desc:'Bezorg een pizza voordat hij koud is',
+  start(){const g=this.g;JOB.tgt=randWalk(g[0],g[1],900,1700);JOB.T=Math.round(Math.hypot(JOB.tgt[0]-g[0],JOB.tgt[1]-g[1])/1.9+900);return 'Bezorg de pizza op het aangegeven adres. Snel, voor de fooi!';},
+  step(){if(near(JOB.tgt,40)){const pay=15+PRG.lvl*2,tip=JOB.t<JOB.T*.5?10:0;jobWin(pay+tip,50,tip?'Pizza warm afgeleverd + €'+tip+' fooi!':'Pizza afgeleverd.');}}},
+ {id:'oma',n:'Boodschappen voor oma',ic:'👵',col:'#f48fb1',giver:()=>shopDoor("Oma's Winkeltje"),desc:'Haal boodschappen bij de Albert Heijn en advocaat bij Gall & Gall',
+  start(){JOB.i=0;JOB.tgt=shopDoor('Albert Heijn');JOB.T=60*240;return 'Oma heeft boodschappen nodig. Eerst naar de Albert Heijn aan de Steenweg.';},
+  step(){if(!JOB.tgt||!near(JOB.tgt,40))return;if(JOB.i===0){if(P.money<6){if(frameN%120===0)msg('GEEN GELD','Boodschappen kosten €6','#ff6b6b',100);return;}addMoney(-6);sfx('kassa');JOB.i=1;JOB.tgt=shopDoor('Gall & Gall');jobText('Nu nog een fles advocaat bij Gall & Gall (naast de AH).');}
+    else if(JOB.i===1){if(P.money<9){if(frameN%120===0)msg('GEEN GELD','Advocaat kost €9','#ff6b6b',100);return;}addMoney(-9);sfx('kassa');JOB.i=2;JOB.tgt=this.g;jobText("Breng alles terug naar oma bij Oma's Winkeltje.");}
+    else jobWin(60,80,'Oma is dolblij en geeft je een dikke zoen. Én geld.');}},
+ {id:'race',n:'Straatrace',ic:'🏁',col:'#ffd166',car:1,giver:()=>{const m=ROADS.find(r=>r.n==='Markt');return m?[m.p[0][0]*.7+m.p[1][0]*.3,m.p[0][1]*.7+m.p[1][1]*.3]:null;},desc:'Rij met een auto in het icoon. Haal alle checkpoints op tijd',
+  start(){const pts=[roadMid('Waterstraat',.6),roadMid('Waalkade',.5),roadMid('Oliestraat',.5),roadMid('Boschstraat',.35),roadMid('Gamerschestraat',.7),this.g].filter(Boolean);JOB.d.cps=pts;JOB.i=0;JOB.tgt=pts[0];let L=0,a=this.g;for(const q of pts){L+=Math.hypot(q[0]-a[0],q[1]-a[1]);a=q;}JOB.T=Math.round(L/4.4+240);JOB.d.cnt=180;return 'Rij door alle checkpoints en eindig weer op de Markt!';},
+  step(){if(JOB.d.cnt>0){JOB.d.cnt--;if(JOB.d.cnt%60===0&&JOB.d.cnt>0){msg(String(JOB.d.cnt/60),'','#ffd166',40);sfx('blip');}if(JOB.d.cnt===0){msg('GO!','','#7dff6a',60);sfx('sting');}JOB.t=0;return;}
+    if(near(JOB.tgt,70)){JOB.i++;sfx('reward');if(JOB.i>=JOB.d.cps.length){PRG.races++;unlock('race');jobWin(80+PRG.lvl*5,120,'Je bent de snelste van Bommel!');}else{JOB.tgt=JOB.d.cps[JOB.i];popTxt(me().x,me().y-30,'CHECKPOINT '+JOB.i+'/'+JOB.d.cps.length,'#ffd166',1.2);}}}},
+ {id:'vlucht',n:'De grote ontsnapping',ic:'🚨',col:'#4d8dff',giver:()=>shopDoor('Dubai Barbershop'),desc:'De kapper heeft de politie op je afgestuurd. Schud ze af!',
+  start(){addHeat(3.3);JOB.tgt=null;JOB.T=60*120;return 'Drie sterren! Schud de politie binnen 2 minuten af.';},
+  step(){if(JOB.t>90&&stars===0)jobWin(70,90,'Spoorloos verdwenen. De kapper betaalt je.');}},
+ {id:'schat',n:'De schat van Maarten',ic:'🗝️',col:'#f0d58a',giver:()=>shopDoor('Stadskasteel'),desc:'Volg de raadsels van Maarten van Rossum door de stad',
+  start(){const wp=LANDMARKS.find(l=>l.n==='Waterpoort'),gk=LANDMARKS.find(l=>l.n==='Gasthuiskapel');JOB.d.cps=[wp&&snap(wp.x,wp.y),gk&&snap(gk.x,gk.y),churchDoor(),WTOWER&&walkNear(WTOWER.x,WTOWER.y,45,120,10),this.g].filter(Boolean);
+    JOB.d.rid=['"Waar de rivier de stad binnenkwam, ligt mijn eerste aanwijzing." (de Waterpoort)','"Waar zieken eens werden verpleegd, bid ik verder." (de Gasthuiskapel)','"Onder de hoogste toren van Bommel." (de Sint-Maartenskerk)','"Waar het water hoog werd bewaard." (de oude watertoren)','"Keer terug naar mijn huis, de schat ligt in de kelder." (het Stadskasteel)'];
+    JOB.i=0;JOB.tgt=JOB.d.cps[0];JOB.T=0;return JOB.d.rid[0];},
+  step(){if(near(JOB.tgt,40)){JOB.i++;sfx('organ');if(JOB.i>=JOB.d.cps.length){const first=!PRG.ach.includes('schat');unlock('schat');jobWin(first?150:50,first?200:60,first?'Een kist vol oude munten! De schat is van jou.':'Weer een paar muntjes gevonden.');}else{JOB.tgt=JOB.d.cps[JOB.i];jobText(JOB.d.rid[JOB.i]);}}}},
+ {id:'pistool',n:'Het gerucht',ic:'❓',col:'#c77dff',giver:()=>ACT.zw?[ACT.zw.x+30,ACT.zw.y+30]:null,avail:()=>!P.gun,desc:'De zwerver weet iets over een verloren pistool',
+  start(){JOB.tgt=WTOWER?WTOWER.gun.slice():null;JOB.d.zone=1;JOB.T=0;return 'Zwerver: "In het park bij de oude watertoren ligt iets dat glinstert. Zoek goed!"';},
+  step(){if(P.gun)jobWin(0,40,'Gevonden. Wees er voorzichtig mee…');}},
+ {id:'schiet',n:'Flessen schieten',ic:'🎯',col:'#7dff6a',giver:()=>WTOWER?walkNear(WTOWER.x+120,WTOWER.y+60,0,200,8)||[WTOWER.x+120,WTOWER.y+60]:null,avail:()=>P.gun,desc:'Schiet alle flessen in het park om binnen 35 seconden',
+  start(){TARGETS=[];for(let i=0;i<8;i++){const a=i/8*TAU+rr(-.2,.2),d=rr(90,180);TARGETS.push({x:WTOWER.x+Math.cos(a)*d,y:WTOWER.y+Math.sin(a)*d,hit:0});}P.weapon=1;JOB.tgt=null;JOB.T=60*35;return 'Schiet alle 8 flessen om (Spatie / actieknop).';},
+  step(){const left=TARGETS.filter(t=>!t.hit).length;JOB.d.left=left;if(left===0){TARGETS=[];unlock('schutter');jobWin(50,80,'Alle flessen aan gruzelementen!');}},end(){TARGETS=[];}}
+];
+function near(p,r){if(!p)return false;const o=me();return Math.hypot(o.x-p[0],o.y-p[1])<r;}
+function initJobs(){for(const j of JOBDEF){j.g=j.giver();}}
+function jobsAvail(){return JOBDEF.filter(j=>j.g&&(!j.avail||j.avail()));}
+function jobText(t){JOB.txt=t;missionBanner(JOB.cur.n.toUpperCase(),t,JOB.cur.col,240);}
+function startJob(j){if(JOB.cur)return;JOB.cur=j;JOB.t=0;JOB.T=0;JOB.i=0;JOB.d={};JOB.tgt=null;const t=j.start();JOB.txt=t;missionBanner('KLUS: '+j.n.toUpperCase(),t,j.col,300);sfx('sting');}
+function jobEnd(){const j=JOB.cur;if(j&&j.end)j.end();JOB.cur=null;JOB.tgt=null;JOB.cd=120;}
+function jobWin(cash,xp,t){const j=JOB.cur;if(cash){P.money+=cash;P.moneyF=20;}sfx('reward');missionBanner('KLUS GESLAAGD: '+j.n.toUpperCase(),t+(cash?`  Beloning: €${cash}.`:''),'#7dff6a',300);PRG.jobs++;PRG.dirty=true;if(PRG.jobs>=3)unlock('klus3');jobEnd();setTimeout(()=>addXP(xp),300);}
+function jobFail(t){const j=JOB.cur;sfx('slap');missionBanner('KLUS MISLUKT: '+j.n.toUpperCase(),t,'#ff4d4d',240);jobEnd();}
+function jobStep(){if(JOB.cd>0)JOB.cd--;
+  if(!JOB.cur){// straatrace starten door er met een auto in te rijden
+    const r=JOBDEF.find(j=>j.id==='race');if(r&&r.g&&P.car&&!P.car.t.bike&&JOB.cd<=0&&near(r.g,46))startJob(r);return;}
+  JOB.t++;if(P.dead){jobFail('Dat ging mis…');return;}
+  if(JOB.cur.car&&!P.car&&JOB.d.cnt<=0&&JOB.t>60){jobFail('Je bent uit de auto gestapt.');return;}
+  if(JOB.T>0&&JOB.t>JOB.T){jobFail('De tijd is om!');return;}
+  JOB.cur.step();}
+function jobAct(){if(JOB.cur||JOB.cd>0||P.car)return null;for(const j of jobsAvail()){if(!near(j.g,34))continue;if(j.car)return{k:'jobcar',t:j.ic+' '+j.n+': kom terug met een auto',btn:'',off:1};return{k:'job',j,t:j.ic+' Klus: '+j.n+' · '+j.desc,btn:'▶<br>KLUS'};}return null;}
+function drawJobsWorld(){const t=frameN*.08;
+  if(!JOB.cur)for(const j of jobsAvail()){const [x,y]=j.g;if(Math.abs(x-CAM.x)>1300||Math.abs(y-CAM.y)>1300)continue;const pu=1+.12*Math.sin(t+x);
+    ctx.save();ctx.globalCompositeOperation='lighter';glow(x,y,40*pu,j.col+'66');ctx.restore();ctx.strokeStyle=j.col;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,17*pu,0,TAU);ctx.stroke();
+    ctx.fillStyle='rgba(10,4,24,.85)';ctx.beginPath();ctx.arc(x,y-30-4*Math.sin(t*1.3),13,0,TAU);ctx.fill();ctx.font='15px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(j.ic,x,y-29-4*Math.sin(t*1.3));}
+  if(JOB.cur&&JOB.tgt){const [x,y]=JOB.tgt,pu=1+.25*Math.sin(frameN*.12),c=JOB.cur.col;ctx.save();ctx.globalCompositeOperation='lighter';glow(x,y,50*pu,'rgba(54,209,255,.5)');ctx.restore();ctx.strokeStyle=c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,24*pu,0,TAU);ctx.stroke();
+    const by=y-38-6*Math.sin(frameN*.1);ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x,by+14);ctx.lineTo(x-10,by);ctx.lineTo(x+10,by);ctx.closePath();ctx.fill();}
+  if(JOB.cur&&JOB.cur.id==='pistool'&&WTOWER){ctx.strokeStyle='rgba(199,125,255,.6)';ctx.setLineDash([10,8]);ctx.lineWidth=3;ctx.beginPath();ctx.arc(WTOWER.x,WTOWER.y,240,0,TAU);ctx.stroke();ctx.setLineDash([]);}}
+function jobHud(){if(!JOB.cur||MG.on)return;ctx=fctx;const j=JOB.cur,U=clamp(Math.min(CW,CH)/560,.75,1.2),w=Math.min(CW-30,380*U),x=CW/2-w/2,y=CW<640?uiTop().top+(MINI_S||120)+56:uiTop().top+72*U;
+  let tl='';if(JOB.T>0){const s=Math.max(0,Math.ceil((JOB.T-JOB.t)/60));tl=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+  const extra=j.id==='schiet'?' · nog '+(JOB.d.left!=null?JOB.d.left:8)+' flessen':j.id==='race'&&JOB.d.cps?' · checkpoint '+Math.min(JOB.i+1,JOB.d.cps.length)+'/'+JOB.d.cps.length:'';
+  ctx.font=`700 ${12*U}px Inter, sans-serif`;const ls=wrapLines(JOB.txt||'',w-24*U),h=(26+ls.length*15)*U;
+  ctx.fillStyle='rgba(10,4,24,.8)';rrect(ctx,x,y,w,h,10*U);ctx.fill();ctx.strokeStyle=j.col;ctx.lineWidth=2;rrect(ctx,x,y,w,h,10*U);ctx.stroke();
+  txt(j.ic+' KLUS: '+j.n.toUpperCase()+extra,x+12*U,y+6*U,11*U,j.col,'left','Inter, sans-serif');if(tl)txt(tl,x+w-12*U,y+4*U,15*U,JOB.T-JOB.t<600&&(frameN>>4)%2?'#ff4d4d':'#fff','right');
+  ctx.font=`700 ${12*U}px Inter, sans-serif`;ctx.fillStyle='#fff';ctx.textAlign='left';ctx.textBaseline='top';ls.forEach((l,i)=>ctx.fillText(l,x+12*U,y+(22+i*15)*U));
+  if(JOB.tgt){const Z0=viewZ(),sx=CW/2+(JOB.tgt[0]-camX)*Z0,sy=CH/2+(JOB.tgt[1]-camY)*Z0,mg=34;if(sx<mg||sx>CW-mg||sy<mg+60||sy>CH-mg){const a=Math.atan2(sy-CH/2,sx-CW/2),ex=clamp(CW/2+Math.cos(a)*CW,mg,CW-mg),ey=clamp(CH/2+Math.sin(a)*CH,mg+60,CH-mg-(IS_TOUCH?260:0));
+    ctx.save();ctx.translate(ex,ey);ctx.rotate(a);ctx.fillStyle=j.col;ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(16,0);ctx.lineTo(-8,-11);ctx.lineTo(-3,0);ctx.lineTo(-8,11);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();}}
+  ctx=wctx;}
+function jobMinimap(mp,cxm,cym,S){const dot=(p,c,r)=>{let [x,y]=mp(p[0],p[1]);const dx=x-cxm,dy=y-cym,dd=Math.hypot(dx,dy);if(dd>S/2-7){if(r<5)return;x=cxm+dx/dd*(S/2-7);y=cym+dy/dd*(S/2-7);}ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=1.2;ctx.stroke();};
+  if(JOB.cur){if(JOB.tgt)dot(JOB.tgt,JOB.cur.col,5.5);}else for(const j of jobsAvail())dot(j.g,j.col,3.6);}
+function jobBigMap(mp,fs){if(JOB.cur){if(JOB.tgt){const [x,y]=mp(JOB.tgt[0],JOB.tgt[1]);ctx.strokeStyle=JOB.cur.col;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,9+3*Math.sin(frameN*.15),0,TAU);ctx.stroke();}return;}
+  for(const j of jobsAvail()){const [x,y]=mp(j.g[0],j.g[1]);ctx.fillStyle='rgba(10,4,24,.85)';ctx.beginPath();ctx.arc(x,y,11,0,TAU);ctx.fill();ctx.strokeStyle=j.col;ctx.lineWidth=2;ctx.stroke();ctx.font='12px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(j.ic,x,y+1);}}
+
 // ---- 22-start.js
 // ====================== start ======================
 function populate(){const v=parkNear(P.x+30,P.y+30,'velzart');v.keep=0;for(let i=0;i<22;i++)spawnCivCar(true);for(let i=0;i<40;i++)spawnPed(true);}
 function init(){
   resize();genWorld();buildGraph();buildMini();buildVectorMap();buildPats();initBarges();
   const mk=ROADS.find(r=>r.n==='Markt');SPAWN=mk?mk.p[mk.p.length>>1]:[W/2,H/2];respawn();camZ=1.15;
-  placeStatue();initActs();populate();initMission();
+  placeStatue();initActs();makeCoins();initJobs();progLoad();populate();initMission();
   setupTouch();setupMapClick();setupZoom();setupPinch();
 }
 init();
 let last=performance.now(),acc=0;
 function frame(now){requestAnimationFrame(frame);const dt=Math.min(100,now-last);last=now;
+  if(MODE==='play'&&FPV.on){acc+=dt;let n=0;while(acc>=16.667&&n<4){fpvStep();acc-=16.667;n++;}if(n>=4)acc=0;if(FPV.on)drawFpv();else renderWorld();return;}
   if(MODE==='play'&&CLUB.on){acc+=dt;let n=0;while(acc>=16.667&&n<4){clubStep();acc-=16.667;n++;}if(n>=4)acc=0;if(CLUB.on)drawClub();return;}
   if(MODE==='play'){if(!paused&&!bigMap){acc+=dt;let n=0;while(acc>=16.667&&n<4){if(MG.on)mgStep();else if(hitStop>0){hitStop--;frameN++;}else step();acc-=16.667;n++;}if(n>=4)acc=0;}renderWorld();}
 }

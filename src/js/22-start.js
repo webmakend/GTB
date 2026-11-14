@@ -3,12 +3,13 @@ function populate(){const v=parkNear(P.x+30,P.y+30,'velzart');v.keep=0;for(let i
 function init(){
   resize();genWorld();buildGraph();buildMini();buildVectorMap();buildPats();initBarges();
   const mk=ROADS.find(r=>r.n==='Markt');SPAWN=mk?mk.p[mk.p.length>>1]:[W/2,H/2];respawn();camZ=1.15;
-  placeStatue();initActs();populate();initMission();
+  placeStatue();initActs();makeCoins();initJobs();progLoad();populate();initMission();
   setupTouch();setupMapClick();setupZoom();setupPinch();
 }
 init();
 let last=performance.now(),acc=0;
 function frame(now){requestAnimationFrame(frame);const dt=Math.min(100,now-last);last=now;
+  if(MODE==='play'&&FPV.on){acc+=dt;let n=0;while(acc>=16.667&&n<4){fpvStep();acc-=16.667;n++;}if(n>=4)acc=0;if(FPV.on)drawFpv();else renderWorld();return;}
   if(MODE==='play'&&CLUB.on){acc+=dt;let n=0;while(acc>=16.667&&n<4){clubStep();acc-=16.667;n++;}if(n>=4)acc=0;if(CLUB.on)drawClub();return;}
   if(MODE==='play'){if(!paused&&!bigMap){acc+=dt;let n=0;while(acc>=16.667&&n<4){if(MG.on)mgStep();else if(hitStop>0){hitStop--;frameN++;}else step();acc-=16.667;n++;}if(n>=4)acc=0;}renderWorld();}
 }

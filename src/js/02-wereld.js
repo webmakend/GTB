@@ -29,7 +29,7 @@ const BUILDINGS=[],TREES=[],TERRACE=[];
 // kleuren naar de luchtfoto's: veel oranje pannen, leisteen-grijs, witte en bakstenen gevels
 const ROOFS=['#d0623a','#c85a33','#d97048','#bd5530','#cf6a43','#d0623a','#c85a33','#56595f','#4b4e54','#63666c','#7a3b2c'];
 const WALLS=['#ece6da','#e2d8c6','#f2eee6','#8a4a36','#9c5a42','#b98060','#d9cdb8','#7d4434','#e8e1d3'];
-const SIGNS={'Dubai Barbershop':['#0d0d0d','#d4af37'],'Kapsalon Saer':['#2b2b2b','#ffffff'],'Van Uffelen Mode':['#1f2a44','#ffffff'],'Suus Dames':['#f3e3d3','#b5523b'],'Stadskasteel':['#4a3b2a','#f0d58a'],'Perla di Cairo':['#0c5c3a','#ffffff'],'CinCin':['#5a0f2e','#ffd9e6'],'The Stone':['#141414','#f2f2f2'],'Xenos':['#e30613','#fff'],'Marktzicht Friet':['#ffcc00','#c8102e'],'IJssalon Hygge':['#f7c6d9','#7a1f3d'],'Máxima':['#0f5a3a','#ffd166'],'Huisarts':['#ffffff','#1a7f37'],'Kruidvat':['#e2001a','#fff'],'Intertoys':['#f26b0f','#fff'],'Bruna':['#0b4da2','#ffd200'],'Shoeby':['#111','#fff'],'HEMA':['#d6001c','#fff'],
+const SIGNS={'Albert Heijn':['#00a0e2','#ffffff'],'Lidl':['#0050aa','#fff000'],'Gall & Gall':['#7a1c2e','#ffffff'],'Het Zusje':['#2f2a26','#f5d7a1'],'Dubai Barbershop':['#0d0d0d','#d4af37'],'Kapsalon Saer':['#2b2b2b','#ffffff'],'Van Uffelen Mode':['#1f2a44','#ffffff'],'Suus Dames':['#f3e3d3','#b5523b'],'Stadskasteel':['#4a3b2a','#f0d58a'],'Perla di Cairo':['#0c5c3a','#ffffff'],'CinCin':['#5a0f2e','#ffd9e6'],'The Stone':['#141414','#f2f2f2'],'Xenos':['#e30613','#fff'],'Marktzicht Friet':['#ffcc00','#c8102e'],'IJssalon Hygge':['#f7c6d9','#7a1f3d'],'Máxima':['#0f5a3a','#ffd166'],'Huisarts':['#ffffff','#1a7f37'],'Kruidvat':['#e2001a','#fff'],'Intertoys':['#f26b0f','#fff'],'Bruna':['#0b4da2','#ffd200'],'Shoeby':['#111','#fff'],'HEMA':['#d6001c','#fff'],
  'Kapsalon Saer':['#2b2b2b','#e8c46a'],'Kapper Dubai':['#0d0d0d','#d4af37'],'LEF':['#1d6b4a','#fff'],'De Heeren van Bommel':['#5a1622','#f1dfb3'],'Xenos':['#e30613','#fff'],'Sport 2000':['#003da5','#fff'],
  'Toast & Tosti':['#f2b134','#3a2410'],'Zorba':['#1f5fa8','#fff'],'Máxima':['#6cace4','#fff'],'CinCin':['#7a1f3d','#fff'],"Kim's Kitchen":['#2e7d32','#fff'],'De Verdraagzaamheid':['#203a5c','#f1dfb3'],'De Eetgelegenheid':['#4e342e','#fff']};
 const CATC={'Winkel':[['#2d6cdf','#fff'],['#7b2cbf','#fff'],['#e76f51','#fff'],['#264653','#fff']],'Kapper / Barbershop':[['#111','#e8c46a'],['#3d3d3d','#fff']],'Restaurant':[['#7a1f3d','#fff'],['#1d6b4a','#fff'],['#4e342e','#ffd166']]};
@@ -50,7 +50,7 @@ function prepBuilding(b){
   BUILDINGS.push(b);
   if(!b.pass)polyFill(b.p,i=>{G[i]=BUILD;});
 }
-const SHOPS=[];let BEACH=null,BEACHERS=[],SWIMMERS=[],BWALK=[],BPROPS=[];
+const SHOPS=[];let WTOWER=null;let BEACH=null,BEACHERS=[],SWIMMERS=[],BWALK=[],BPROPS=[];
 const SAY_BEACH=['Ik heb nu al zand op plekken waar het zonlicht nog nooit is geweest.','Broodje kaas met een extra krokant laagje schelpengruis.','Ik kan Tuil zien liggen aan de overkant!','Het is heerlijk weer!','Wil je ook een pilsje?','Kun jij mijn rug even insmeren?'];
 function makeBeach(){const n=FORT.length,cyT=FORTBB[1]+(FORTBB[3]-FORTBB[1])*.32,c=centroid(FORT);let best=[],cur=[];
   for(let k=0;k<2*n;k++){const i=k%n;if(FORT[i][1]<cyT){cur.push(i);if(cur.length>best.length)best=cur.slice();if(cur.length>=n)break;}else cur=[];}
@@ -118,9 +118,33 @@ function genWorld(){
   if(wp){const ne=nearestRoadDir(wp.x,wp.y),ux=Math.cos(ne),uy=Math.sin(ne),a=48,b=78;
     prepBuilding({p:[[wp.x-ux*a-uy*b,wp.y-uy*a+ux*b],[wp.x+ux*a-uy*b,wp.y+uy*a+ux*b],[wp.x+ux*a+uy*b,wp.y+uy*a-ux*b],[wp.x-ux*a+uy*b,wp.y-uy*a-ux*b]],ht:78,kind:'gate',pass:1,roof:'#5a3a2e',wall:'#8b5a44',ridge:false,label:'Waterpoort'});
     LANDMARKS.push({n:'Waterpoort',x:wp.x,y:wp.y});}
+  // ---- extra: oude watertoren met park, supermarkten aan de Steenweg, Het Zusje op de Markt
+  {const clear=(x,y,r,bad)=>{for(let a=0;a<16;a++)for(const rr2 of [r*.35,r*.7,r]){const t=cellAt(x+Math.cos(a/16*TAU)*rr2,y+Math.sin(a/16*TAU)*rr2);if(bad.includes(t))return false;}return!bad.includes(cellAt(x,y));};
+   const spiral=(x0,y0,r,bad,maxR)=>{for(let R2=0;R2<=maxR;R2+=24)for(let k=0;k<Math.max(1,R2/12);k++){const a=k/Math.max(1,R2/12)*TAU,x=x0+Math.cos(a)*R2,y=y0+Math.sin(a)*R2;if(clear(x,y,r,bad))return[x,y];}return null;};
+   const box=(cx,cy,w,h,ang)=>{const c=Math.cos(ang),s2=Math.sin(ang),P2=[[-w/2,-h/2],[w/2,-h/2],[w/2,h/2],[-w/2,h/2]].map(([u,v])=>[cx+u*c-v*s2,cy+u*s2+v*c]);P2.push(P2[0].slice());return P2;};
+   // watertoren: in de uiterwaarden tussen de A2 en de vesting
+   const wt=spiral(8250,2560,120,[ROAD,WATER,BUILD,WALK],900);
+   if(wt){const [x,y]=wt,pp=[];for(let i=0;i<=20;i++){const a=i/20*TAU;pp.push([x+Math.cos(a)*34,y+Math.sin(a)*34]);}
+     for(let gy=-280;gy<=280;gy+=T)for(let gx=-280;gx<=280;gx+=T){if(gx*gx+gy*gy>280*280)continue;const cx=Math.floor((x+gx)/T),cy=Math.floor((y+gy)/T);if(cx<0||cy<0||cx>=GW||cy>=GH)continue;if(G[cy*GW+cx]===GRASS||G[cy*GW+cx]===SAND)G[cy*GW+cx]=PARK;}
+     let rs=11;const rn=()=>((rs=(rs*16807)%2147483647)/2147483647);
+     for(let i=0;i<70;i++){const a=rn()*TAU,d=70+rn()*200,tx=x+Math.cos(a)*d,ty=y+Math.sin(a)*d;if(cellAt(tx,ty)!==PARK)continue;if(TREES.some(q=>Math.abs(q.x-tx)<26&&Math.abs(q.y-ty)<26))continue;TREES.push({x:tx,y:ty,r:14+rn()*10,c:['#3a6b2f','#41752f','#335f2a','#4a7d36'][i%4]});}
+     prepBuilding({p:pp,ht:150,kind:'watertoren',wt:1,wall:'#9a4b32',roof:'#3b2f2a',ridge:false,flat:true,noFac:1});
+     WTOWER={x,y,door:null};LANDMARKS.push({n:'Oude Watertoren',x,y});
+     let gp=null;for(let i=0;i<60&&!gp;i++){const a=rn()*TAU,d=120+rn()*110,gx=x+Math.cos(a)*d,gy=y+Math.sin(a)*d;if(cellAt(gx,gy)===PARK&&!TREES.some(q=>Math.hypot(q.x-gx,q.y-gy)<18))gp=[gx,gy];}
+     WTOWER.gun=gp||[x+150,y];}
+   // supermarkten aan de Steenweg (Albert Heijn + Gall & Gall onder één dak, Lidl ernaast)
+   const sw=ROADS.filter(r=>r.n==='Steenweg');let sa=-.75;if(sw.length){const r=sw[0];sa=Math.atan2(r.p[r.p.length-1][1]-r.p[0][1],r.p[r.p.length-1][0]-r.p[0][0]);}
+   const s1=spiral(1640,4760,130,[ROAD,WATER,BUILD],700);
+   if(s1){const [x,y]=s1,c=Math.cos(sa),sn=Math.sin(sa);
+     const ah=box(x,y,170,110,sa),gg=box(x+c*122,y+sn*122,70,110,sa);
+     prepBuilding({p:ah,ht:28,kind:'retail',flat:true,noFac:1,wall:'#e9ecef',roof:'#b9c2cb',ridge:false});prepBuilding({p:gg,ht:28,kind:'retail',flat:true,noFac:1,wall:'#e9ecef',roof:'#a9b3bd',ridge:false});
+     WD.biz.push({n:'Albert Heijn',c:'Super',cat:'Supermarkt',adr:'Steenweg 8a',x,y},{n:'Gall & Gall',c:'Super',cat:'Slijterij',adr:'Steenweg 8a',x:x+c*122,y:y+sn*122});
+     const s2=spiral(x-sn*230,y+c*230,120,[ROAD,WATER,BUILD],600)||spiral(x+c*330,y+sn*330,120,[ROAD,WATER,BUILD],600);
+     if(s2){prepBuilding({p:box(s2[0],s2[1],170,110,sa),ht:26,kind:'retail',flat:true,noFac:1,wall:'#f4f4f4',roof:'#c9cfd6',ridge:false});WD.biz.push({n:'Lidl',c:'Super',cat:'Supermarkt',adr:'Steenweg 10',x:s2[0],y:s2[1]});}}
+   WD.biz.push({n:'Het Zusje',c:'Restaurant',cat:'Restaurant',adr:'Markt',x:4180,y:3010});}
   // winkels en horeca
   const used=new Set();
-  const signOn=(name,x,y,cat,adr)=>{let best=null,bd=1e9;for(const b of BUILDINGS){if(b.pass||b.kind==='tower'||used.has(b))continue;if(Math.abs(b.cx-x)>260||Math.abs(b.cy-y)>260)continue;const d=pip(x,y,b.p)?0:Math.hypot(b.cx-x,b.cy-y);if(d<bd){bd=d;best=b;}}
+  const signOn=(name,x,y,cat,adr)=>{let best=null,bd=1e9;for(const b of BUILDINGS){if(b.pass||b.kind==='tower'||b.wt||used.has(b))continue;if(Math.abs(b.cx-x)>260||Math.abs(b.cy-y)>260)continue;const d=pip(x,y,b.p)?0:Math.hypot(b.cx-x,b.cy-y);if(d<bd){bd=d;best=b;}}
     if(best){used.add(best);SHOPS.push({b:best,n:name,c:cat,rob:0});best.sign=name;best.signC=signCol(name,cat);best.sa=nearestRoadDir(best.cx,best.cy);LANDMARKS.push({n:name,x:best.cx,y:best.cy,shop:1,c:best.signC[0],cat,adr});}};
   for(const z of WD.biz)signOn(z.n,z.x,z.y,z.c,z.adr);
   // terrassen

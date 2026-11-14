@@ -77,3 +77,5 @@ button{font-family:inherit}
 .sb svg{width:17px;height:17px;fill:currentColor}
 .sb:active{transform:scale(.92);background:#ff2e88}
 .sb:active{background:rgba(255,46,136,.6)}
+
+#bX{right:calc(var(--sr) + 126px);bottom:calc(var(--sb) + 112px);width:58px;height:58px;font-size:22px;background:rgba(255,107,61,.4);display:none}

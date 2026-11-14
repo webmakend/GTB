@@ -17,7 +17,7 @@ function askName(cb){const wasP=paused;paused=true;let m=document.getElementById
   document.getElementById('nameOk').onclick=ok;inp.onkeydown=e=>{e.stopPropagation();if(e.key==='Enter')ok();};}
 function savedCard(){const s=getSave();if(!s)return null;const b=CHARS.find(c=>c.id===s.base)||CHARS[0];
   return Object.assign({},b,{id:'save',save:s,base:b,name:s.name.toUpperCase(),c:'#7dff6a',sub:`VERDER SPELEN · MISSIE ${Math.min(3,s.stage===4?3:s.stage===3?2:s.stage===2?2:1)}${s.done&&s.stage>=4?' ✓':''} · €${s.money.toFixed(2).replace('.',',')}`});}
-function applySave(s){P.x=s.x;P.y=s.y;camX=P.x;camY=P.y;P.money=s.money||0;P.stats=Object.assign({nat:0,omver:0,gejat:0},s.stats||{});P.hp=s.hp||P.maxhp;
+function applySave(s){const sp=snap(SPAWN[0],SPAWN[1]);P.x=sp[0];P.y=sp[1];camX=P.x;camY=P.y;P.money=s.money||0;P.stats=Object.assign({nat:0,omver:0,gejat:0},s.stats||{});P.hp=s.hp||P.maxhp;
   MIS.gold=!!s.gold;setStage(s.stage||1);if(s.done)MIS.done=true;MBAN=null;
   const s2=snap(P.x,P.y);if(footBlocked(P.x,P.y)){P.x=s2[0];P.y=s2[1];}
   setTimeout(()=>{if(MODE==='play')missionBanner('WELKOM TERUG, '+s.name.toUpperCase(),MIS.done?'Alle missies zijn klaar. Verken Bommel op je eigen manier!':(MIS_DO[MIS.stage]||''),'#7dff6a',300);},1200);}
