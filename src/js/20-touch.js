@@ -2,7 +2,7 @@
 function placeTopBtns(){const tb=document.getElementById('topBtns');if(tb){const S=Math.round(clamp(Math.min(CW,CH)*.27,96,150));tb.style.top=(uiTop().top+S+8)+'px';tb.style.right='calc(var(--sr) + '+(12+S/2-52)+'px)';}const sb=document.getElementById('sideBtns');if(!sb)return;const S=Math.round(clamp(Math.min(CW,CH)*.28,100,180)),top=uiTop().bottom+8+S+12;sb.style.top=top+'px';sb.style.flexDirection=(CH-top<260)?'row':'column';}
 function buzz(ms){if(Array.isArray(ms)){try{if(IS_TOUCH&&navigator.vibrate)navigator.vibrate(ms);}catch(e){}return;}try{if(IS_TOUCH&&navigator.vibrate)navigator.vibrate(ms);}catch(e){}}
 function updTouchUI(){document.getElementById('bJump').style.display=P.car||P.dead||swimming()?'none':'flex';const bA=document.getElementById('bAct'),bC=document.getElementById('bCar');const ac=P.car?'REM':'💧<br>GOOI';if(bA._t!==ac){bA.innerHTML=ac;bA._t=ac;}
-  const show=!!P.car||!!carNear(),ct=P.car?'UIT<br>STAP':'IN<br>STAP';bC.style.display=show&&!P.dead?'flex':'none';if(bC._t!==ct){bC.innerHTML=ct;bC._t=ct;}}
+  const ac2=!P.car&&ACT.cur&&!ACT.cur.off?ACT.cur:null,show=!!P.car||!!carNear()||!!ac2,ct=P.car?'UIT<br>STAP':ac2?ac2.btn:'IN<br>STAP';bC.style.display=show&&!P.dead?'flex':'none';if(bC._t!==ct){bC.innerHTML=ct;bC._t=ct;}}
 let PINCH=null,joyCancel=()=>{};
 function setupPinch(){const isBtn=t=>t&&t.closest&&t.closest('.tb,.sb,#mus');let first=null;
   window.addEventListener('touchstart',e=>{if(MODE!=='play'||MG.on)return;const now=performance.now();

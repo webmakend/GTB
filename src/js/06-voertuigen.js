@@ -8,6 +8,7 @@ const CT={
  police:{n:'Politie',eng:40,w:21,l:46,acc:.21,max:9,turn:.06,grip:.82,hp:130,col:['#f5f5f5']},
  velzart:{n:'VelzArt',eng:44,w:21,l:46,acc:.21,max:8.8,turn:.058,grip:.82,hp:125,col:['#0b0b0b']},
  bakfiets:{n:'Bakfiets',w:12,l:26,acc:.07,max:3.2,turn:.08,grip:.9,hp:50,ev:1,col:['#2a6f97','#7b8f3a','#a63d40']},
+ fiets:{n:'Omafiets',w:9,l:23,acc:.13,max:5,turn:.09,grip:.9,hp:35,ev:1,bike:1,col:['#1d1d1d','#2a4d8f','#8a1c1c','#2f6b3a','#c9c3b5','#6b4a8a']},
  fatbike:{n:'Fatbike',w:10,l:24,acc:.22,max:7.6,turn:.085,grip:.86,hp:40,ev:1,bike:1,col:['#111111','#2b2b2b','#4a4a4a','#1f3d2b','#7a0f1e']},
  bus:{n:'Bus',eng:26,w:26,l:92,acc:.07,max:5,turn:.035,grip:.9,hp:260,col:['#1e88e5']},
  ambulance:{n:'Ambulance',eng:36,w:23,l:54,acc:.15,max:8,turn:.05,grip:.84,hp:160,col:['#ffffff']},

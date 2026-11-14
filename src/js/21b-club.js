@@ -38,7 +38,7 @@ function clubInit(){if(!CLUB.pano)CLUB.pano=buildPano();CLUB.dancers=[];const n=
   CLUB.dots=[];for(let i=0;i<420;i++){const a=rr(0,TAU),d=Math.sqrt(Math.random())*8.6;CLUB.dots.push({x:Math.cos(a)*d,z:Math.sin(a)*d,c:rpick(['#ff2e88','#36d1ff','#ffd166','#c77dff','#7dff6a']),ph:rr(0,6)});}}
 function enterClub(){clubInit();CLUB.on=true;CLUB.t=0;CLUB.yaw=0;CLUB.pitch=0;CLUB.joined=0;bigMap=false;document.getElementById('touch').style.display='none';document.getElementById('topBtns').style.display='none';
   document.getElementById('lightc').style.display='none';GL.shown=false;clubBtn(true);CLUB.music=false;CLUB.strobe=0;try{radio.pause();}catch(e){}sfx('door');setTimeout(()=>{if(CLUB.on&&!CLUB.music)msg('HET IS STIL…','Loop naar de DJ-booth en zet de muziek aan','#36d1ff',220);},600);}
-function exitClub(){CLUB.on=false;MIS.cool=240;CLUB.music=false;clubBtn(false);djBtn(false);try{barMusic.pause();}catch(e){}if(IS_TOUCH)document.getElementById('touch').style.display='block';document.getElementById('topBtns').style.display='flex';if(AU.on)musicPlay();sfx('door');
+function exitClub(){CLUB.on=false;barBtn(false);MIS.cool=240;CLUB.music=false;clubBtn(false);djBtn(false);try{barMusic.pause();}catch(e){}if(IS_TOUCH)document.getElementById('touch').style.display='block';document.getElementById('topBtns').style.display='flex';if(AU.on)musicPlay();sfx('door');
   if(MIS.stage===4&&!MIS.done){MIS.done=true;MIS.allDone=true;missionBanner('MISSIE 3 GESLAAGD!','Wat een avond in Café Henkie! Alle missies zijn klaar. Rijd, zwem en verken Bommel op je eigen manier.','#7dff6a',360);sfx('reward');}}
 function djStart(){if(CLUB.music)return;CLUB.music=true;CLUB.mt=CLUB.t;CLUB.flash=1;CLUB.strobe=90;barMusic.currentTime=0;barMusic.volume=1;barMusic.play().catch(()=>{});sfx('sting');djBtn(false);msg('DROP THE BEAT!','Iedereen gaat los','#ff7ad9',160);}
 function djBtn(show){let b=document.getElementById('djBtn');if(!b){b=document.createElement('div');b.id='djBtn';b.innerHTML='🎧 DRAAI DE PLAAT';b.style.cssText='position:fixed;z-index:40;left:50%;transform:translateX(-50%);bottom:calc(var(--sb) + 34px);padding:16px 26px;border-radius:16px;background:linear-gradient(90deg,#ff2e88,#7b2ff7);color:#fff;font:900 18px Inter,sans-serif;letter-spacing:1.5px;box-shadow:0 0 30px rgba(255,46,136,.7);cursor:pointer;white-space:nowrap;pointer-events:auto';
@@ -49,10 +49,10 @@ function clubBtn(show){let b=document.getElementById('clubExit');if(!b){b=docume
   window.addEventListener('pointermove',e=>{if(!CLUB.on||!drag)return;CLUB.yaw=drag.yaw-(e.clientX-drag.x)*.006;CLUB.pitch=clamp(drag.pitch+(e.clientY-drag.y)*.8,-CH*.25,CH*.25);});
   window.addEventListener('pointerup',()=>{drag=null;});})();
 function clubStep(){CLUB.t+=1/60;frameN++;const k=keys;if(k.ArrowLeft||k.KeyA)CLUB.yaw-=.035;if(k.ArrowRight||k.KeyD)CLUB.yaw+=.035;if(k.ArrowUp||k.KeyW)CLUB.pitch=Math.min(CH*.25,CLUB.pitch+6);if(k.ArrowDown||k.KeyS)CLUB.pitch=Math.max(-CH*.25,CLUB.pitch-6);
-  if(pressed.KeyE||pressed.Escape)exitClub();for(const kk in pressed)delete pressed[kk];
+  if(pressed.KeyE||pressed.Escape)exitClub();if((pressed.Enter||pressed.Space)&&Math.abs(wrap(CLUB.yaw-Math.PI))<.5)buyBeer();for(const kk in pressed)delete pressed[kk];
   const facing=Math.abs(wrap(CLUB.yaw))<.42;if(!CLUB.music&&facing&&(keys.Enter||keys.Space))djStart();
   if(CLUB.music){const bpm=124,mt=CLUB.t-CLUB.mt,beat=Math.floor(mt*bpm/60);if(beat!==CLUB.beat){CLUB.beat=beat;if(beat%4===0)CLUB.flash=1;if(beat%32===24)CLUB.strobe=Math.round(8*60/bpm*60/4);}}CLUB.flash*=.86;if(CLUB.strobe>0)CLUB.strobe--;
-  if(CLUB.music&&CLUB.t-CLUB.mt>8&&!CLUB.joined){CLUB.joined=1;msg('FEEST!','Kijk rond · tik ⟵ NAAR BUITEN om te gaan','#ff7ad9',200);}}
+  if(CLUB.music&&CLUB.t-CLUB.mt>8&&!CLUB.joined){CLUB.joined=1;msg('FEEST!','Draai je om voor een biertje aan de bar','#ff7ad9',200);}}
 function drawClub(){const g=fctx;g.setTransform(DPR,0,0,DPR,0,0);const W2=CW,H2=CH,fov=1.25,f=Math.max((W2/2)/Math.tan(fov/2),H2*.62),y0=H2*.5+CLUB.pitch,camH=1.6,R=9,wallH=4.6,t=CLUB.t;
   g.fillStyle='#07020c';g.fillRect(0,0,W2,H2);
   const wt=y0-(wallH-camH)/R*f,wb=y0+camH/R*f,P=CLUB.pano,PW=P.width;
@@ -80,8 +80,10 @@ function drawClub(){const g=fctx;g.setTransform(DPR,0,0,DPR,0,0);const W2=CW,H2=
   if(CLUB.strobe>0){const on=Math.floor(t*24)%2===0;g.fillStyle=on?'rgba(255,255,255,.62)':'rgba(0,0,0,.55)';g.fillRect(0,0,W2,H2);}
   if(!CLUB.music){g.fillStyle='rgba(0,0,0,.35)';g.fillRect(0,0,W2,H2);}
   const vg=g.createRadialGradient(W2/2,H2/2,Math.min(W2,H2)*.35,W2/2,H2/2,Math.max(W2,H2)*.75);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.7)');g.fillStyle=vg;g.fillRect(0,0,W2,H2);
-  const facing=Math.abs(wrap(CLUB.yaw))<.42;djBtn(!CLUB.music&&facing);
+  const facing=Math.abs(wrap(CLUB.yaw))<.42;djBtn(!CLUB.music&&facing);CLUB.atBar=Math.abs(wrap(CLUB.yaw-Math.PI))<.5;barBtn(CLUB.atBar);
   if(!CLUB.music&&!facing){ctx=fctx;txt('Kijk rond en zoek de DJ-booth bij het podium',W2/2,H2-120,16,'#36d1ff','center','Inter, sans-serif');}
   ctx=fctx;txt('CAFÉ HENKIE',W2/2,uiTop().top+56,clamp(W2/12,22,40),'#ff7ad9','center');txt(IS_TOUCH?'Sleep om rond te kijken':'Muis slepen of pijltjes om rond te kijken · E = naar buiten',W2/2,uiTop().top+56+clamp(W2/12,22,40)+10,12,'rgba(255,255,255,.85)','center','Inter, sans-serif');
   msgs.forEach(m=>{const a=clamp(Math.min(m.life/25,(m.ml-m.life)/8+.2),0,1);ctx.globalAlpha=a;txt(m.t,W2/2,H2*.75,Math.min(46,W2*.1),m.col,'center');if(m.sub)txt(m.sub,W2/2,H2*.75+Math.min(46,W2*.1)+6,14,'#fff','center','Inter, sans-serif');ctx.globalAlpha=1;m.life--;});while(msgs.length&&msgs[0].life<=0)msgs.shift();
   ctx=wctx;}
+function barBtn(show){let b=document.getElementById('barBtn');if(!b){b=document.createElement('div');b.id='barBtn';b.innerHTML='🍺 BIERTJE · €2';b.style.cssText='position:fixed;z-index:40;left:50%;transform:translateX(-50%);bottom:calc(var(--sb) + 34px);padding:16px 26px;border-radius:16px;background:linear-gradient(90deg,#f7b733,#fc4a1a);color:#fff;font:900 18px Inter,sans-serif;letter-spacing:1.5px;box-shadow:0 0 30px rgba(252,74,26,.6);cursor:pointer;white-space:nowrap;pointer-events:auto;user-select:none';
+    b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();buyBeer();b.style.transform='translateX(-50%) scale(.94)';setTimeout(()=>b.style.transform='translateX(-50%)',120);});document.body.appendChild(b);}b.style.display=show?'block':'none';}

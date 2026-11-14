@@ -29,7 +29,7 @@ const BUILDINGS=[],TREES=[],TERRACE=[];
 // kleuren naar de luchtfoto's: veel oranje pannen, leisteen-grijs, witte en bakstenen gevels
 const ROOFS=['#d0623a','#c85a33','#d97048','#bd5530','#cf6a43','#d0623a','#c85a33','#56595f','#4b4e54','#63666c','#7a3b2c'];
 const WALLS=['#ece6da','#e2d8c6','#f2eee6','#8a4a36','#9c5a42','#b98060','#d9cdb8','#7d4434','#e8e1d3'];
-const SIGNS={'Kruidvat':['#e2001a','#fff'],'Intertoys':['#f26b0f','#fff'],'Bruna':['#0b4da2','#ffd200'],'Shoeby':['#111','#fff'],'HEMA':['#d6001c','#fff'],
+const SIGNS={'The Stone':['#141414','#f2f2f2'],'Xenos':['#e30613','#fff'],'Marktzicht Friet':['#ffcc00','#c8102e'],'IJssalon Hygge':['#f7c6d9','#7a1f3d'],'Máxima':['#0f5a3a','#ffd166'],'Huisarts':['#ffffff','#1a7f37'],'Kruidvat':['#e2001a','#fff'],'Intertoys':['#f26b0f','#fff'],'Bruna':['#0b4da2','#ffd200'],'Shoeby':['#111','#fff'],'HEMA':['#d6001c','#fff'],
  'Kapsalon Saer':['#2b2b2b','#e8c46a'],'Kapper Dubai':['#0d0d0d','#d4af37'],'LEF':['#1d6b4a','#fff'],'De Heeren van Bommel':['#5a1622','#f1dfb3'],'Xenos':['#e30613','#fff'],'Sport 2000':['#003da5','#fff'],
  'Toast & Tosti':['#f2b134','#3a2410'],'Zorba':['#1f5fa8','#fff'],'Máxima':['#6cace4','#fff'],'CinCin':['#7a1f3d','#fff'],"Kim's Kitchen":['#2e7d32','#fff'],'De Verdraagzaamheid':['#203a5c','#f1dfb3'],'De Eetgelegenheid':['#4e342e','#fff']};
 const CATC={'Winkel':[['#2d6cdf','#fff'],['#7b2cbf','#fff'],['#e76f51','#fff'],['#264653','#fff']],'Kapper / Barbershop':[['#111','#e8c46a'],['#3d3d3d','#fff']],'Restaurant':[['#7a1f3d','#fff'],['#1d6b4a','#fff'],['#4e342e','#ffd166']]};
@@ -50,7 +50,7 @@ function prepBuilding(b){
   BUILDINGS.push(b);
   if(!b.pass)polyFill(b.p,i=>{G[i]=BUILD;});
 }
-let BEACH=null,BEACHERS=[],SWIMMERS=[],BWALK=[],BPROPS=[];
+const SHOPS=[];let BEACH=null,BEACHERS=[],SWIMMERS=[],BWALK=[],BPROPS=[];
 const SAY_BEACH=['Ik heb nu al zand op plekken waar het zonlicht nog nooit is geweest.','Broodje kaas met een extra krokant laagje schelpengruis.','Ik kan Tuil zien liggen aan de overkant!','Het is heerlijk weer!','Wil je ook een pilsje?','Kun jij mijn rug even insmeren?'];
 function makeBeach(){const n=FORT.length,cyT=FORTBB[1]+(FORTBB[3]-FORTBB[1])*.32,c=centroid(FORT);let best=[],cur=[];
   for(let k=0;k<2*n;k++){const i=k%n;if(FORT[i][1]<cyT){cur.push(i);if(cur.length>best.length)best=cur.slice();if(cur.length>=n)break;}else cur=[];}
@@ -76,14 +76,14 @@ function genWorld(){
   const edgeD=(x,y)=>{let d=1e9;for(let i=0;i<FORT.length;i++){const a=FORT[i],q=FORT[(i+1)%FORT.length],dx=q[0]-a[0],dy=q[1]-a[1],L2=dx*dx+dy*dy||1,t=clamp(((x-a[0])*dx+(y-a[1])*dy)/L2,0,1);d=Math.min(d,Math.hypot(a[0]+dx*t-x,a[1]+dy*t-y));}return d;};
   const bizB=new Set();for(const z of WD.biz){let best=-1,bd=1e9;WD.buildings.forEach((ob,k)=>{const c=centroid(ob.p);if(Math.abs(c[0]-z.x)>300||Math.abs(c[1]-z.y)>300)return;const d=pip(z.x,z.y,ob.p)?0:Math.hypot(c[0]-z.x,c[1]-z.y);if(d<bd){bd=d;best=k;}});if(best>=0&&bd<200)bizB.add(best);}
   // Waterstraat: in het echt een smalle straat vol hoge, smalle panden (geen groen)
-  const WSTR=ROADS.filter(r=>r.n==='Waterstraat'),segD=(x,y,A,B)=>{const dx=B[0]-A[0],dy=B[1]-A[1],t=clamp(((x-A[0])*dx+(y-A[1])*dy)/(dx*dx+dy*dy||1),0,1);return Math.hypot(x-A[0]-t*dx,y-A[1]-t*dy);},
-    nearWS=(x,y,d)=>WSTR.some(r=>{for(let i=0;i<r.p.length-1;i++)if(segD(x,y,r.p[i],r.p[i+1])<d)return true;return false;});
-  WD.buildings.forEach((ob,k)=>{const c=centroid(ob.p),h0=hsh(ob.p[0][0],ob.p[0][1]);const front=nearR(AR,c[0],c[1],125),edge=edgeD(c[0],c[1]);ob.ws=nearWS(c[0],c[1],190);ob.keep=!!(ob.ws||bizB.has(k)||ob.n||ob.b==='church'||ob.b==='civic'||(front&&edge>300&&(nearMain(c[0],c[1],175)||h0%100<72)));});
+  const WSTR=ROADS.filter(r=>r.n==='Waterstraat'),BSTR=ROADS.filter(r=>r.n==='Boschstraat'),segD=(x,y,A,B)=>{const dx=B[0]-A[0],dy=B[1]-A[1],t=clamp(((x-A[0])*dx+(y-A[1])*dy)/(dx*dx+dy*dy||1),0,1);return Math.hypot(x-A[0]-t*dx,y-A[1]-t*dy);},
+    nearWS=(x,y,d,L)=>(L||WSTR).some(r=>{for(let i=0;i<r.p.length-1;i++)if(segD(x,y,r.p[i],r.p[i+1])<d)return true;return false;});
+  WD.buildings.forEach((ob,k)=>{const c=centroid(ob.p),h0=hsh(ob.p[0][0],ob.p[0][1]);const front=nearR(AR,c[0],c[1],125),edge=edgeD(c[0],c[1]);ob.ws=nearWS(c[0],c[1],190);ob.bs=pip(c[0],c[1],FORT)&&nearWS(c[0],c[1],170,BSTR);ob.keep=!!(ob.ws||ob.bs||bizB.has(k)||ob.n||ob.b==='church'||ob.b==='civic'||(front&&edge>300&&(nearMain(c[0],c[1],175)||h0%100<72)));});
   for(const ob of WD.buildings){
     if(!ob.keep)continue;
     const b={p:ob.p,n:ob.n,kind:ob.b,ws:ob.ws};const a=polyArea(ob.p),h=hsh(ob.p[0][0],ob.p[0][1]);
     let m=(ob.b==='apartments'?14:ob.b==='house'?8+(h%4):ob.b==='church'?22:ob.b==='retail'||ob.b==='commercial'?10:ob.b==='shed'||ob.b==='roof'||a<1200?4:9+(h%5));
-    if(ob.b==='civic')m=16;if(ob.b==='houseboat')m=4;if(ob.ws&&ob.b!=='church')m=Math.max(m,13+(h%5));
+    if(ob.b==='civic')m=16;if(ob.b==='houseboat')m=4;if(ob.ws&&ob.b!=='church')m=Math.max(m,13+(h%5));if(ob.bs&&ob.b!=='church')m=Math.max(m,10+(h%4));
     b.ht=m*3.2;b.flat=(ob.b==='retail'||ob.b==='commercial'||ob.b==='industrial'||ob.b==='apartments'||a>25000)&&ob.b!=='church';
     if(b.flat)b.roof=RP(['#9a9c9e','#86898c','#b3b3ae','#7a7d80','#c4c3bd']);
     if(ob.b==='church'){b.roof='#5d636a';b.wall='#b8ab95';b.label=ob.n;}
@@ -98,12 +98,12 @@ function genWorld(){
   {const inB=(x,y)=>BUILDINGS.some(b=>x>b.bb[0]-4&&x<b.bb[2]+4&&y>b.bb[1]-4&&y<b.bb[3]+4&&pip(x,y,b.p)),onRoad=(x,y)=>ROADS.some(r=>{if(x<r.bb[0]-r.w||x>r.bb[2]+r.w||y<r.bb[1]-r.w||y>r.bb[3]+r.w)return false;for(let i=0;i<r.p.length-1;i++)if(segD(x,y,r.p[i],r.p[i+1])<r.w/2+12)return true;return false;}),
      inPl=(x,y)=>WD.plaza.some(p=>pip(x,y,p));let rs=7;const rnd2=()=>((rs=(rs*16807)%2147483647)/2147483647);
    const wallC=['#8b4a35','#a0563c','#c9b79c','#e8e0d0','#7a4a3a','#b8664a','#d9cbb0','#6e3f30','#efe6d6','#a77b5a'],roofC=['#4a3a34','#5d4a40','#3d3a3a','#6b4a3a'];
-   for(const r of WSTR)for(let i=0;i<r.p.length-1;i++){const A=r.p[i],B=r.p[i+1],L=Math.hypot(B[0]-A[0],B[1]-A[1]);if(L<40)continue;const ux=(B[0]-A[0])/L,uy=(B[1]-A[1])/L,nx=-uy,ny=ux;
+   for(const r of WSTR.concat(BSTR))for(let i=0;i<r.p.length-1;i++){const isB=r.n==='Boschstraat';const A=r.p[i],B=r.p[i+1],L=Math.hypot(B[0]-A[0],B[1]-A[1]);if(L<40)continue;const ux=(B[0]-A[0])/L,uy=(B[1]-A[1])/L,nx=-uy,ny=ux;
      for(const sd of [-1,1]){let t=4;while(t<L-24){const w=44+rnd2()*22,fo=r.w/2+18;if(t+w>L-4)break;let ok=false;
        for(const D of [115,90,68,48]){const p0=[A[0]+ux*t+nx*sd*fo,A[1]+uy*t+ny*sd*fo],p1=[p0[0]+ux*w,p0[1]+uy*w],p2=[p1[0]+nx*sd*D,p1[1]+ny*sd*D],p3=[p0[0]+nx*sd*D,p0[1]+ny*sd*D],cxx=(p0[0]+p2[0])/2,cyy=(p0[1]+p2[1])/2;
          const pts=[p0,p1,p2,p3,[cxx,cyy],[(p0[0]+p1[0])/2,(p0[1]+p1[1])/2],[(p2[0]+p3[0])/2,(p2[1]+p3[1])/2]];
          if(pts.every(q=>pip(q[0],q[1],FORT)&&!inB(q[0],q[1])&&!onRoad(q[0],q[1])&&!inPl(q[0],q[1])&&cellAt(q[0],q[1])!==WATER)){const h=hsh(p0[0]|0,p0[1]|0);
-           prepBuilding({p:sd>0?[p0,p1,p2,p3]:[p0,p3,p2,p1],ht:(14+h%6)*3.2,kind:'house',wall:wallC[h%wallC.length],roof:roofC[h%roofC.length],ridge:true,gen:1});ok=true;break;}}
+           prepBuilding({p:sd>0?[p0,p1,p2,p3]:[p0,p3,p2,p1],ht:(isB?10+h%5:14+h%6)*3.2,kind:'house',wall:wallC[h%wallC.length],roof:roofC[h%roofC.length],ridge:true,gen:1});ok=true;break;}}
        t+=ok?w+1:10;}}}}
   const gk=BUILDINGS.find(b=>b.n==='Grote of Sint-Maartenskerk');
   if(gk){const x0=gk.bb[0],ys=gk.p.filter(q=>q[0]<x0+150).map(q=>q[1]),cy=(Math.min(...ys)+Math.max(...ys))/2,s=60;
@@ -121,7 +121,7 @@ function genWorld(){
   // winkels en horeca
   const used=new Set();
   const signOn=(name,x,y,cat,adr)=>{let best=null,bd=1e9;for(const b of BUILDINGS){if(b.pass||b.kind==='tower'||used.has(b))continue;if(Math.abs(b.cx-x)>260||Math.abs(b.cy-y)>260)continue;const d=pip(x,y,b.p)?0:Math.hypot(b.cx-x,b.cy-y);if(d<bd){bd=d;best=b;}}
-    if(best){used.add(best);best.sign=name;best.signC=signCol(name,cat);best.sa=nearestRoadDir(best.cx,best.cy);LANDMARKS.push({n:name,x:best.cx,y:best.cy,shop:1,c:best.signC[0],cat,adr});}};
+    if(best){used.add(best);SHOPS.push({b:best,n:name,c:cat,rob:0});best.sign=name;best.signC=signCol(name,cat);best.sa=nearestRoadDir(best.cx,best.cy);LANDMARKS.push({n:name,x:best.cx,y:best.cy,shop:1,c:best.signC[0],cat,adr});}};
   for(const z of WD.biz)signOn(z.n,z.x,z.y,z.c,z.adr);
   // terrassen
   for(const p of WD.seating){const b=bbox(p),col=RP(['#e9e2d0','#1d6b4a','#5a1622','#f2f2f2','#c43b2f']);for(let y=b[1]+16;y<b[3]-8;y+=34)for(let x=b[0]+16;x<b[2]-8;x+=34)if(pip(x,y,p))TERRACE.push({x,y,c:col});}

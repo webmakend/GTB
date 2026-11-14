@@ -14,7 +14,7 @@ function carNear(){let best=null,bd=1e9;for(const c of cars){if(c.dead||c.state!
   if(Math.abs(lx)<c.t.l/2+18&&Math.abs(ly)<c.t.w/2+20){const d=Math.hypot(dx,dy);if(d<bd){bd=d;best=c;}}}return best;}
 function tryEnter(){const best=carNear();if(!best)return;
   if(best.driver==='npc')ejectDriver(best);else if(best.driver==='cop'){exitCops(best);addHeat(1.2);}else if(best.type==='police')addHeat(1);
-  best.driver='player';best.ai=null;best.keep=1;P.car=best;P.stats.gejat++;showCarName(best);popTxt(best.x,best.y-16,'GEJAT!','#ffd166',1.1);sfx('door');msg(best.t.n.toUpperCase(),'','#ffffff',70);}
+  best.driver='player';best.ai=null;best.keep=1;P.car=best;P.stats.gejat++;showCarName(best);popTxt(best.x,best.y-16,'GEJAT!','#ffd166',1.1);sfx('door');msg(best.t.n.toUpperCase(),'','#ffffff',70);stoleBike(best);}
 function exitCar(){const c=P.car,s=c.t.w/2+10,L=[c.x+Math.sin(c.a)*s,c.y-Math.cos(c.a)*s],Rt=[c.x-Math.sin(c.a)*s,c.y+Math.cos(c.a)*s];
   const p=!footBlocked(L[0],L[1])?L:!footBlocked(Rt[0],Rt[1])?Rt:[c.x,c.y];P.x=p[0];P.y=p[1];P.a=c.a;c.driver=null;c.keep=0;c.ctl=[0,0,1];P.car=null;sfx('door');}
 function addMoney(v){P.money=Math.max(0,P.money+v);P.moneyF=20;popTxt(me().x,me().y-20,(v>0?'+':'-')+'€'+Math.abs(v).toFixed(2).replace('.',','),v>0?'#7dff6a':'#ff6b6b',1.2);}
@@ -28,7 +28,7 @@ function snap(x,y){const cx0=Math.floor(x/T),cy0=Math.floor(y/T);for(let r=0;r<6
 function playerStep(){
   if(P.dead>0){if(--P.dead===0)respawn();return;}
   const k=inp();if(P.throwCd>0)P.throwCd--;
-  if(k.enter){if(P.car)exitCar();else if(nearStatue())openStatue();else tryEnter();}
+  if(k.enter){if(P.car)exitCar();else if(nearStatue())openStatue();else if(!actTry())tryEnter();}
   if(P.car){const c=P.car;let th=(k.up?1:0)-(k.down?1:0),st=(k.right?1:0)-(k.left?1:0);
     if(touch.on&&(Math.abs(touch.jx)>.15||Math.abs(touch.jy)>.15)){const m=Math.min(1,Math.hypot(touch.jx,touch.jy)),want=Math.atan2(touch.jy,touch.jx),d=wrap(want-c.a);
       const fs0=fwdSpeed(c);if(Math.abs(d)<2.3||fs0>2.5){th=Math.abs(d)>1.9&&fs0>1.5?-1:m;st=clamp(d*(fs0>3?1.7:2.4),-1,1);}else{th=-m;st=clamp(-wrap(want+Math.PI-c.a)*2.4,-1,1);}
@@ -39,7 +39,7 @@ function playerStep(){
     if(P.jz>0){P.jz+=P.jv;P.jv-=.32;if(P.jz<=0){P.jz=0;P.jv=0;sfx('step',1);buzz(10);P.squash=9;for(let i=0;i<6;i++){const a=rr(0,TAU);parts.push({x:P.x,y:P.y,vx:Math.cos(a)*1.2,vy:Math.sin(a)*1.2,l:20,ml:20,s:2,k:'d'});}}}
     if(touch.on&&(Math.abs(touch.jx)>.12||Math.abs(touch.jy)>.12)){mx=touch.jx;my=touch.jy;run=Math.hypot(mx,my)>.92;}
     const sw=swimming();if(sw&&frameN%14===0)parts.push({x:P.x,y:P.y,vx:0,vy:0,l:40,ml:40,s:6,k:'p'});
-    const m=Math.hypot(mx,my);P.moving=m>.1;P.running=P.moving&&run;if(m>.1){const rk=P.ch?P.ch.perk.run:1,sp=(sw?1.45:run?3.3:2.3)*rk*Math.min(1,m)*(P.jz>0?1.15:1);mx/=m;my/=m;P.a=Math.atan2(my,mx);const nx=P.x+mx*sp,ny=P.y+my*sp;if(!footBlocked(nx,P.y))P.x=nx;if(!footBlocked(P.x,ny))P.y=ny;const ph=Math.floor(P.anim/Math.PI);P.anim+=sp*.28;if(Math.floor(P.anim/Math.PI)!==ph&&!(P.jz>0)){if(sw){if(ph%2===0)sfx('swim');}else{const gt=cellAt(P.x,P.y);sfx('step',run?1:0,(gt===GRASS||gt===PARK||gt===SAND)?1:0);}}}
+    const m=Math.hypot(mx,my);P.moving=m>.1;P.running=P.moving&&run;if(m>.1){const rk=P.ch?P.ch.perk.run:1,sp=(sw?1.45:run?3.3:2.3)*rk*Math.min(1,m)*(P.jz>0?1.15:1)*(P.high>0?1.3:1)*(P.drunk>=4?.85:1);mx/=m;my/=m;if(P.drunk>=2){const w=Math.sin(frameN*.045)*Math.min(1,P.drunk/6)*.9;const c2=Math.cos(w),s2=Math.sin(w);[mx,my]=[mx*c2-my*s2,mx*s2+my*c2];}P.a=Math.atan2(my,mx);const nx=P.x+mx*sp,ny=P.y+my*sp;if(!footBlocked(nx,P.y))P.x=nx;if(!footBlocked(P.x,ny))P.y=ny;const ph=Math.floor(P.anim/Math.PI);P.anim+=sp*.28;if(Math.floor(P.anim/Math.PI)!==ph&&!(P.jz>0)){if(sw){if(ph%2===0)sfx('swim');}else{const gt=cellAt(P.x,P.y);sfx('step',run?1:0,(gt===GRASS||gt===PARK||gt===SAND)?1:0);}}}
     pushOutOfCars(P,6);
     if(k.act&&P.throwCd<=0&&!sw)throwBalloon();
     if(heat<.5&&P.hp<P.maxhp)P.hp=Math.min(P.maxhp,P.hp+.03);}

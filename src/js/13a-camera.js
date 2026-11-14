@@ -12,5 +12,6 @@ function cameraStep(){const o=me(),c=P.car;let tx=o.x,ty=o.y,k=.12;
   shake*=.9;if(shake<.05)shake=0;zoomKick*=.86;if(zoomKick<.001)zoomKick=0;}
 function camHit(s,kick){shake=Math.max(shake,s);if(kick)zoomKick=Math.max(zoomKick,kick);}
 function cameraView(){const tr=Math.min(1,shake/12),t2=tr*tr,t=performance.now()/1000*15;CAM.z=viewZ();
-  CAM.x=camX+camNoise(t,1)*t2*24/CAM.z;CAM.y=camY+camNoise(t,7)*t2*24/CAM.z;CAM.r=camNoise(t,13)*t2*.04;return CAM;}
+  CAM.x=camX+camNoise(t,1)*t2*24/CAM.z;CAM.y=camY+camNoise(t,7)*t2*24/CAM.z;CAM.r=camNoise(t,13)*t2*.04;
+  if((P.drunk>=2||P.high>0)&&!CLUB.on){const q=Math.min(1,P.drunk/6)+(P.high>0?.35:0),s=performance.now()/1000;CAM.r+=Math.sin(s*.8)*.06*q;CAM.x+=Math.sin(s*1.1)*16*q/CAM.z;CAM.y+=Math.cos(s*.7)*10*q/CAM.z;}return CAM;}
 function applyCam(c2){c2.setTransform(DPR,0,0,DPR,0,0);c2.translate(CW/2,CH/2);if(CAM.r)c2.rotate(CAM.r);c2.scale(CAM.z,CAM.z);c2.translate(-CAM.x,-CAM.y);}
