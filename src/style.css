@@ -72,6 +72,8 @@ button{font-family:inherit}
 #bJump{right:calc(var(--sr) + 34px);bottom:calc(var(--sb) + 138px);width:68px;height:68px;font-size:11px;background:rgba(120,255,160,.32)}
 #bCar{right:calc(var(--sr) + 126px);bottom:calc(var(--sb) + 22px);width:72px;height:72px;background:rgba(255,190,40,.45);display:none}
 #sideBtns{position:fixed;z-index:11;display:none;gap:8px;flex-direction:column;right:calc(var(--sr) + 10px)}
-#topBtns{position:fixed;z-index:11;display:none;gap:8px;top:calc(var(--st) + 10px);right:calc(var(--sr) + 58px)}
-.sb{pointer-events:auto;width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.35);background:rgba(10,4,24,.55);color:#fff;font:700 18px Inter,sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(4px)}
+#topBtns{position:fixed;z-index:11;display:none;gap:6px;top:calc(var(--st) + 10px);right:calc(var(--sr) + 10px)}
+.sb{pointer-events:auto;width:32px;height:32px;border-radius:10px;border:1px solid rgba(255,255,255,.22);background:linear-gradient(180deg,rgba(40,16,64,.85),rgba(12,4,24,.85));color:#fff;font:700 14px Inter,sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(4px);box-shadow:0 2px 8px rgba(0,0,0,.35)}
+.sb svg{width:17px;height:17px;fill:currentColor}
+.sb:active{transform:scale(.92);background:#ff2e88}
 .sb:active{background:rgba(255,46,136,.6)}

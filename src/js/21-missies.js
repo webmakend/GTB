@@ -9,9 +9,13 @@ function pickGirl(){if(!BEACHERS.length)return null;const cx=(BEACH.bb[0]+BEACH.
 function henkeDoor(){const l=LANDMARKS.find(l=>l.n==='Café Henkie');return l?snap(l.x,l.y):null;}
 function setStage(st){MIS.stage=st;MIS.inside=0;let d=null;if(st===4)d=henkeDoor();else if(st===1)d=churchDoor();else if(st===2)d=kruidvatDoor();else if(st===3){if(!MIS.girl)MIS.girl=pickGirl();if(MIS.girl)d=[MIS.girl.x,MIS.girl.y];}
   if(d){MIS.x=d[0];MIS.y=d[1];MIS.on=true;}else if(st<3)setStage(st+1);else{MIS.done=true;}}
+// na missie 3 blijft Café Henkie open: gewoon naar binnen lopen
+function henkieVisit(){if(P.car||CLUB.on||MIS.cool>0)return;const d=henkeDoor();if(!d)return;if(Math.hypot(P.x-d[0],P.y-d[1])<34)enterClub();}
+function henkieMarker(){if(!(MIS.done&&MIS.stage>=4)||MG.on||bigMap||CLUB.on)return;const d=henkeDoor();if(!d)return;const sx=CW/2+(d[0]-CAM.x)*CAM.z,sy=CH/2+(d[1]-CAM.y)*CAM.z;if(sx<-40||sx>CW+40||sy<-40||sy>CH+40)return;
+  const b=Math.sin(frameN*.08)*3,y=sy-26-b;ctx.fillStyle='rgba(10,4,24,.85)';rrect(ctx,sx-34,y-12,68,22,11);ctx.fill();ctx.strokeStyle='#ff7ad9';ctx.lineWidth=2;rrect(ctx,sx-34,y-12,68,22,11);ctx.stroke();ctx.font='800 11px Inter, sans-serif';ctx.fillStyle='#ff7ad9';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🍸 OPEN',sx,y);}
 function henkeStep(){if(MIS.stage!==4||MIS.done||P.car||CLUB.on)return;if(Math.hypot(P.x-MIS.x,P.y-MIS.y)<36&&!MIS.cool){if(P.money<10){msg('TE WEINIG GELD','Entree kost €10','#ff6b6b',140);MIS.cool=200;return;}addMoney(-10);sfx('kassa');enterClub();}}
 function initMission(){MIS.done=false;MIS.gold=false;MIS.girl=null;MIS.cool=0;MIS.ann=0;MIS.on=true;setStage(1);}
-function missionStep(){if(!MIS.on||MIS.done||P.dead)return;if(MIS.ann>0&&--MIS.ann===0)missionBanner('MISSIE 2: ZONNEBRAND','Je hebt €20. Koop zonnebrand bij de Kruidvat in de Boschstraat en breng het naar het strand. Volg de gele pijl.');
+function missionStep(){if(MIS.cool>0&&MIS.done)MIS.cool--;if(MIS.done&&MIS.stage>=4&&!P.dead){henkieVisit();return;}if(!MIS.on||MIS.done||P.dead)return;if(MIS.ann>0&&--MIS.ann===0)missionBanner('MISSIE 2: ZONNEBRAND','Je hebt €20. Koop zonnebrand bij de Kruidvat in de Boschstraat en breng het naar het strand. Volg de gele pijl.');
   if(MIS.cool>0)MIS.cool--;
   if(MIS.stage===1){if(MIS.inside>0){if(--MIS.inside===0){P.hp=P.maxhp;heat=0;stars=0;MIS.gold=true;sfx('reward');addMoney(20);
         msg('MISSIE GESLAAGD!','Beloning: €20 + gouden waterballonnen','#ffd166',260);setStage(2);MIS.ann=270;}return;}

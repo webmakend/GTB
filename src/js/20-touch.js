@@ -1,8 +1,8 @@
 // ====================== touch-bediening ======================
-function placeTopBtns(){const sb=document.getElementById('sideBtns');if(!sb)return;const S=Math.round(clamp(Math.min(CW,CH)*.28,100,180)),top=uiTop().bottom+8+S+12;sb.style.top=top+'px';sb.style.flexDirection=(CH-top<260)?'row':'column';}
+function placeTopBtns(){const tb=document.getElementById('topBtns');if(tb){const S=Math.round(clamp(Math.min(CW,CH)*.27,96,150));tb.style.top=(uiTop().top+S+8)+'px';tb.style.right='calc(var(--sr) + '+(12+S/2-52)+'px)';}const sb=document.getElementById('sideBtns');if(!sb)return;const S=Math.round(clamp(Math.min(CW,CH)*.28,100,180)),top=uiTop().bottom+8+S+12;sb.style.top=top+'px';sb.style.flexDirection=(CH-top<260)?'row':'column';}
 function buzz(ms){if(Array.isArray(ms)){try{if(IS_TOUCH&&navigator.vibrate)navigator.vibrate(ms);}catch(e){}return;}try{if(IS_TOUCH&&navigator.vibrate)navigator.vibrate(ms);}catch(e){}}
 function updTouchUI(){document.getElementById('bJump').style.display=P.car||P.dead||swimming()?'none':'flex';const bA=document.getElementById('bAct'),bC=document.getElementById('bCar');const ac=P.car?'REM':'💧<br>GOOI';if(bA._t!==ac){bA.innerHTML=ac;bA._t=ac;}
-  const ns=!P.car&&nearStatue(),show=!!P.car||ns||!!carNear(),ct=P.car?'UIT<br>STAP':ns?'👁<br>BEKIJK':'IN<br>STAP';bC.style.display=show&&!P.dead?'flex':'none';if(bC._t!==ct){bC.innerHTML=ct;bC._t=ct;}}
+  const show=!!P.car||!!carNear(),ct=P.car?'UIT<br>STAP':'IN<br>STAP';bC.style.display=show&&!P.dead?'flex':'none';if(bC._t!==ct){bC.innerHTML=ct;bC._t=ct;}}
 let PINCH=null,joyCancel=()=>{};
 function setupPinch(){const isBtn=t=>t&&t.closest&&t.closest('.tb,.sb,#mus');let first=null;
   window.addEventListener('touchstart',e=>{if(MODE!=='play'||MG.on)return;const now=performance.now();
@@ -19,13 +19,14 @@ function setupZoom(){cv.addEventListener('wheel',e=>{if(MODE!=='play')return;e.p
   const hold=(id,f)=>{const el=document.getElementById(id);let iv=null;el.addEventListener('pointerdown',e=>{e.preventDefault();f();clearInterval(iv);iv=setInterval(f,120);});['pointerup','pointerleave','pointercancel'].forEach(t=>el.addEventListener(t,()=>{clearInterval(iv);}));};
   document.getElementById('bRestart').addEventListener('pointerdown',e=>{e.preventDefault();askRestart();});
   document.getElementById('bSave').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();writeSave(false);});}
-function setupMapClick(){const mgp=e=>{if(MG.on&&!MG.res&&(e.pointerType==='mouse'||e.buttons||e.type==='pointerdown')){const B=mgBox();MG.hy=clamp(e.clientY,B.top+10,B.bot-10);}};cv.addEventListener('pointerdown',mgp);cv.addEventListener('pointermove',mgp);
+function setupMapClick(){cv.addEventListener('pointerdown',e=>{if(MODE==='play'&&!CLUB.on&&!MG.on&&!bigMap&&statueAt(e.clientX,e.clientY)){e.stopImmediatePropagation();openStatue();}},true);
+  const mgp=e=>{if(MG.on&&!MG.res&&(e.pointerType==='mouse'||e.buttons||e.type==='pointerdown')){const B=mgBox();MG.hy=clamp(e.clientY,B.top+10,B.bot-10);}};cv.addEventListener('pointerdown',mgp);cv.addEventListener('pointermove',mgp);
   cv.addEventListener('pointerdown',e=>{if(MODE!=='play'||MG.on)return;if(bigMap){bigMap=false;return;}if(Math.hypot(e.clientX-MM.x,e.clientY-MM.y)<=MM.r+4)bigMap=true;});
   cv.addEventListener('pointermove',e=>{if(MODE==='play')cv.style.cursor=(bigMap||Math.hypot(e.clientX-MM.x,e.clientY-MM.y)<=MM.r)?'pointer':'default';});}
 function setupTouch(){
   const zone=document.getElementById('joyZone'),base=document.getElementById('joyBase'),knob=document.getElementById('joyKnob'),hint=document.getElementById('joyHint');let jid=null,bx=0,by=0;
   touch.on=IS_TOUCH;
-  zone.addEventListener('pointerdown',e=>{if(jid!==null)return;jid=e.pointerId;try{zone.setPointerCapture(jid);}catch(_){}bx=e.clientX;by=e.clientY;base.style.display='block';base.style.left=bx+'px';base.style.top=(by-zone.getBoundingClientRect().top)+'px';hint.style.display='none';e.preventDefault();});
+  zone.addEventListener('pointerdown',e=>{if(jid===null&&MODE==='play'&&statueAt(e.clientX,e.clientY)){e.preventDefault();openStatue();return;}if(jid!==null)return;jid=e.pointerId;try{zone.setPointerCapture(jid);}catch(_){}bx=e.clientX;by=e.clientY;base.style.display='block';base.style.left=bx+'px';base.style.top=(by-zone.getBoundingClientRect().top)+'px';hint.style.display='none';e.preventDefault();});
   const zt=()=>zone.getBoundingClientRect().top;
   joyCancel=()=>{if(jid!==null){jid=null;base.style.display='none';knob.style.left='40px';knob.style.top='40px';}};
   zone.addEventListener('pointermove',e=>{if(e.pointerId!==jid)return;if(PINCH){touch.jx=touch.jy=0;return;}let dx=e.clientX-bx,dy=e.clientY-by,d=Math.hypot(dx,dy);const m=58;
