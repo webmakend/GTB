@@ -22,3 +22,19 @@ function runLoader(fast){
     if(shown>=.999){loadDone=true;lb.style.opacity=0;setTimeout(()=>{lb.style.display='none';pl.classList.add('show');},450);return;}requestAnimationFrame(tick);};
   requestAnimationFrame(tick);const tipIv=setInterval(()=>{if(loadDone){clearInterval(tipIv);return;}ti=(ti+1)%TIPS.length;tip.textContent=TIPS[ti];},2600);
 }
+
+// ---- korte filmische intro vóór het startscherm (tik = overslaan)
+let CINE_DONE=false;
+function playCine(){if(CINE_DONE)return;CINE_DONE=true;const d=document.createElement('div');d.id='cine';
+  const L=[['ZALTBOMMEL','Een vestingstad aan de Waal.'],['','Grachten. Klinkers. Een kerk van 800 jaar.'],['','Rustig. Gezellig.'],['','Té rustig.']];
+  d.innerHTML=`<div class="cbg" style="background-image:url('${ARTS[1]}')"></div><div class="cbar t"></div><div class="cbar b"></div><div class="csir"></div><div class="ctx"></div><div class="cflash"></div><div class="clogo"><img src="assets/logo.png" alt=""><b>GRAND THEFT BOMMEL</b></div><div class="cskip">TIK OM OVER TE SLAAN ›</div>`;
+  document.body.appendChild(d);const tx=d.querySelector('.ctx'),tm=[];let gone=false;
+  const show=(a,b)=>{tx.classList.remove('on');setTimeout(()=>{tx.innerHTML=(a?`<i>${a}</i>`:'')+`<span>${b}</span>`;void tx.offsetWidth;tx.classList.add('on');},180);};
+  const end=()=>{if(gone)return;gone=true;tm.forEach(clearTimeout);d.classList.add('out');setTimeout(()=>d.remove(),650);};
+  const at=(ms,f)=>tm.push(setTimeout(f,ms));
+  L.forEach((l,i)=>at(250+i*1250,()=>show(l[0],l[1])));
+  at(5100,()=>{tx.classList.remove('on');d.classList.add('siren');try{buzz([40,60,40]);}catch(e){}});
+  at(5900,()=>show('','Tijd om de stad over te nemen.'));
+  at(7300,()=>{tx.classList.remove('on');d.classList.remove('siren');d.classList.add('slam');});
+  at(9600,end);
+  d.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();end();});}

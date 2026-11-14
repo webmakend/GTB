@@ -9,7 +9,7 @@ function unlockSound(e){if(!NEED_TAP)return;NEED_TAP=false;document.getElementBy
 ['pointerup','touchend','click','keydown'].forEach(ev=>window.addEventListener(ev,unlockSound,true));
 document.getElementById('mus').addEventListener('click',e=>{e.stopPropagation();if(NEED_TAP)return;musicToggle();});
 function enterIntro(fast){MODE='intro';document.getElementById('lightc').style.display='none';GL.shown=false;document.getElementById('intro').style.display='block';document.getElementById('pick').style.display='none';document.getElementById('touch').style.display='none';
-  document.getElementById('topBtns').style.display='none';document.getElementById('sideBtns').style.display='none';setupIntro();runLoader(fast);}
+  document.getElementById('topBtns').style.display='none';document.getElementById('sideBtns').style.display='none';setupIntro();runLoader(fast);if(!fast)playCine();}
 function restartGame(){paused=false;bigMap=false;P.stats={nat:0,omver:0,gejat:0};cars=[];peds=[];balloons=[];parts=[];decals=[];bubbles=[];msgs.length=0;P.dead=0;P.jz=0;respawn();camZ=1.15;populate();initMission();P.money=0;FX=[];SKIDS=[];hitStop=0;if(MG.on)mgEnd();
   document.getElementById('bPause').textContent='❚❚';radio.volume=.9;enterIntro(true);}
 let restartArm=0;function askRestart(){if(performance.now()-restartArm<2500){restartArm=0;restartGame();}else{restartArm=performance.now();msg('OPNIEUW BEGINNEN?','Tik nog een keer op ⟲','#ffd166',140);}}

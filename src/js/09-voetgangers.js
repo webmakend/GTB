@@ -19,7 +19,7 @@ function pedStep(p){
   if(p.state==='down'){if(--p.downT<=0){p.state=p.kind==='cop'&&stars>0?'chase':'flee';p.fx=me().x;p.fy=me().y;p.fleeT=200;}return;}
   let sp=0;
   if(p.kind==='cop'&&stars>0&&!P.dead){const t=me(),d=Math.hypot(t.x-p.x,t.y-p.y);p.a=Math.atan2(t.y-p.y,t.x-p.x);sp=d>14?2.4:0;p.state='chase';
-    if(!P.car&&d<17)copTouch=true;if(P.car&&d<P.car.t.l/2+14&&speedOf(P.car)<.8)copTouch=true;if(Math.random()<.004)say(p,rpick(['Staan blijven!','Politie!','Handen omhoog!']));}
+    if(!P.car&&d<17){copTouch=true;if(stars>=2&&!P.dead&&(p.hitCd=(p.hitCd||0)-1)<=0){p.hitCd=40;P.lastHit='Neergeknuppeld door de politie';hurt(stars>=4?14:9);sfx('slap');}}if(P.car&&d<P.car.t.l/2+14&&speedOf(P.car)<.8)copTouch=true;if(Math.random()<.004)say(p,rpick(['Staan blijven!','Politie!','Handen omhoog!']));}
   else{if(p.kind==='cop'&&p.state==='chase')p.state='walk';
     if(p.state==='walk'){sp=p.spd;if(--p.think<=0){p.think=rr(60,240)|0;if(Math.random()<.35)p.a+=rr(-1.6,1.6);if(Math.random()<.04)p.cross=90;if(Math.random()<.02&&!offscreen(p.x,p.y))say(p,p.kind==='boer'?rpick(SAY_BOER).replace('#',p.dorp||'Gameren'):rpick(SAY_IDLE));}}
     else if(p.state==='flee'){sp=2.2;p.a=Math.atan2(p.y-p.fy,p.x-p.fx)+Math.sin(frameN*.05+p.x)*.4;if(--p.fleeT<=0)p.state='walk';}}

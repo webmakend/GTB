@@ -18,11 +18,11 @@ function tryEnter(){const best=carNear();if(!best)return;
 function exitCar(){const c=P.car,s=c.t.w/2+10,L=[c.x+Math.sin(c.a)*s,c.y-Math.cos(c.a)*s],Rt=[c.x-Math.sin(c.a)*s,c.y+Math.cos(c.a)*s];
   const p=!footBlocked(L[0],L[1])?L:!footBlocked(Rt[0],Rt[1])?Rt:[c.x,c.y];P.x=p[0];P.y=p[1];P.a=c.a;c.driver=null;c.keep=0;c.ctl=[0,0,1];P.car=null;sfx('door');}
 function addMoney(v){P.money=Math.max(0,P.money+v);P.moneyF=20;popTxt(me().x,me().y-20,(v>0?'+':'-')+'€'+Math.abs(v).toFixed(2).replace('.',','),v>0?'#7dff6a':'#ff6b6b',1.2);}
-function hurt(d){if(P.dead)return;P.hp-=d;P.hurtF=18;buzz(30);shake=Math.max(shake,5);if(P.hp<=0){P.hp=0;wasted('WASTED');}}
-function wasted(t){if(P.dead)return;P.dead=170;P.deadKind='wasted';msg(t,'De huisarts lapt je weer op','#e8433a',170);sfx('sting');}
-function busted(){if(P.dead)return;if(P.car){P.car.driver=null;P.car.keep=0;P.car=null;}P.dead=170;P.deadKind='bust';msg('GEARRESTEERD!','Een nachtje in de cel, morgen weer vrij','#4d8dff',170);sfx('sting');}
+function hurt(d){if(P.dead)return;P.hp-=d;P.hurtF=18;buzz(30);shake=Math.max(shake,5);if(P.hp<=0){P.hp=0;wasted('WASTED',P.lastHit);}P.lastHit='';}
+function wasted(t,why){if(P.dead)return;P.dead=220;P.deadKind='wasted';P.deadWhy=why||'';if(P.car){P.car.driver=null;P.car=null;}sfx('sting');buzz([60,40,120]);}
+function busted(){if(P.dead)return;if(P.car){P.car.driver=null;P.car.keep=0;P.car=null;}P.dead=220;P.deadKind='bust';const hadGun=P.gun;P.deadWhy=hadGun?'Al je wapens zijn in beslag genomen':'Een nachtje in de cel, morgen weer vrij';P.gun=false;P.weapon=0;if(typeof PRG!=='undefined'){PRG.gun=false;PRG.dirty=true;try{progSave();}catch(e){}}noteAdd('BUSTED',hadGun?'Opgepakt! De politie heeft al je wapens afgepakt':'Een nachtje in de cel, morgen weer vrij','#4d8dff',260);sfx('sting');buzz([60,40,120]);}
 let SPAWN=[0,0];
-function respawn(){const s=snap(SPAWN[0],SPAWN[1]);P.x=s[0];P.y=s[1];P.hp=P.maxhp;P.car=null;P.bust=0;heat=0;stars=0;
+function respawn(){const s=snap(SPAWN[0],SPAWN[1]);P.x=s[0];P.y=s[1];P.hp=P.maxhp;P.car=null;P.bust=0;heat=0;stars=0;P.lastHit='';P.deadKind='';
   cars=cars.filter(c=>!(c.driver==='cop'&&c.ai&&c.ai.mode==='pursuit'));peds=peds.filter(p=>p.kind!=='cop');camX=P.x;camY=P.y;}
 function snap(x,y){const cx0=Math.floor(x/T),cy0=Math.floor(y/T);for(let r=0;r<60;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const cx=cx0+dx,cy=cy0+dy;if(cx<0||cy<0||cx>=GW||cy>=GH)continue;const t=G[cy*GW+cx];if(t===WALK||t===PLAZA)return[cx*T+8,cy*T+8];}return[x,y];}
 function playerStep(){
@@ -42,7 +42,7 @@ function playerStep(){
     const sw=swimming();if(sw&&frameN%14===0)parts.push({x:P.x,y:P.y,vx:0,vy:0,l:40,ml:40,s:6,k:'p'});
     const m=Math.hypot(mx,my);P.moving=m>.1;P.running=P.moving&&run;if(m>.1){const rk=P.ch?P.ch.perk.run:1,sp=(sw?1.45:run?3.3:2.3)*rk*Math.min(1,m)*(P.jz>0?1.15:1)*(P.high>0?1.3:1)*(P.boost>0?1.3:1)*(P.drunk>=4?.85:1);mx/=m;my/=m;if(P.drunk>=2){const w=Math.sin(frameN*.045)*Math.min(1,P.drunk/6)*.9;const c2=Math.cos(w),s2=Math.sin(w);[mx,my]=[mx*c2-my*s2,mx*s2+my*c2];}P.a=Math.atan2(my,mx);const nx=P.x+mx*sp,ny=P.y+my*sp;if(!footBlocked(nx,P.y))P.x=nx;if(!footBlocked(P.x,ny))P.y=ny;const ph=Math.floor(P.anim/Math.PI);P.anim+=sp*.28;if(Math.floor(P.anim/Math.PI)!==ph&&!(P.jz>0)){if(sw){if(ph%2===0)sfx('swim');}else{const gt=cellAt(P.x,P.y);sfx('step',run?1:0,(gt===GRASS||gt===PARK||gt===SAND)?1:0);}}}
     if(!(P.jz>7))pushOutOfCars(P,6);
-    if(k.act&&P.throwCd<=0&&!sw){if(P.weapon===1&&P.gun)fireGun();else if(P.ammo>0){P.ammo--;throwBalloon();}else{P.throwCd=30;noteAdd('💧 BALLONNEN OP','Even wachten, ze vullen zich vanzelf bij','#7fc8ff',90,'ammo');}}
+    if(k.act&&P.throwCd<=0&&!sw){if(P.weapon===1&&P.gun)fireGun();else throwBalloon();}
     if(heat<.5&&P.hp<P.maxhp)P.hp=Math.min(P.maxhp,P.hp+.03);}
 }
 function beachHits(){for(const c of cars){if(c.dead)continue;const sp=speedOf(c);if(sp<1.6)continue;for(let i=BEACHERS.length-1;i>=0;i--){const b=BEACHERS[i];if(Math.abs(b.x-c.x)>26||Math.abs(b.y-c.y)>26)continue;if(b.special)continue;BEACHERS.splice(i,1);const p=makePed(b.x,b.y,'civ');p.col=b.suit;p.hair=b.hair;peds.push(p);knockDown(p,c===P.car,Math.atan2(c.vy,c.vx));}}
@@ -56,5 +56,5 @@ function carPedHits(){beachHits();
   for(const c of cars){if(c.dead)continue;const sp=speedOf(c);if(sp<.9)continue;const fx=Math.cos(c.a),fy=Math.sin(c.a);
     for(const p of peds){if(p.state==='down')continue;const dx=p.x-c.x,dy=p.y-c.y;if(Math.abs(dx)>40||Math.abs(dy)>40)continue;const lx=dx*fx+dy*fy,ly=-dx*fy+dy*fx;
       if(Math.abs(lx)<c.t.l/2+5&&Math.abs(ly)<c.t.w/2+5){if(sp>1.8){knockDown(p,c===P.car,Math.atan2(c.vy,c.vx)+rr(-.5,.5));p.x+=c.vx*3;p.y+=c.vy*3;if(c===P.car)sfx('bump');}else{p.x+=c.vx*2;p.y+=c.vy*2;if(p.kind==='civ')flee(p,c.x,c.y,200);}}}
-    if(c!==P.car&&!P.car&&!P.dead&&!(P.jz>6)){const dx=P.x-c.x,dy=P.y-c.y,lx=dx*fx+dy*fy,ly=-dx*fy+dy*fx;if(Math.abs(lx)<c.t.l/2+6&&Math.abs(ly)<c.t.w/2+6&&sp>2.4&&c.hitCd<=0){c.hitCd=30;hurt(sp*5);const a=Math.atan2(dy,dx),nx=P.x+Math.cos(a)*14,ny=P.y+Math.sin(a)*14;if(!footBlocked(nx,ny)){P.x=nx;P.y=ny;}}}}}
+    if(c!==P.car&&!P.car&&!P.dead&&!(P.jz>6)){const dx=P.x-c.x,dy=P.y-c.y,lx=dx*fx+dy*fy,ly=-dx*fy+dy*fx;if(Math.abs(lx)<c.t.l/2+6&&Math.abs(ly)<c.t.w/2+6&&sp>2.4&&c.hitCd<=0){c.hitCd=30;if(c.driver==='cop'&&stars>0)wasted('WASTED','Aangereden door de politie');else hurt(sp*5);const a=Math.atan2(dy,dx),nx=P.x+Math.cos(a)*14,ny=P.y+Math.sin(a)*14;if(!footBlocked(nx,ny)){P.x=nx;P.y=ny;}}}}}
 

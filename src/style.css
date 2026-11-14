@@ -1,3 +1,4 @@
+@font-face{font-family:"Pricedown";src:local("Pricedown"),local("Pricedown Bl"),local("Pricedown Black"),local("PricedownBl-Regular");font-display:swap}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:Inter,system-ui,sans-serif;color:#fff;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;overscroll-behavior:none}
 canvas{display:block;position:fixed;inset:0}
@@ -93,12 +94,60 @@ button{font-family:inherit}
 #bJump{--c:#2fd1b0;--g:rgba(47,209,176,.45);right:calc(var(--sr) + 26px);bottom:calc(var(--sb) + 156px);width:86px;height:86px;font-size:12px!important}
 #bX{--c:#ff4fb3;--g:rgba(255,79,179,.5);right:calc(var(--sr) + 124px);bottom:calc(var(--sb) + 112px);width:84px;height:84px;font-size:12px!important}
 #bCar{--c:#ffa53a;--g:rgba(255,165,58,.5);right:calc(var(--sr) + 142px);bottom:calc(var(--sb) + 8px);width:86px;height:86px;font-size:10.5px!important}
-#bAmmo{--c:#8a93a8;--g:rgba(138,147,168,.35);right:calc(var(--sr) + 36px);bottom:calc(var(--sb) + 256px);width:66px;height:66px;font-size:13px!important;display:none}
-#bAmmo svg{width:46%}
-#bAmmo b{position:absolute;right:6px;bottom:10px;font:900 13px Inter,sans-serif}
 #joyHint{visibility:hidden!important}
 #joyBase{width:150px!important;height:150px!important;margin:-75px 0 0 -75px!important;border:2px solid rgba(255,255,255,.16)!important;background:radial-gradient(circle,rgba(30,34,52,.55) 0 46%,rgba(14,16,28,.62) 47% 100%)!important;box-shadow:inset 0 0 22px rgba(0,0,0,.6),0 6px 18px rgba(0,0,0,.45);
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 150'%3E%3Cg fill='rgba(255,255,255,.28)'%3E%3Cpath d='M75 10l9 11H66z'/%3E%3Cpath d='M75 140l9-11H66z'/%3E%3Cpath d='M10 75l11 9V66z'/%3E%3Cpath d='M140 75l-11 9V66z'/%3E%3C/g%3E%3Ccircle cx='75' cy='75' r='44' fill='none' stroke='rgba(255,255,255,.12)' stroke-width='2'/%3E%3C/svg%3E"),radial-gradient(circle,rgba(30,34,52,.55) 0 46%,rgba(14,16,28,.62) 47% 100%)!important}
 #joyBase.idle{opacity:.85}
 #joyKnob{left:43px;top:43px;width:64px!important;height:64px!important;background:radial-gradient(circle,#3a1d52 0 52%,transparent 54%),conic-gradient(from 200deg,#36d1ff,#7b6bff,#ff2e88,#ff6fb5,#36d1ff)!important;box-shadow:0 0 18px rgba(54,209,255,.55),0 0 26px rgba(255,46,136,.4)!important}
 #topBtns .sb{border-radius:50%!important;background:radial-gradient(circle at 50% 30%,rgba(46,54,78,.92),rgba(12,14,26,.92))!important;border:2px solid rgba(255,255,255,.22)!important}
+
+/* ===== HUD-ontwerp v2: glanzende bollen, geen tekstlabels ===== */
+.tb{border:none!important;box-shadow:0 8px 18px rgba(0,0,0,.45),inset 0 -6px 12px rgba(0,0,0,.35),inset 0 4px 10px rgba(255,255,255,.35)!important}
+.tb::after{content:'';position:absolute;left:18%;top:8%;width:64%;height:34%;border-radius:50%;background:linear-gradient(rgba(255,255,255,.55),rgba(255,255,255,0));pointer-events:none}
+.tb svg{width:44%;max-height:48%;filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))}
+#bAct{width:118px;height:118px;right:calc(var(--sr) + 34px);bottom:calc(var(--sb) + 30px);background:radial-gradient(circle at 40% 30%,#6fc0ff,#1d6fe0 45%,#0b3a94 100%)!important}
+#bAct svg{width:46%}
+#bJump{width:72px;height:72px;right:calc(var(--sr) + 158px);bottom:calc(var(--sb) + 124px);background:radial-gradient(circle at 40% 30%,#7ff5dc,#16b596 50%,#0a6b5a 100%)!important;outline:none}
+#bJump::before{content:'';position:absolute;inset:-7px;border-radius:50%;background:conic-gradient(#b07cff var(--p,0%),rgba(255,255,255,.12) 0);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px))}
+#bCar{width:58px;height:58px;right:calc(var(--sr) + 64px);bottom:calc(var(--sb) + 172px);background:radial-gradient(circle at 40% 30%,#ffd08a,#f08a1c 50%,#9a4c05 100%)!important}
+#bCar.pulse{animation:carp 1.1s ease-in-out infinite}
+@keyframes carp{50%{transform:scale(1.1);box-shadow:0 0 18px rgba(255,165,58,.8),0 8px 18px rgba(0,0,0,.45)}}
+#bCar svg{width:56%}#bCar svg path{fill:#fff}
+#bX{width:58px;height:58px;right:calc(var(--sr) + 172px);bottom:calc(var(--sb) + 110px);background:radial-gradient(circle at 40% 30%,#ff9ad6,#e8389b 50%,#8d0e55 100%)!important}
+.tb.mini{width:30px;height:30px;display:none;background:radial-gradient(circle at 40% 30%,#4b5470,#1a1e30)!important;bottom:calc(var(--sb) + 74px)}
+.tb.mini::after{display:none}.tb.mini svg{width:60%;max-height:60%}
+#wPrev{right:calc(var(--sr) + 156px);bottom:calc(var(--sb) + 52px)!important}#wNext{right:calc(var(--sr) + 2px)}
+#joyBase{background:radial-gradient(circle,rgba(255,255,255,.04) 55%,rgba(255,255,255,.1))!important;border:2px solid rgba(255,255,255,.28)!important;box-shadow:none!important}
+#joyKnob{background:radial-gradient(circle at 38% 30%,#fdfdfd,#b9bdc8 45%,#6a6f7d 100%)!important;border:none!important;box-shadow:0 6px 14px rgba(0,0,0,.5),inset 0 -4px 8px rgba(0,0,0,.25)!important}
+#topBtns .sb{position:fixed;width:34px!important;height:34px!important;padding:0!important;display:flex;align-items:center;justify-content:center;background:rgba(18,20,34,.92)!important;border:1.5px solid rgba(255,255,255,.2)!important}
+#topBtns .sb svg{width:17px;height:17px;fill:#fff}
+#bNet .bdg{position:absolute;right:-5px;top:-5px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:#8b5cf6;color:#fff;font:800 10px/17px Inter,sans-serif;text-align:center;box-sizing:border-box}
+
+/* ===== filmische intro ===== */
+#cine{position:fixed;inset:0;z-index:80;background:#000;overflow:hidden;font-family:Inter,sans-serif;transition:opacity .6s}
+#cine.out{opacity:0;pointer-events:none}
+#cine .cbg{position:absolute;inset:-6%;background-size:cover;background-position:center;opacity:.38;filter:saturate(.6) brightness(.7);animation:cburns 10s linear both}
+@keyframes cburns{from{transform:scale(1.25) translateX(3%)}to{transform:scale(1) translateX(-2%)}}
+#cine .cbar{position:absolute;left:0;right:0;height:13vh;background:#000;z-index:3;animation:cbar .8s ease-out both}
+#cine .cbar.t{top:0}#cine .cbar.b{bottom:0}
+@keyframes cbar{from{height:50vh}}
+#cine .ctx{position:absolute;left:8vw;right:8vw;top:50%;transform:translateY(-50%);z-index:4;color:#fff;opacity:0;transition:opacity .45s,transform .6s;text-align:left}
+#cine .ctx.on{opacity:1;transform:translateY(-55%)}
+#cine .ctx i{display:block;font:400 clamp(40px,12vw,84px)/1 Anton,Impact,sans-serif;font-style:normal;letter-spacing:4px;color:#ffd166;margin-bottom:10px}
+#cine .ctx span{font:700 clamp(18px,5vw,28px)/1.25 Inter,sans-serif;letter-spacing:.5px;text-shadow:0 2px 10px #000}
+#cine .csir{position:absolute;inset:0;z-index:2;opacity:0}
+#cine.siren .csir{animation:csir .5s steps(1) infinite}
+@keyframes csir{0%{opacity:.55;background:radial-gradient(circle at 15% 50%,#ff1f3d,transparent 60%)}50%{opacity:.55;background:radial-gradient(circle at 85% 50%,#2f6bff,transparent 60%)}}
+#cine .cflash{position:absolute;inset:0;background:#fff;opacity:0;z-index:6;pointer-events:none}
+#cine.slam .cflash{animation:cflash .5s ease-out .22s both}
+@keyframes cflash{0%{opacity:.9}100%{opacity:0}}
+#cine .clogo{position:absolute;left:50%;top:50%;z-index:5;transform:translate(-50%,-50%) scale(3);opacity:0;text-align:center;width:min(84vw,520px)}
+#cine .clogo img{width:100%;filter:drop-shadow(0 10px 30px rgba(0,0,0,.8))}
+#cine .clogo b{display:block;margin-top:8px;font:400 clamp(20px,6vw,34px)/1 'Pricedown',Anton,Impact,sans-serif;letter-spacing:3px;color:#fff;-webkit-text-stroke:1.5px #1a0a2c;opacity:0}
+#cine.slam .clogo{animation:cslam .45s cubic-bezier(.3,1.5,.5,1) both}
+#cine.slam .clogo b{animation:cfade .5s ease .7s both}
+#cine.slam{animation:cshake .4s ease .2s}
+@keyframes cslam{from{opacity:0;transform:translate(-50%,-50%) scale(3)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+@keyframes cfade{from{opacity:0;transform:translateY(10px)}to{opacity:1}}
+@keyframes cshake{20%{transform:translate(-8px,5px)}40%{transform:translate(7px,-6px)}60%{transform:translate(-5px,3px)}80%{transform:translate(3px,-2px)}}
+#cine .cskip{position:absolute;right:calc(var(--sr) + 18px);bottom:calc(var(--sb) + 18px);z-index:7;font:800 11px Inter,sans-serif;letter-spacing:2px;color:rgba(255,255,255,.55)}

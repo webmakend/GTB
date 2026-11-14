@@ -53,7 +53,7 @@ function actTry(){const a=ACT.cur;if(!a)return false;if(a.off)return true;
 function buyBeer(){if(P.money<2){msg('GEEN GELD','Een biertje kost €2','#ff6b6b',110);return;}addMoney(-2);P.drunk=Math.min(8,P.drunk+1);P.bladP+=34;sfx('kassa');
   const l=['PROOST!','NOG EENTJE!','GEZELLIG!','HUP, ADTJE!','IK BEN NIET DRONKEN!','WAAR IS DE WC?'];msg(l[Math.min(l.length-1,P.drunk-1)],P.drunk>=4?'De vloer begint te bewegen…':'Lekker koud biertje','#ffd166',110);}
 function actStep(){
-  for(const s of SHOPS)if(s.rob>0)s.rob--;if(P.boost>0)P.boost--;if(P.ammo<12&&frameN%70===0)P.ammo++;
+  for(const s of SHOPS)if(s.rob>0)s.rob--;if(P.boost>0)P.boost--;
   // drank, plasnood en spul
   if(P.bladP>0){const d=Math.min(P.bladP,.06);P.bladP-=d;P.bladder+=d;}
   if(P.drunk>0&&frameN%(60*12)===0)P.drunk=Math.max(0,P.drunk-1);
@@ -86,7 +86,7 @@ function drawActs(){
     ctx.fillStyle='#e8dcc0';ctx.fillRect(-14,13,20,8);ctx.fillStyle='#222';ctx.font='700 5px Inter, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('HONGER',-4,17.3);
     ctx.restore();}
 }
-function actHint(){if(MG.on||bigMap||CLUB.on)return;ctx=fctx;const a=ACT.cur;ACT.hintA+=((a?1:0)-ACT.hintA)*.2;
+function actHint(){return;if(MG.on||bigMap||CLUB.on)return;ctx=fctx;const a=ACT.cur;ACT.hintA+=((a?1:0)-ACT.hintA)*.2;
   if(a&&a.k==='pee'){ACT.hintA=0;ACT.lastT='';}
   if(ACT.hintA>.02&&(a||ACT.lastT)){if(a)ACT.lastT=a.t+(a.off?'':IS_TOUCH?'':'   [E]');ctx.globalAlpha=ACT.hintA;ctx.font='800 15px Inter, sans-serif';const t=ACT.lastT,w=ctx.measureText(t).width+30,y=CH-118;
     ctx.fillStyle='rgba(12,8,24,.82)';rrect(ctx,CW/2-w/2,y,w,34,17);ctx.fill();ctx.strokeStyle=a&&a.k==='rob'?'#ff4d4d':'#ffd166';ctx.lineWidth=2;rrect(ctx,CW/2-w/2,y,w,34,17);ctx.stroke();ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(t,CW/2,y+17.5);ctx.globalAlpha=1;}

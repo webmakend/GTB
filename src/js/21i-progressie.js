@@ -31,7 +31,7 @@ function makeCoins(){COINS.length=0;let rs=4242;const rn=()=>((rs=(rs*16807)%214
 function progStep(){
   {const mh=100+Math.min(60,(PRG.lvl-1)*6);if(P.maxhp!==mh)P.maxhp=mh;}
   if(!PRG.dailyDone&&MODE==='play'&&frameN>200){PRG.dailyDone=true;const d=new Date(),day=d.toISOString().slice(0,10),y=new Date(d-864e5).toISOString().slice(0,10);
-    if(PRG.day!==day){PRG.streak=PRG.day===y?PRG.streak+1:1;PRG.day=day;const cash=Math.min(70,10*PRG.streak);P.money+=cash;P.moneyF=20;PRG.dirty=true;setTimeout(()=>missionBanner('DAGBONUS · DAG '+PRG.streak,`Welkom terug in Bommel! €${cash} op je rekening. Kom morgen terug voor meer (max €70).`,'#7dff6a',300),3500);}}
+    if(PRG.day!==day){const sk=PRG.day===y?PRG.streak+1:1,cash=Math.min(70,10*sk);PRG.bonus={cash,day:sk,d:day};sfx('blip');}}
   if(PRG.comboT>0&&--PRG.comboT===0)PRG.combo=0;
   if(PRG.reveal>0)PRG.reveal--;
   // gouden bommels
@@ -64,3 +64,5 @@ function progMinimap(mp,cxm,cym,S){if(PRG.reveal>0&&PRG.revealC>=0){const c=COIN
 function progBigMap(mp,fs){const n=PRG.coins.length;txt(`LV ${PRG.lvl} · ${rankOf(PRG.lvl)}   ·   Gouden Bommels ${n}/25   ·   Historie ${PRG.hist.length}/${HIST.length}   ·   Prestaties ${PRG.ach.length}/${Object.keys(ACH).length}   ·   Dagbonus: dag ${PRG.streak||1}`,CW/2,CH-22,12,'#c77dff','center','Inter, sans-serif');
   if(PRG.reveal>0&&PRG.revealC>=0){const c=COINS[PRG.revealC];if(c&&!PRG.coins.includes(c.i)){const [x,y]=mp(c.x,c.y);ctx.fillStyle='#ffd34d';ctx.beginPath();ctx.arc(x,y,5,0,TAU);ctx.fill();ctx.strokeStyle='#000';ctx.stroke();}}}
 function revealCoin(){const o=me();let best=-1,bd=1e9;for(const c of COINS){if(PRG.coins.includes(c.i))continue;const d=Math.hypot(c.x-o.x,c.y-o.y);if(d<bd){bd=d;best=c.i;}}if(best<0)return false;PRG.revealC=best;PRG.reveal=60*90;return true;}
+
+function progClaim(){const b=PRG.bonus;if(!b)return;PRG.bonus=null;PRG.day=b.d;PRG.streak=b.day;addMoney(b.cash);sfx('reward');buzz(30);noteAdd('DAGBONUS GECLAIMD','+€'+b.cash+' · kom morgen terug voor meer','#4ade80',200);progSave();}
