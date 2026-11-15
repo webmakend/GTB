@@ -1,16 +1,16 @@
 // ====================== WNC-gebied (kunstgras, geen bomen op de velden, geparkeerde auto's), max 8 huizen + verkopen, huizen op de grote kaart, winkelmandje met afrekenen ======================
 // ---- WNC en tennis
 function wncWorld(){if(!WB)return;const pitches=(WD.pitch||[]).map(pc=>{const p=pc.p;if(!p.bb)p.bb=bbox(p);return pc;});
-  const so=pitches.filter(p=>p.s==='soccer');let best=null,bd=1e9;for(const pc of so){const c=centroid(pc.p.slice(0,-1)),d=Math.hypot(c[0]-5505,c[1]-1312);if(d<bd){bd=d;best=pc;}}if(best&&bd<200)best.turf=1;
+  const so=pitches.filter(p=>p.s==='soccer');let best=null,bd=1e9;for(const pc of so){const c=centroid(pc.p.slice(0,-1)),q0=WBT(5505,1312),d=Math.hypot(c[0]-q0[0],c[1]-q0[1]);if(d<bd){bd=d;best=pc;}}if(best&&bd<200)best.turf=1;
   const near=(x,y,m)=>pitches.some(pc=>x>pc.p.bb[0]-m&&x<pc.p.bb[2]+m&&y>pc.p.bb[1]-m&&y<pc.p.bb[3]+m&&(pip(x,y,pc.p)||ptPolyD(x,y,pc.p)<m));
   for(let i=TREES.length-1;i>=0;i--){const t=TREES[i];if(near(t.x,t.y,26))TREES.splice(i,1);}
-  if(typeof APPLE!=='undefined'){for(let i=APPLE.length-1;i>=0;i--){const t=APPLE[i];if(near(t.x,t.y,30)||cellAt(t.x,t.y)===PLAZA){t.gone=1;APPLE.splice(i,1);}}if(typeof ORCH!=='undefined')for(const o of ORCH)if(o.rows)o.rows=o.rows.map(r=>r.filter(t=>!t.gone)).filter(r=>r.length>3);}
+  if(typeof APPLE!=='undefined'){for(let i=APPLE.length-1;i>=0;i--){const t=APPLE[i];if(near(t.x,t.y,30)||cellAt(t.x,t.y)===PLAZA||cellAt(t.x,t.y)===WATER){t.gone=1;APPLE.splice(i,1);}}if(typeof ORCH!=='undefined')for(const o of ORCH)if(o.rows)o.rows=o.rows.map(r=>r.filter(t=>!t.gone)).filter(r=>r.length>3);}
   try{chunkCache.clear();}catch(e){}}
 function wncCars(){if(!WB)return;let sd=4242;const rn=()=>((sd=(sd*16807)%2147483647)/2147483647);const types=['sedan','hatch'].filter(t=>CT[t]),pitches=WD.pitch||[];
   const put=(x,y,a)=>{if(cellAt(x,y)===BUILD||cellAt(x,y)===WATER)return;if(pitches.some(pc=>pip(x,y,pc.p)))return;if(cars.some(c=>Math.hypot(c.x-x,c.y-y)<30))return;const c=makeCar(types[(rn()*types.length)|0],x,y,a,null);c.keep=1;c.wncPark=1;cars.push(c);};
   const lot=(cx,cy,a,w,h,n)=>{const ca=Math.cos(a),sa=Math.sin(a);let k=0;for(let v=-h+26;v<=h-20&&k<n;v+=h*2-50)for(let u=-w+16;u<=w-16&&k<n;u+=26){if(rn()<.25)continue;put(cx+u*ca-v*sa,cy+u*sa+v*ca,a+Math.PI/2+(v<0?0:Math.PI));k++;}};
   if(WD._wncPark){const [cx,cy,a,w,h]=WD._wncPark;lot(cx,cy,a,w,h,9);}
-  for(const pk of WD.parking){const b=bbox(pk);if(b[0]<6600||b[0]>7300||b[1]>2000||b[1]<1300)continue;let best=0,ang=0;for(let i=0;i<pk.length-1;i++){const l=Math.hypot(pk[i+1][0]-pk[i][0],pk[i+1][1]-pk[i][1]);if(l>best){best=l;ang=Math.atan2(pk[i+1][1]-pk[i][1],pk[i+1][0]-pk[i][0]);}}
+  for(const pk of WD.parking){const b=bbox(pk),A0=WBT(6600,1300),A1=WBT(7300,2000);if(b[0]<A0[0]||b[0]>A1[0]||b[1]>A1[1]||b[1]<A0[1])continue;let best=0,ang=0;for(let i=0;i<pk.length-1;i++){const l=Math.hypot(pk[i+1][0]-pk[i][0],pk[i+1][1]-pk[i][1]);if(l>best){best=l;ang=Math.atan2(pk[i+1][1]-pk[i][1],pk[i+1][0]-pk[i][0]);}}
     let n=0;for(let t=0;t<400&&n<8;t++){const x=b[0]+rn()*(b[2]-b[0]),y=b[1]+rn()*(b[3]-b[1]);if(!pip(x,y,pk)||cellAt(x,y)===ROAD)continue;const before=cars.length;put(x,y,ang+Math.PI/2);if(cars.length>before)n++;}}}
 {const _bo=buildOrchards;buildOrchards=function(){_bo();try{wncWorld();}catch(e){console.warn(e);}};}
 {const _po=populate;populate=function(){_po();if(!cars.some(c=>c.wncPark))try{wncCars();}catch(e){console.warn(e);}};}
@@ -20,7 +20,7 @@ const HOUSE_MAX=8;function houseValue(oid){const b=BUILDINGS.find(q=>String(q.oi
 {const lim=fn=>function(){if(Object.keys(MYH).length>=HOUSE_MAX){noteAdd('MAXIMAAL 8 HUIZEN','Verkoop eerst een huis via 🧸 Mijn spullen (tik op het beertje naast je geld)','#ff9f1c',260,'huismax');return;}return fn.apply(this,arguments);};houseBuy=lim(houseBuy);houseTakeover=lim(houseTakeover);}
 function houseSell(oid){oid=String(oid);if(!MYH[oid])return;const v=houseValue(oid),nm=MYH[oid];
   const done=()=>{delete MYH[oid];delete HS[oid];lsSet('gtb_myhouses',JSON.stringify(MYH));addMoney(v);sfx('kassa');buyLog('💰','Huis "'+String(nm).slice(0,10)+'" verkocht',-v);noteAdd('HUIS VERKOCHT','"'+String(nm).slice(0,10)+'" is verkocht voor €'+v+'. Iedereen kan het nu weer kopen.','#7dff6a',220);
-    const R=ROOMS['h'+oid];if(R&&SC.on&&SC.room==='h'+oid)scExit();if(document.getElementById('bagOv')&&document.getElementById('bagOv').style.display==='flex')bagOpen('mijn');};
+    const R=ROOMS['h'+oid];if(R&&SC.on&&SC.room==='h'+oid)scExit();if(document.getElementById('bagOv')&&document.getElementById('bagOv').style.display==='flex')bagOpen(document.getElementById('bagOv')._tab||'mijn');};
   if(NET.http)fetch('api.php?a=sell',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:netPid(),oid})}).then(r=>r.json()).then(j=>{if(j&&j.ok)done();else{noteAdd('NIET GELUKT','Dit huis staat niet (meer) op jouw naam','#ff6b6b',180);houseFetch();}}).catch(()=>noteAdd('GEEN VERBINDING','Probeer het zo nog eens','#ff6b6b',150));else done();}
 
 // ---- huizen van iedereen op de grote kaart
