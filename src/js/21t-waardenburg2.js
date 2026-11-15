@@ -1,6 +1,5 @@
 // ====================== Waardenburg extra: startplek kiezen, schoolpleinen met hek, Esso, speeltuin De Rakkershof,
 // picknickplek Weerdenborch, Chinotaria De Waard, A2 (snel, niet te belopen), nieuwe klussen en blijvend opslaan ======================
-WBOPEN=true; // Waardenburg is voor iedereen meteen open
 const WBS=WD.wbspot||{},YARDS=[],FENCES=[],KIDS=[],PROPS2=[],SCHOOLZ=[];let ESSO=null,SPEEL=null,PICNIC=null,WBSPAWN=null;
 function clearRect(cx,cy,w,h,bad){for(let u=-w/2;u<=w/2;u+=12)for(let v=-h/2;v<=h/2;v+=12)if(bad.includes(cellAt(cx+u,cy+v)))return false;return true;}
 function findRect(x0,y0,w,h,bad,maxR){for(let R2=0;R2<=maxR;R2+=20){const n=Math.max(1,Math.round(R2/14));for(let k=0;k<n;k++){const a=k/n*TAU,x=x0+Math.cos(a)*R2,y=y0+Math.sin(a)*R2;if(clearRect(x,y,w,h,bad))return[x,y];}}return null;}
@@ -73,9 +72,9 @@ function essoNear(){return ESSO&&P.car&&!P.car.t.bike&&Math.hypot(P.car.x-ESSO.x
 function essoFill(){const c=P.car;if(!c)return;if(P.money<10){noteAdd('TE WEINIG GELD','Tanken en wassen kost €10','#ff6b6b',140);return;}addMoney(-10);c.hp=Math.max(c.hp,100);c.dmgV=0;sfx('kassa');noteAdd('GETANKT','Volle tank en een wasbeurt: je auto is weer als nieuw','#7dff6a',200);}
 // ---- startgebied kiezen (Zaltbommel of Waardenburg, of verder waar je was)
 function areaPick(sv){if(!WB)return;paused=true;let ov=document.getElementById('areaOv');if(!ov){ov=document.createElement('div');ov.id='areaOv';document.body.appendChild(ov);}
-  const okPos=sv&&sv.v===2&&typeof sv.x==='number'&&![BUILD,WATER].includes(cellAt(sv.x,sv.y));
-  ov.innerHTML=`<div class="arBox"><b>WAAR WIL JE BEGINNEN?</b>${okPos?'<div class="arB cont" data-k="cont">▶ VERDER WAAR JE WAS<small>'+esc(sv.place||'')+'</small></div>':''}<div class="arB zb" data-k="zb">ZALTBOMMEL<small>De vesting · Markt</small></div><div class="arB wb" data-k="wb">WAARDENBURG<small>Dorpsstraat · kasteel · boomgaarden</small></div></div>`;ov.style.display='flex';
-  ov.querySelectorAll('.arB').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();const k=b.dataset.k;ov.style.display='none';paused=false;
+  const okPos=sv&&sv.v===2&&typeof sv.x==='number'&&![BUILD,WATER].includes(cellAt(sv.x,sv.y))&&(WBOPEN||!inWB(sv.x,sv.y));
+  ov.innerHTML=`<div class="arBox"><b>WAAR WIL JE BEGINNEN?</b>${okPos?'<div class="arB cont" data-k="cont">▶ VERDER WAAR JE WAS<small>'+esc(sv.place||'')+'</small></div>':''}<div class="arB zb" data-k="zb">ZALTBOMMEL<small>De vesting · Markt</small></div>${WBOPEN?'<div class="arB wb" data-k="wb">WAARDENBURG<small>Dorpsstraat · kasteel · boomgaarden</small></div>':'<div class="arB lock">🔒 WAARDENBURG<small>Nog op slot · betaal €300 tol bij de Martinus Nijhoffbrug</small></div>'}</div>`;ov.style.display='flex';
+  ov.querySelectorAll('.arB:not(.lock)').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();const k=b.dataset.k;ov.style.display='none';paused=false;
     let q=k==='cont'?[sv.x,sv.y]:k==='wb'&&WBSPAWN?snap(WBSPAWN[0],WBSPAWN[1]):snap(SPAWN[0],SPAWN[1]);if(P.car){P.car.driver=null;P.car=null;}P.x=q[0];P.y=q[1];camX=P.x;camY=P.y;try{populate();}catch(er){}sfx('reward');if(k==='wb')WBX.ann=false;}));}
 // ---- blijvend bewaren: positie mee opslaan, automatisch opslaan, opslag laten vasthouden door de browser
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}

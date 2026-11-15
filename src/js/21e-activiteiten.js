@@ -17,6 +17,7 @@ function initActs(){
 }
 function nearShop(){let best=null,bd=34;for(const s of SHOPS){const b=s.b;if(P.x<b.bb[0]-40||P.x>b.bb[2]+40||P.y<b.bb[1]-40||P.y>b.bb[3]+40)continue;const d=ptPolyD(P.x,P.y,b.p);if(d<bd){bd=d;best=s;}}return best;}
 function actFind(){
+  if(typeof tollNear==='function'&&tollNear())return{k:'tol',t:'🚧 Tol betalen: toegang tot Waardenburg (€300)',btn:'🚧<br>€300'};
   if(typeof essoNear==='function'&&essoNear())return{k:'esso',t:'⛽ Tanken & wassen bij de Esso (€10)',btn:'⛽<br>€10'};
   if(P.car||P.dead||CLUB.on||MG.on||P.peeT>0||swimming()||FPV.on)return null;
   const ja=jobAct();if(ja)return ja;
@@ -27,6 +28,7 @@ function actFind(){
   const z=ACT.zw;if(z&&Math.hypot(P.x-z.x,P.y-z.y)<46)return{k:'zw',t:P.high>0?'De zwerver: "Rustig aan, maat"':'Spul kopen bij de zwerver (€5)',btn:'💊<br>€5',off:P.high>0};
   const s=nearShop();
   if(s){if(s.n==='Café Henkie')return null;
+    if(s.n==="'t Stadscafé")return{k:'stadscafe',t:"🍺 Naar binnen bij 't Stadscafé",btn:'🍺<br>BINNEN'};
     if(s.n==='Huisarts')return{k:'doc',s,t:P.hp>=P.maxhp?'Huisarts: je bent kerngezond':'Naar de dokter: volle health (€2)',btn:'🩺<br>€2',off:P.hp>=P.maxhp};
     const f=FOOD[s.n];if(f)return{k:'eat',s,f,t:`${f.t} (€${f.p})`,btn:`${f.e}<br>€${f.p}`};
     const SC={'Albert Heijn':'ah','Lidl':'lidl','Gall & Gall':'gall'}[s.n];if(SC)return{k:'fpv',sc:SC,t:'Naar binnen bij '+s.n,btn:'🛒<br>BINNEN'};
@@ -41,7 +43,9 @@ function actTry(){const a=ACT.cur;if(!a)return false;if(a.off)return true;
   if(a.k==='job'){startJob(a.j);return true;}
   if(a.k==='hist'){histRead(a.h);return true;}
   if(a.k==='appel'){applePick();return true;}
+  if(a.k==='stadscafe'){scEnter();return true;}
   if(a.k==='esso'){essoFill();return true;}
+  if(a.k==='tol'){tollPay();return true;}
   if(a.k==='fpv'){fpvEnter(a.sc);return true;}
   if(a.k==='zw'){if(P.money<5){say(ACT.zw,'Geen geld, geen spul.');sfx('blip');return true;}addMoney(-5);P.high=60*45;say(ACT.zw,'Niet alles tegelijk, hè!');sfx('whoosh');msg('ZO… DAT IS STERK SPUL','Alles kleurt en je rent harder','#c77dff',170);if(copNear(320))addHeat(1.1);return true;}
   if(a.k==='doc'){if(P.money<2){msg('GEEN GELD','Een consult kost €2','#ff6b6b',110);return true;}addMoney(-2);P.hp=P.maxhp;P.high=0;P.drunk=Math.max(0,P.drunk-2);sfx('reward');msg('WEER HELEMAAL FIT','De huisarts plakt je weer aan elkaar','#7dff6a',140);for(let i=0;i<14;i++)parts.push({x:P.x,y:P.y,vx:rr(-1.5,1.5),vy:rr(-2,-.4),l:40,ml:40,s:1,k:'h'});return true;}

@@ -22,7 +22,7 @@ function manage(){
     placeName=swimming()?(o.y<FORTBB[1]+500?'Zwemmen in de Waal':'Zwemmen in de stadsgracht'):[lm,rn].filter(Boolean).join(' · ')||(inWB(o.x,o.y)?'Waardenburg':inFort(o.x,o.y)?'Vesting Zaltbommel':o.y<FORTBB[1]-200?'Martinus Nijhoffbrug':'Zaltbommel');}
 }
 function step(){
-  frameN++;playerStep();actStep();gunStep();if(typeof wbStep==='function')wbStep();if(typeof orchardStep==='function')orchardStep();if(typeof voiceStep==='function')voiceStep();if(typeof wb2Step==='function')wb2Step();if(typeof pvpStep==='function')pvpStep();radioStep();progStep();jobStep();netStep();
+  frameN++;playerStep();actStep();gunStep();if(typeof wbStep==='function')wbStep();if(typeof orchardStep==='function')orchardStep();if(typeof voiceStep==='function')voiceStep();if(typeof wb2Step==='function')wb2Step();if(typeof terraceStep==='function')terraceStep();if(typeof pvpStep==='function')pvpStep();radioStep();progStep();jobStep();netStep();
   for(const c of cars){if(c.dead)continue;if(c===P.car){}else if(c.driver==='npc'&&c.ai)c.ctl=aiCivil(c);else if(c.driver==='cop'&&c.ai)c.ctl=c.ai.mode==='pursuit'?aiCop(c):aiCivil(c);else c.ctl=[0,0,1];carStep(c);}
   carCollisions();carPedHits();for(const p of peds)pedStep(p);missionStep();balloonStep();bargeStep();wantedStep();manage();
   for(const m of msgs)m.life--;while(msgs.length&&msgs[0].life<=0)msgs.shift();

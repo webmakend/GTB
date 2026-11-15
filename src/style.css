@@ -187,3 +187,5 @@ button{font-family:inherit}
 #areaOv .arB.zb{background:linear-gradient(135deg,#7b2ff7,#ff2e88);border-color:#ff9fd0}
 #areaOv .arB.wb{background:linear-gradient(135deg,#1e7a4a,#2bb673);border-color:#9fffcf}
 #areaOv .arB.cont{background:linear-gradient(135deg,#ff9f1c,#ff5e3a);border-color:#ffd8a8}
+.scBtn{position:fixed;z-index:42;padding:12px 18px;border-radius:14px;color:#fff;font:900 15px Inter,sans-serif;letter-spacing:.5px;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.4);user-select:none}
+#areaOv .arB.lock{background:#2a2540;border-color:#555;color:#aaa;cursor:default}
