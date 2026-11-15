@@ -60,13 +60,15 @@ if ($a === 'tag' && $_SERVER['REQUEST_METHOD'] === 'POST') {
   $db->prepare('DELETE FROM tags WHERE oid = ? AND id NOT IN (SELECT id FROM tags WHERE oid = ? ORDER BY id DESC LIMIT 60)')->execute([$oid, $oid]);
   echo json_encode(['ok' => true]); exit;
 }
-if (($a === 'buy' || $a === 'hname' || $a === 'takeover') && $_SERVER['REQUEST_METHOD'] === 'POST') {
+if (($a === 'buy' || $a === 'hname' || $a === 'takeover' || $a === 'sell') && $_SERVER['REQUEST_METHOD'] === 'POST') {
   $in = json_decode(file_get_contents('php://input', false, null, 0, 2048), true) ?: [];
   $id = preg_replace('/[^a-zA-Z0-9]/', '', (string)($in['id'] ?? ''));
   $oid = preg_replace('/[^0-9]/', '', (string)($in['oid'] ?? ''));
   $name = mb_substr(trim(preg_replace('/[\x00-\x1F<>]/u', '', (string)($in['name'] ?? 'Mijn huis'))), 0, 10) ?: 'Mijn huis';
   $pl = $db->prepare('SELECT nm,pub FROM players WHERE id = ?'); $pl->execute([$id]); $p = $pl->fetch(PDO::FETCH_ASSOC);
   if (!$p || $oid === '' || !$p['pub']) { echo json_encode(['ok' => false, 'err' => 'onbekend']); exit; }
+  if ($a === 'sell') { $st2 = $db->prepare('DELETE FROM houses WHERE oid = ? AND pid = ?'); $st2->execute([$oid, $p['pub']]); echo json_encode(['ok' => $st2->rowCount() === 1]); exit; }
+  if ($a === 'buy' && (int)$db->query('SELECT COUNT(*) FROM houses WHERE pid = ' . $db->quote($p['pub']))->fetchColumn() >= 8) { echo json_encode(['ok' => false, 'err' => 'max']); exit; }
   if ($a === 'takeover') {
     // huis overkopen: de koper betaalt de standaardprijs + 10%, die 10% gaat naar de vorige eigenaar
     $cut = max(0, min(100000, (int)($in['cut'] ?? 0)));

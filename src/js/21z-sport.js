@@ -28,15 +28,15 @@ function tnIn(t,x,y,drag){const F=SP.F;if(!F)return;if(t==='down'||t==='move'){i
 function tnPoint(me){SP.sc[me?0:1]++;SP.b=null;sfx(me?'reward':'slap');buzz(me?20:[40,30,40]);const [a,b]=SP.sc;
   if(a>=5||b>=5){const win=a>b;SP.msg=win?'GEWONNEN! +€30':'VERLOREN… ('+a+'-'+b+')';SP.done=150;if(win){addMoney(30);addXP(70);}return;}
   SP.srv=(a+b)%2;SP.msg=(me?'Punt voor jou!':'Punt voor de tegenstander')+(SP.srv===0?(IS_TOUCH?' · tik om op te slaan':' · spatie'):'');if(SP.srv===1)setTimeout(()=>{if(SP.on&&!SP.b&&!SP.done)tnServe();},1100);}
-function tnTick(){const k=SP.keys;if(k.ArrowLeft||k.KeyA)SP.me=Math.max(.04,SP.me-.018);if(k.ArrowRight||k.KeyD)SP.me=Math.min(.96,SP.me+.018);
-  const b=SP.b;if(!b){SP.op+=(.5-SP.op)*.05;return;}const sp=1+Math.min(.8,SP.rally*.06);b.x+=b.vx*sp;b.y+=b.vy*sp;
+function tnTick(){const k=SP.keys;if(k.ArrowLeft||k.KeyA)SP.me=Math.max(.04,SP.me-.022);if(k.ArrowRight||k.KeyD)SP.me=Math.min(.96,SP.me+.022);
+  const b=SP.b;if(!b){SP.op+=(.5-SP.op)*.05;return;}const sp=.8+Math.min(.45,SP.rally*.035);b.x+=b.vx*sp;b.y+=b.vy*sp;
   if(b.x<-.08){tnPoint(b.last==='op');return;}if(b.x>1.08){tnPoint(b.last==='op');return;}
   // jij slaat terug als de bal je racket raakt
-  if(b.vy>0&&b.y>1.84&&b.y<1.98&&Math.abs(b.x-SP.me)<.11){const off=(b.x-SP.me)/.11;b.vy=-(.022+rr(0,.004));b.vx=off*.012+rr(-.002,.002);b.last='me';SP.rally++;sfx('slap');buzz(10);}
+  if(b.vy>0&&b.y>1.82&&b.y<2.0&&Math.abs(b.x-SP.me)<.16){const off=(b.x-SP.me)/.16;b.vy=-(.022+rr(0,.004));b.vx=off*.012+rr(-.002,.002);b.last='me';SP.rally++;sfx('slap');buzz(10);}
   else if(b.y>2.06){tnPoint(false);return;}
   // tegenstander loopt naar de bal
-  const tgt=b.vy<0?b.x+b.vx*((b.y-.12)/-b.vy):.5,ms=.011+Math.min(.006,SP.rally*.0006);SP.op+=clamp(tgt-SP.op,-ms,ms);
-  if(b.vy<0&&b.y<.16&&b.y>.02&&Math.abs(b.x-SP.op)<.11){if(Math.random()<.93-SP.rally*.012){const aim=rr(.12,.88);b.vy=.022+rr(0,.004);b.vx=(aim-b.x)/((1.9-b.y)/b.vy);b.last='op';SP.rally++;sfx('slap');}else{b.vx+=rr(-.02,.02);b.last='op_mis';}}
+  const tgt=b.vy<0?b.x+b.vx*((b.y-.12)/-b.vy):.5,ms=.008+Math.min(.004,SP.rally*.0004);SP.op+=clamp(tgt-SP.op,-ms,ms);
+  if(b.vy<0&&b.y<.16&&b.y>.02&&Math.abs(b.x-SP.op)<.11){if(Math.random()<.8-SP.rally*.025){const aim=rr(.12,.88);b.vy=.022+rr(0,.004);b.vx=(aim-b.x)/((1.9-b.y)/b.vy);b.last='op';SP.rally++;sfx('slap');}else{b.vx+=rr(-.02,.02);b.last='op_mis';}}
   else if(b.y<-.06){tnPoint(true);return;}}
 function tnDraw(g){const F=SP.F=spField(2.05),X=x=>F.x+x*F.w,Y=y=>F.y+y/2*F.h;g.fillStyle='#1e4f7a';g.fillRect(0,0,CW,CH);g.fillStyle='#2f6f3a';g.fillRect(F.x-14,F.y-14,F.w+28,F.h+28);
   g.fillStyle='#3d7ec2';g.fillRect(F.x,F.y,F.w,F.h);g.strokeStyle='#fff';g.lineWidth=3;g.strokeRect(F.x,F.y,F.w,F.h);g.lineWidth=2;g.beginPath();g.moveTo(X(.12),F.y);g.lineTo(X(.12),F.y+F.h);g.moveTo(X(.88),F.y);g.lineTo(X(.88),F.y+F.h);
