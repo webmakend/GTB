@@ -18,7 +18,7 @@ function wbStep(){if(!WB||!BRIDGE)return;if(!WBOPEN&&(PRG.wb||MIS.done))wbUnlock
     if(frameN-WBX.curT>240){WBX.curT=frameN;noteAdd('TE DIEP!','Zwem terug naar de kant, anders verdrink je','#36d1ff',200,'diep');buzz([40,60,40]);}
     if(P.drown>=5){P.drown=0;P.lastHit='Verdronken in diep water';wasted('WASTED','Verdronken in diep water');}}
   else if(P.drown)P.drown=Math.max(0,P.drown-2/60);
-  if(inWB(o.x,o.y)&&!WBX.ann){WBX.ann=true;missionBanner('WELKOM IN WAARDENBURG','Dorp aan de Waal · kasteel, PLUS en v.v. WNC','#ffd166',220);addXP(60);}}
+  if(inWB(o.x,o.y)&&!WBX.ann){WBX.ann=true;if(typeof voice==='function')setTimeout(()=>voice('wb',true),2500);missionBanner('WELKOM IN WAARDENBURG','Dorp aan de Waal · kasteel, PLUS en v.v. WNC','#ffd166',220);addXP(60);}}
 function drawWbBar(){if(!WB||!BRIDGE)return;const b=wbBar();if(Math.abs(b.x-CAM.x)>1500||Math.abs(b.y-CAM.y)>1500)return;const ang=Math.atan2(b.uy,b.ux)+Math.PI/2,hw=66;
   ctx.save();ctx.translate(b.x,b.y);ctx.rotate(ang);
   for(const sd of [-1,1]){ctx.fillStyle='#2a2a2e';ctx.fillRect(sd*hw-5,-5,10,10);}

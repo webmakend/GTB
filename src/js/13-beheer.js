@@ -15,14 +15,14 @@ function manage(){
     if((lat>1.6||br)&&!c.t.bike){const hl=c.t.l/2-4,hw=c.t.w/2-2;for(const sd of [-1,1]){const x=c.x-fx2*hl-fy2*hw*sd,y=c.y-fy2*hl+fx2*hw*sd,key='sk'+sd;const pv=c[key];if(pv&&Math.hypot(pv[0]-x,pv[1]-y)<30)SKIDS.push({x0:pv[0],y0:pv[1],x1:x,y1:y,l:900});c[key]=[x,y];}
       if(frameN%3===0)parts.push({x:c.x-fx2*hl,y:c.y-fy2*hl,vx:rr(-.3,.3),vy:rr(-.3,.3),l:30,ml:30,s:4,k:'s'});}else{c.sk1=null;c['sk-1']=null;}}
   for(const d of decals)d.life--;decals=decals.filter(d=>d.life>0);if(decals.length>400)decals.splice(0,decals.length-400);
-  for(const b of bubbles)b.life--;bubbles=bubbles.filter(b=>b.life>0&&(peds.includes(b.p)||cars.includes(b.p)||BWALK.includes(b.p)||BEACHERS.includes(b.p)));
+  for(const b of bubbles)b.life--;bubbles=bubbles.filter(b=>b.life>0&&(b.me||(typeof FARMERS!=='undefined'&&FARMERS.includes(b.p))||peds.includes(b.p)||cars.includes(b.p)||BWALK.includes(b.p)||BEACHERS.includes(b.p)));
   if(frameN%140===0){const cand=cars.filter(c=>c.driver==='npc'&&(c.rider||c.boer)&&!offscreen(c.x,c.y,-40));if(cand.length){const c=rpick(cand);say(c,c.boer?rpick(SAY_BOER).replace('#',c.boer):rpick(SAY_FAT));}}
   if(frameN%15===0){let rn='';const ne=nearestEdge(o.x,o.y);if(ne&&ne.d<EDGES[ne.ei].w/2+24)rn=EDGES[ne.ei].n;
     let lm='';for(const l of LANDMARKS){if(Math.hypot(l.x-o.x,l.y-o.y)<(l.shop?90:200)){lm=l.n;break;}}
     placeName=swimming()?(o.y<FORTBB[1]+500?'Zwemmen in de Waal':'Zwemmen in de stadsgracht'):[lm,rn].filter(Boolean).join(' · ')||(inWB(o.x,o.y)?'Waardenburg':inFort(o.x,o.y)?'Vesting Zaltbommel':o.y<FORTBB[1]-200?'Martinus Nijhoffbrug':'Zaltbommel');}
 }
 function step(){
-  frameN++;playerStep();actStep();gunStep();if(typeof wbStep==='function')wbStep();if(typeof pvpStep==='function')pvpStep();radioStep();progStep();jobStep();netStep();
+  frameN++;playerStep();actStep();gunStep();if(typeof wbStep==='function')wbStep();if(typeof orchardStep==='function')orchardStep();if(typeof voiceStep==='function')voiceStep();if(typeof pvpStep==='function')pvpStep();radioStep();progStep();jobStep();netStep();
   for(const c of cars){if(c.dead)continue;if(c===P.car){}else if(c.driver==='npc'&&c.ai)c.ctl=aiCivil(c);else if(c.driver==='cop'&&c.ai)c.ctl=c.ai.mode==='pursuit'?aiCop(c):aiCivil(c);else c.ctl=[0,0,1];carStep(c);}
   carCollisions();carPedHits();for(const p of peds)pedStep(p);missionStep();balloonStep();bargeStep();wantedStep();manage();
   for(const m of msgs)m.life--;while(msgs.length&&msgs[0].life<=0)msgs.shift();

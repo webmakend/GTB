@@ -46,7 +46,7 @@ function setOpen(){const ov=ovEl('menuOv'),b=boxEl();b.appendChild(hEl('INSTELLI
   const slider=(lab,val,fn)=>{const w=document.createElement('label');w.style.cssText='display:block;margin:14px 0 4px;font-weight:700;font-size:14px';w.textContent=lab;const i=document.createElement('input');i.type='range';i.min=0;i.max=100;i.value=Math.round(val*100);i.style.cssText='width:100%;accent-color:#ff2e88';i.addEventListener('input',()=>fn(i.value/100));w.appendChild(i);b.appendChild(w);};
   slider('🎵 Muziekvolume',SET.mus,v=>{SET.mus=v;setSave();});slider('💥 Geluidseffecten',SET.sfx,v=>{SET.sfx=v;setSave();});slider('🔍 Camera-zoom',(ZU-.3)/2.3,v=>setZoom(.3+v*2.3));
   const tog=(lab,get,fn)=>{const d=btnEl(lab+': '+(get()?'AAN':'UIT'),'#3a3a5a',()=>{fn();d.textContent=lab+': '+(get()?'AAN':'UIT');});b.appendChild(d);};
-  tog('🔊 Geluid',()=>AU.on,()=>musicToggle());tog('📳 Trillen',()=>SET.vib,()=>{SET.vib=!SET.vib;setSave();});
+  tog('🔊 Geluid',()=>AU.on,()=>musicToggle());tog('📳 Trillen',()=>SET.vib,()=>{SET.vib=!SET.vib;setSave();});tog('🗣 Stem personage',()=>SET.voice!==false,()=>{SET.voice=SET.voice===false;setSave();if(SET.voice!==false&&typeof voiceSay==='function')voiceSay('Hoi! Zo klink ik.');});
   b.appendChild(btnEl('⟵  TERUG','#ff2e88',menuRender));ov.replaceChildren(b);}
 // ---- personage-maker ----
 function custOpen(){const ov=ovEl('menuOv');let o=custLoad();const b=boxEl();b.appendChild(hEl('EIGEN PERSONAGE',null,30));

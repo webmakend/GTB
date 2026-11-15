@@ -28,6 +28,7 @@ function renderChunk(ci,cj){
   const fillPolys=(list,style,stroke,lw)=>{for(const p of list){if(!p.bb)p.bb=bbox(p);if(!inBox(p.bb,ox,oy,X1,Y1,20))continue;pathPoly(g,p);g.closePath();g.fillStyle=style;g.fill();if(stroke){g.strokeStyle=stroke;g.lineWidth=lw;g.stroke();}}};
   fillPolys(WD.green,pat('park'));
   fillPolys(WD.sand,pat('sand'));
+  if(typeof drawOrchardGround==='function')drawOrchardGround(g,ox,oy,X1,Y1);
   for(const p of WATERS){if(!p.bb)p.bb=bbox(p);if(!inBox(p.bb,ox,oy,X1,Y1,20))continue;pathPoly(g,p);g.closePath();g.fillStyle=pat('water');g.fill();g.fillStyle='rgba(8,22,60,.62)';g.fill();g.save();g.clip();g.strokeStyle=pat('water');g.lineWidth=40;g.stroke();g.restore();g.strokeStyle='#8f8a80';g.lineWidth=6;g.stroke();}
   fillPolys(WD.islands,pat('park'),'#8f8a80',5);
   fillPolys(WD.parking,PATS.conc?pat('conc'):'#8e8f8f','#77787a',2);

@@ -34,6 +34,7 @@ ET.ElementTree(root).write('/tmp/wb/wb_cut.osm',encoding='utf-8')
 src=open(os.path.join(os.path.dirname(__file__),'osm2world.py')).read()
 src=src.replace("def inworld(p,m=400):return any(-m<x<WW+m and -m<y<HH+m for x,y in p)","def inworld(p,m=400):return True")
 src=src.replace("if -100<x<WW+100 and -100<y<HH+100:out['pois']","if True:out['pois']")
+src=src.replace("    if t.get('natural')=='water':out['water'].append(r1(p))","    if t.get('landuse')=='orchard':out.setdefault('orchard',[]).append(r1(p))\n    elif t.get('natural')=='water':out['water'].append(r1(p))")
 src=src.replace("DRIVE={","DRIVE={'motorway':14,'motorway_link':6,'trunk':10,'primary_link':6,'secondary_link':6,")
 open('/tmp/wb/o2w.py','w').write(src)
 subprocess.run([sys.executable,'/tmp/wb/o2w.py','/tmp/wb/wb_cut.osm','/tmp/wb/wb_world.json'],check=True)
@@ -75,7 +76,8 @@ C=[[max(wl(yt),RX0+IN),yt],[xr,yt],[xr,yb],[max(wl(yb),RX0+IN),yb]]
 add_edge(C[0],C[1],45,1);add_edge(C[1],C[2],45,2);add_edge(C[2],C[3],45,3);add_edge(C[3],C[0],25,4)
 okp=lambda x,y:_pipf(x,y,land)
 cen=lambda p:(sum(q[0] for q in p)/len(p),sum(q[1] for q in p)/len(p))
-for k in('water','green','parking','plaza'):d[k]=[p for p in d[k] if okp(*cen(p))]
+d.setdefault('orchard',[])
+for k in('water','green','parking','plaza','orchard'):d[k]=[p for p in d[k] if okp(*cen(p))]
 d['buildings']=[b for b in d['buildings'] if okp(*cen(b['p']))]
 def cutline(pts,js=None):
     out=[];cur=[];cj=[]
@@ -133,7 +135,7 @@ for cat,name,adr,pc,pl in rows:
             pts=[q for x in rr for q in x['p']];q=pts[len(pts)//2];q=W2([q])[0];wbz.append({'n':name,'c':cat,'adr':adr,'x':q[0],'y':q[1],'approx':1});continue
         miss.append(name+' ('+adr+')');continue
     q=W2([[hit['x'],hit['y']]])[0];wbz.append({'n':name,'c':cat,'adr':adr,'x':q[0],'y':q[1]})
-g['wbiz']=wbz
+g['wbiz']=wbz;g['orchard']=[W2(p) for p in d['orchard']]
 WL=W2(land);g['wb']={'bb':[min(q[0] for q in WL),min(q[1] for q in WL),max(q[0] for q in WL),max(q[1] for q in WL)],'zy':ZY,'land':WL}
 g['H']=g['H']+ZY;g['W']=max(g['W'],int(max(q[0] for q in WL))+250)
 json.dump(g,open(OUT,'w'),separators=(',',':'))

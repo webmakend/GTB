@@ -10,7 +10,7 @@ const WB=WD.wb||null,WBF=0,ZOY=WB?WB.zy:0;let WBLAND=null,WBOPEN=false;
 if(WB){WBLAND=WB.land;WBLAND.bb=bbox(WBLAND);}
 const inWB=(x,y)=>!!WB&&x>WB.bb[0]-60&&x<WB.bb[2]+60&&y>WB.bb[1]-60&&y<WB.bb[3]+60&&pip(x,y,WBLAND);
 const inWBForest=()=>false;
-const LANDS=WBLAND?[FORT,WBLAND]:[FORT];
+const LANDS=WBLAND?[FORT,WBLAND]:[FORT];const ORCHP=(WD.orchard||[]).map(p=>{const q=p.slice();q.bb=bbox(q);return q;});
 // rivier: oever + afsluiting naar het noorden
 const WATERS=WD.water;
 function cellAt(x,y){const cx=Math.floor(x/T),cy=Math.floor(y/T);if(cx<0||cy<0||cx>=GW||cy>=GH)return BUILD;return G[cy*GW+cx];}
@@ -25,7 +25,7 @@ function stampSeg(x1,y1,x2,y2,hw,fn){
 function stampLine(p,hw,fn){for(let i=0;i<p.length-1;i++)stampSeg(p[i][0],p[i][1],p[i+1][0],p[i+1][1],hw,fn);}
 
 (function addBridge(){let ne=null,bv=-1e9;for(const q of FORT){const v=q[0]-q[1]*1.1;if(v>bv){bv=v;ne=q;}}let A=null,jid=null,bd=1e18;
-  for(const r of WD.roads){if(!(r.k==='tertiary'||r.k==='residential'||r.k==='unclassified'))continue;r.p.forEach((q,i)=>{if(!r.j[i])return;const d=Math.hypot(q[0]-ne[0],q[1]-ne[1]);if(d<bd){bd=d;A=q;jid=r.j[i];}});}
+  for(const r of WD.roads){if(r.wb||!(r.k==='tertiary'||r.k==='residential'||r.k==='unclassified'))continue;r.p.forEach((q,i)=>{if(!r.j[i])return;const d=Math.hypot(q[0]-ne[0],q[1]-ne[1]);if(d<bd){bd=d;A=q;jid=r.j[i];}});}
   if(!A)return;let B=null,bj='brug_einde';
   if(WB){let by=-1;for(const r of WD.roads){if(!r.wb||!/^motorway|trunk|primary|secondary/.test(r.k))continue;for(const i of [0,r.p.length-1]){const q=r.p[i];if(q[1]>by&&Math.abs(q[0]-A[0])<3500){by=q[1];B=q;bj=r.j[i];}}}}
   if(!B)B=[W-90,70];const dx=B[0]-A[0],dy=B[1]-A[1],L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L;
@@ -190,7 +190,7 @@ function genWorld(){
   // bomen
   for(let i=0;i<40000&&TREES.length<3400;i++){const x=R(0,W),y=R(0,H),t=cellAt(x,y);let pr=0;if(!inFort(x,y))continue;if(t===PARK)pr=.55;else if(t===GRASS)pr=.16;if(rnd()<pr){let ok=true;for(const q of TREES){if(Math.abs(q.x-x)<22&&Math.abs(q.y-y)<22){ok=false;break;}}if(ok)TREES.push({x,y,r:R(13,24),c:RP(['#3a6b2f','#41752f','#335f2a','#4a7d36','#2f5a28'])});}}
   // Waardenburg: bomen in tuinen en parken + dichte bosrand
-  if(WB){const [x0,y0,x1,y1]=WB.bb;let n=0;for(let i=0;i<30000&&n<1400;i++){const x=R(x0,x1),y=R(y0,y1),t=cellAt(x,y);if(inWBForest(x,y))continue;const pr=t===PARK?.5:t===GRASS?.12:0;if(rnd()>=pr)continue;if(TREES.some(q=>Math.abs(q.x-x)<24&&Math.abs(q.y-y)<24))continue;TREES.push({x,y,r:R(13,24),c:RP(['#3a6b2f','#41752f','#335f2a','#4a7d36'])});n++;}
+  if(WB){const [x0,y0,x1,y1]=WB.bb;let n=0;for(let i=0;i<30000&&n<1400;i++){const x=R(x0,x1),y=R(y0,y1),t=cellAt(x,y);if(inWBForest(x,y)||(typeof ORCHP!=='undefined'&&ORCHP.some(o=>x>o.bb[0]&&x<o.bb[2]&&y>o.bb[1]&&y<o.bb[3]&&pip(x,y,o))))continue;const pr=t===PARK?.5:t===GRASS?.12:0;if(rnd()>=pr)continue;if(TREES.some(q=>Math.abs(q.x-x)<24&&Math.abs(q.y-y)<24))continue;TREES.push({x,y,r:R(13,24),c:RP(['#3a6b2f','#41752f','#335f2a','#4a7d36'])});n++;}
 }
   // hoge bomen (iepen, platanen, populieren) in parken, op de wallen en langs singels
   for(let i=0;i<60000&&TREES.filter(t=>t.h).length<420;i++){const x=R(FORTBB[0]-300,FORTBB[2]+300),y=R(FORTBB[1]-300,FORTBB[3]+300),t=cellAt(x,y);if(!(t===PARK||t===GRASS))continue;if(t===GRASS&&rnd()<.55)continue;
