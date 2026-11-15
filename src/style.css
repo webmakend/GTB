@@ -189,3 +189,8 @@ button{font-family:inherit}
 #areaOv .arB.cont{background:linear-gradient(135deg,#ff9f1c,#ff5e3a);border-color:#ffd8a8}
 .scBtn{position:fixed;z-index:42;padding:12px 18px;border-radius:14px;color:#fff;font:900 15px Inter,sans-serif;letter-spacing:.5px;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.4);user-select:none}
 #areaOv .arB.lock{background:#2a2540;border-color:#555;color:#aaa;cursor:default}
+#hnDlg{position:fixed;inset:0;z-index:72;display:none;align-items:center;justify-content:center;background:rgba(10,4,24,.8);font-family:Inter,sans-serif}
+#hnDlg .hnBox{width:min(88vw,360px);background:#1a0a2c;border:2px solid #ffd166;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px;color:#fff}
+#hnDlg b{font:400 24px Anton,Impact,sans-serif;color:#ffd166}
+#hnDlg input{padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.25);background:#0b0418;color:#fff;font:700 16px Inter;outline:none}
+#hnDlg .hnOk{text-align:center;padding:12px;border-radius:12px;background:#ff2e88;font-weight:900;cursor:pointer}

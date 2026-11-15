@@ -39,6 +39,18 @@ function renderChunk(ci,cj){
   fillPolys(WD.plaza,pat('plaza'));
   // paden en fietspaden
   for(const p of PATHS){if(!inBox(p.bb,ox,oy,X1,Y1,30))continue;g.strokeStyle=p.k==='cycleway'?'#a3584a':p.k==='footway'?(PATS.tiles?pat('tiles'):'#c7c0b2'):p.k==='track'||p.k==='path'?(PATS.dirt?pat('dirt'):'#a89474'):'#b7a684';g.lineWidth=p.w;for(const q of p.segs){pathPoly(g,q);g.stroke();}}
+  // spoorlijn: grind, dwarsliggers en rails
+  for(const r of (WD.rail||[])){if(!r.bb)r.bb=bbox(r.p);if(!inBox(r.bb,ox,oy,X1,Y1,60))continue;g.strokeStyle='#8f857a';g.lineWidth=46;pathPoly(g,r.p);g.stroke();g.strokeStyle='#a39a8e';g.lineWidth=34;pathPoly(g,r.p);g.stroke();
+    for(let i=0;i<r.p.length-1;i++){const a=r.p[i],b=r.p[i+1],L=Math.hypot(b[0]-a[0],b[1]-a[1]),ux=(b[0]-a[0])/L,uy=(b[1]-a[1])/L;g.strokeStyle='#5d4a3a';g.lineWidth=4;for(let t=0;t<L;t+=9){const x=a[0]+ux*t,y=a[1]+uy*t;g.beginPath();g.moveTo(x-uy*15,y+ux*15);g.lineTo(x+uy*15,y-ux*15);g.stroke();}
+      g.strokeStyle='#c8ccd2';g.lineWidth=2;for(const o of [-8,8]){g.beginPath();g.moveTo(a[0]-uy*o,a[1]+ux*o);g.lineTo(b[0]-uy*o,b[1]+ux*o);g.stroke();}}}
+  // sportvelden: voetbal (gestreept gras met lijnen) en tennis (gravel met lijnen)
+  for(const pc of (WD.pitch||[])){const p=pc.p;if(!p.bb)p.bb=bbox(p);if(!inBox(p.bb,ox,oy,X1,Y1,20))continue;let best=0,ang=0;for(let i=0;i<p.length-1;i++){const l=Math.hypot(p[i+1][0]-p[i][0],p[i+1][1]-p[i][1]);if(l>best){best=l;ang=Math.atan2(p[i+1][1]-p[i][1],p[i+1][0]-p[i][0]);}}
+    const c=centroid(p.slice(0,-1)),ca=Math.cos(ang),sa=Math.sin(ang);let u0=1e9,u1=-1e9,v0=1e9,v1=-1e9;for(const q of p){const u=(q[0]-c[0])*ca+(q[1]-c[1])*sa,v=-(q[0]-c[0])*sa+(q[1]-c[1])*ca;u0=Math.min(u0,u);u1=Math.max(u1,u);v0=Math.min(v0,v);v1=Math.max(v1,v);}
+    g.save();g.translate(c[0],c[1]);g.rotate(ang);const L=u1-u0,Wd=v1-v0;
+    if(pc.s==='tennis'){g.fillStyle='#b5562f';g.fillRect(u0,v0,L,Wd);const nC=Math.max(1,Math.round(Wd/(L*.55)));for(let k=0;k<nC;k++){const cv0=v0+k*Wd/nC+8,cw=Wd/nC-16,cl=L-16;g.strokeStyle='#f4efe6';g.lineWidth=2;g.strokeRect(u0+8,cv0,cl,cw);g.strokeRect(u0+8,cv0+cw*.12,cl,cw*.76);g.beginPath();g.moveTo(u0+8+cl*.27,cv0+cw*.12);g.lineTo(u0+8+cl*.27,cv0+cw*.88);g.moveTo(u0+8+cl*.73,cv0+cw*.12);g.lineTo(u0+8+cl*.73,cv0+cw*.88);g.moveTo(u0+8+cl*.27,cv0+cw/2);g.lineTo(u0+8+cl*.73,cv0+cw/2);g.stroke();g.strokeStyle='#222';g.lineWidth=3;g.beginPath();g.moveTo(0,cv0-4);g.lineTo(0,cv0+cw+4);g.stroke();}}
+    else{for(let u=u0,k=0;u<u1;u+=24,k++){g.fillStyle=k%2?'#4f9a3c':'#5aa845';g.fillRect(u,v0,Math.min(24,u1-u),Wd);}g.strokeStyle='rgba(255,255,255,.9)';g.lineWidth=2.5;g.strokeRect(u0+10,v0+10,L-20,Wd-20);g.beginPath();g.moveTo(0,v0+10);g.lineTo(0,v1-10);g.stroke();g.beginPath();g.arc(0,0,Math.min(Wd,L)*.13,0,TAU);g.stroke();
+      for(const sd of [-1,1]){const ux=sd>0?u1-10:u0+10,bw=Math.min(150,L*.16),bh=Wd*.55;g.strokeRect(sd>0?ux-bw:ux,-bh/2,bw,bh);g.strokeRect(sd>0?ux-bw*.36:ux,-bh*.25,bw*.36,bh*.5);g.fillStyle='#fff';g.fillRect(sd>0?ux:ux-6,-30,6,60);}}
+    g.restore();}
   // rijbaan
   g.strokeStyle='#6d6a64';for(const r of RV){if(r.k==='pedestrian')continue;g.lineWidth=r.w+4;pathPoly(g,r.p);g.stroke();}
   for(const r of RV){g.strokeStyle=r.k==='pedestrian'?pat('plaza'):r.brick?pat('brick'):pat('asphalt');g.lineWidth=r.w;pathPoly(g,r.p);g.stroke();}

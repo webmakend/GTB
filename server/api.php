@@ -26,6 +26,7 @@ try {
   try { $db->exec('ALTER TABLE players ADD COLUMN pub TEXT'); } catch (Exception $e) {}
   $db->exec('CREATE TABLE IF NOT EXISTS dms (id INTEGER PRIMARY KEY AUTOINCREMENT, too TEXT, frm TEXT, nm TEXT, t TEXT, ts INT)');
   $db->exec('CREATE INDEX IF NOT EXISTS i_dm ON dms(too, id)');
+  $db->exec('CREATE TABLE IF NOT EXISTS houses (oid TEXT PRIMARY KEY, pid TEXT, nm TEXT, name TEXT, ts INT)');
 } catch (Exception $e) { http_response_code(500); echo json_encode(['ok' => false]); exit; }
 
 function top($db) {
@@ -37,6 +38,21 @@ function top($db) {
 $a = $_GET['a'] ?? '';
 if ($a === 'hello') { echo json_encode(['ok' => true]); exit; }
 if ($a === 'top') { echo json_encode(['ok' => true, 'top' => top($db)]); exit; }
+if ($a === 'houses') { $q = $db->query('SELECT oid,pid,nm,name FROM houses LIMIT 5000'); echo json_encode(['ok' => true, 'houses' => $q->fetchAll(PDO::FETCH_ASSOC)]); exit; }
+if (($a === 'buy' || $a === 'hname') && $_SERVER['REQUEST_METHOD'] === 'POST') {
+  $in = json_decode(file_get_contents('php://input', false, null, 0, 2048), true) ?: [];
+  $id = preg_replace('/[^a-zA-Z0-9]/', '', (string)($in['id'] ?? ''));
+  $oid = preg_replace('/[^0-9]/', '', (string)($in['oid'] ?? ''));
+  $name = mb_substr(trim(preg_replace('/[\x00-\x1F<>]/u', '', (string)($in['name'] ?? 'Mijn huis'))), 0, 24) ?: 'Mijn huis';
+  $pl = $db->prepare('SELECT nm,pub FROM players WHERE id = ?'); $pl->execute([$id]); $p = $pl->fetch(PDO::FETCH_ASSOC);
+  if (!$p || $oid === '' || !$p['pub']) { echo json_encode(['ok' => false, 'err' => 'onbekend']); exit; }
+  if ($a === 'buy') {
+    $st2 = $db->prepare('INSERT OR IGNORE INTO houses (oid,pid,nm,name,ts) VALUES (?,?,?,?,?)'); $st2->execute([$oid, $p['pub'], $p['nm'], $name, time()]);
+    echo json_encode(['ok' => $st2->rowCount() === 1]); exit;
+  }
+  $st2 = $db->prepare('UPDATE houses SET name = ? WHERE oid = ? AND pid = ?'); $st2->execute([$name, $oid, $p['pub']]);
+  echo json_encode(['ok' => $st2->rowCount() === 1]); exit;
+}
 if ($a !== 'ping' || $_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(400); echo json_encode(['ok' => false]); exit; }
 
 $raw = file_get_contents('php://input', false, null, 0, 8192);
@@ -57,6 +73,7 @@ $st = [
   'ev' => [],
   'cm' => null,
 ];
+if (in_array($in['in'] ?? '', ['stadscafe', 'dorpshuis'], true)) { $st['in'] = $in['in']; $st['ix'] = round(max(0, min(40, (float)($in['ix'] ?? 0))), 2); $st['iz'] = round(max(0, min(40, (float)($in['iz'] ?? 0))), 2); }
 if (is_array($in['cm'] ?? null) && trim((string)($in['cm']['t'] ?? '')) !== '') $st['cm'] = ['i' => max(0, min(1000000000, (int)($in['cm']['i'] ?? 0))), 't' => mb_substr(trim(preg_replace('/[\x00-\x1F<>]/u', '', (string)$in['cm']['t'])), 0, 80)];
 // gebeurtenissen tussen spelers (raak, neergeschoten, vriendschap): alleen bekende soorten, max 12
 foreach (array_slice(is_array($in['ev'] ?? null) ? $in['ev'] : [], 0, 12) as $e) {

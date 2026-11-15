@@ -35,6 +35,7 @@ src=open(os.path.join(os.path.dirname(__file__),'osm2world.py')).read()
 src=src.replace("def inworld(p,m=400):return any(-m<x<WW+m and -m<y<HH+m for x,y in p)","def inworld(p,m=400):return True")
 src=src.replace("if -100<x<WW+100 and -100<y<HH+100:out['pois']","if True:out['pois']")
 src=src.replace("    if t.get('natural')=='water':out['water'].append(r1(p))","    if t.get('landuse')=='orchard':out.setdefault('orchard',[]).append(r1(p))\n    elif t.get('natural')=='water':out['water'].append(r1(p))")
+src=src.replace("    if h and t.get('area')=='yes' and closed:","    if t.get('railway')=='rail':out.setdefault('rail',[]).append({'p':r1(p),'br':1 if t.get('bridge') else 0});continue\n    if t.get('leisure')=='pitch' and closed:out.setdefault('pitch',[]).append({'p':r1(p),'s':t.get('sport','')});continue\n    if h and t.get('area')=='yes' and closed:")
 src=src.replace("DRIVE={","DRIVE={'motorway':14,'motorway_link':6,'trunk':10,'primary_link':6,'secondary_link':6,")
 open('/tmp/wb/o2w.py','w').write(src)
 subprocess.run([sys.executable,'/tmp/wb/o2w.py','/tmp/wb/wb_cut.osm','/tmp/wb/wb_world.json'],check=True)
@@ -72,8 +73,27 @@ def add_edge(p0,p1,amp,ph):
     for k in range(n):
         t=k/n;w=_m.sin(t*L*.0021+ph)*amp+_m.sin(t*L*.0077+ph*2)*amp*.4 if 0<k else 0
         land.append([p0[0]+(p1[0]-p0[0])*t+nx*w,p0[1]+(p1[1]-p0[1])*t+ny*w])
-C=[[max(wl(yt),RX0+IN),yt],[xr,yt],[xr,yb],[max(wl(yb),RX0+IN),yb]]
-add_edge(C[0],C[1],45,1);add_edge(C[1],C[2],45,2);add_edge(C[2],C[3],45,3);add_edge(C[3],C[0],25,4)
+# Waardenburg loopt van v.v. WNC (noordwest) via de PLUS (noordoost) tot het kasteel (oost); de Waalbandijk is de zuidrand, daaronder water.
+AD={(a['s'].lower(),a['h'].lower()):a for a in d['addr']}
+plus=next(p for p in d['pois'] if p['n']=='PLUS');wnc=AD.get(('zandweg','1b')) or AD.get(('zandweg','1'))
+kas=next(b for b in d['buildings'] if b.get('n')=='Kasteel Waardenburg');kc=(sum(q[0] for q in kas['p'])/len(kas['p']),sum(q[1] for q in kas['p'])/len(kas['p']))
+dike=sorted({tuple(q) for r in d['roads'] if r['n']=='Waalbandijk' for q in r['p']},key=lambda q:q[0])
+xE=kc[0]+330;yN1=wnc['y']-520;yN2=plus['y']-320;dk=[[q[0],q[1]+34] for q in dike if q[0]<xE]
+X0=min(q[0] for q in dk)-3000
+poly=[[X0,yN1],[wnc['x']+700,yN1],[plus['x']+260,yN2],[xE,yN2],[xE,dk[-1][1]]]+dk[::-1]+[[X0,dk[0][1]]]
+def clipE(P):
+    out=[];n=len(P)
+    for i in range(n):
+        A2,B2=P[i],P[(i+1)%n];fa=A2[0]-wl(A2[1]);fb=B2[0]-wl(B2[1])
+        if fa>=0:out.append(A2)
+        if (fa>=0)!=(fb>=0):t=fa/(fa-fb);out.append([A2[0]+(B2[0]-A2[0])*t,A2[1]+(B2[1]-A2[1])*t])
+    return out
+poly=clipE(poly);nd=len(dk)
+for i in range(len(poly)):
+    p0,p1=poly[i],poly[(i+1)%len(poly)];onDike=any(abs(p0[0]-q[0])<1 and abs(p0[1]-q[1])<1 for q in dk) and any(abs(p1[0]-q[0])<1 and abs(p1[1]-q[1])<1 for q in dk)
+    if onDike:land.append(list(p0))
+    else:add_edge(p0,p1,28,i)
+TRIM=0
 okp=lambda x,y:_pipf(x,y,land)
 cen=lambda p:(sum(q[0] for q in p)/len(p),sum(q[1] for q in p)/len(p))
 d.setdefault('orchard',[])
@@ -91,14 +111,17 @@ def cutline(pts,js=None):
 nr=[]
 for r in d['roads']:
     for pts,js in cutline(r['p'],r['j']):nr.append(dict(r,p=pts,j=js))
-d['roads']=nr
+d['roads']=[r for r in nr if r['n']!='Waalbandijk']
+for r in nr:
+    if r['n']=='Waalbandijk':d['paths'].append({'k':'footway','w':34,'p':r['p'],'dijk':1})
 npth=[]
 for p in d['paths']:
     for pts,_ in cutline(p['p']):npth.append(dict(p,p=pts))
 d['paths']=npth
 d['pois']=[p for p in d['pois'] if okp(p['x'],p['y'])]
 d['addr']=[a for a in d['addr'] if okp(a['x'],a['y'])]
-ZY=int(round(-(by0+IN)+TOP))
+dy=-GAP-(max(q[1] for q in land)-y0)
+ZY=int(round(-(min(q[1] for q in land)-y0+dy)+TOP))
 def sh(p,ddy):return [[int(round(q[0]-x0)),int(round(q[1]-y0+ddy))] for q in p]
 def shz(p):return [[q[0],q[1]+ZY] for q in p]
 # Zaltbommel omlaag schuiven
@@ -143,6 +166,15 @@ rr=[x for x in d['roads'] if x['n']=='Koningin Julianaplantsoen']
 if rr:
     pts=[q for x in rr for q in x['p']];spots['speeltuin']=W2([[sum(q[0] for q in pts)/len(pts),sum(q[1] for q in pts)/len(pts)]])[0]
 g['wbspot']=spots
+for key,st,hn in [('tennis','zandweg','1a'),('wnc','zandweg','1b'),('kwast','weerdenborch','93'),('dorpshuis','de koeldert','30'),('molen','gasthuisstraat','23')]:
+    h=A.get((st,hn))
+    if h:spots[key]=W2([[h['x'],h['y']]])[0]
+dp=next((p for p in d['pois'] if p['n']=='Dorpshuis De Koeldert'),None)
+if dp and 'dorpshuis' not in spots:spots['dorpshuis']=W2([[dp['x'],dp['y']]])[0]
+g['rail']=[]
+for r in d.get('rail',[]):
+    for pts,_ in cutline(r['p']):g['rail'].append({'p':W2(pts),'br':r['br']})
+g['pitch']=[{'p':W2(p['p']),'s':p['s']} for p in d.get('pitch',[]) if okp(*cen(p['p']))]
 g['wbiz']=wbz;g['orchard']=[W2(p) for p in d['orchard']]
 WL=W2(land);g['wb']={'bb':[min(q[0] for q in WL),min(q[1] for q in WL),max(q[0] for q in WL),max(q[1] for q in WL)],'zy':ZY,'land':WL}
 g['H']=g['H']+ZY;g['W']=max(g['W'],int(max(q[0] for q in WL))+250)

@@ -53,7 +53,7 @@ function friendsOpen(){const ov=ovEl('menuOv'),b=boxEl();b.appendChild(hEl('👥
   for(const p of ks){const g=pvpByPub(p);row(fr[p],g?'online · LV '+(g.lv|0):'offline','ONTVRIENDEN','#7f1d1d',()=>{if(g)pvpUnfriend(p);else{const f=frGet();delete f[p];frSet(f);}},!!g);}
   const others=G.filter(s=>!fr[s.pid]);if(others.length){sec('NU ONLINE');for(const s of others){const nm=String(s.nm||'Speler').slice(0,14);if(PVP.req[s.pid])continue;row(nm,'LV '+(s.lv|0)+' · € '+(s.eur|0),PVP.sent[s.pid]?'VERSTUURD…':'VRIEND WORDEN',PVP.sent[s.pid]?'#3a3a5a':'#2563eb',PVP.sent[s.pid]?null:()=>pvpAsk(s.pid),true);}}
   b.appendChild(btnEl('⟵  TERUG','#3a3a5a',menuRender));ov.replaceChildren(b);}
-setInterval(()=>{if(paused||CLUB.on||(typeof FPV!=='undefined'&&FPV.on))try{netStep();}catch(e){}},300);
+setInterval(()=>{if(paused||CLUB.on||(typeof FPV!=='undefined'&&FPV.on)||(typeof SC!=='undefined'&&SC.on))try{netStep();}catch(e){}},300);
 // ---- chat: kleine berichtknop, iedereen ziet het bericht links tussen de meldingen ----
 const CHAT={i:0,cur:null,seen:new Set()};
 function chatSend(t){t=String(t||'').replace(/[<>]/g,'').replace(/\s+/g,' ').trim().slice(0,80);if(!t)return;CHAT.cur={i:++CHAT.i,t,ts:performance.now()};NET.lastSent='';try{netStep();}catch(e){}

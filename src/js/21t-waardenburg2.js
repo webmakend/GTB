@@ -22,7 +22,7 @@ function wbExtras(){if(!WB)return;
   // ---- Esso tankstation (Dorpsstraat 8)
   if(WBS.esso){const p=findRect(WBS.esso[0],WBS.esso[1],230,150,[BUILD,WATER],420);if(p){const P0=rectPoly(p[0],p[1],230,150);WD.plaza.push(P0.slice(0,4));polyFill(P0,i=>{if(G[i]!==ROAD)G[i]=PLAZA;});
       const shop={p:rectPoly(p[0]+70,p[1]-38,70,50).slice(0,4).concat([[p[0]+35,p[1]-63]]),ht:13,kind:'retail',flat:true,noFac:1,wall:'#f4f4f2',roof:'#d9dde2',ridge:false};shop.p=rectPoly(p[0]+70,p[1]-38,70,50);prepBuilding(shop);addSign(shop,'Esso','Winkel','Dorpsstraat 8, Waardenburg');
-      const can={p:rectPoly(p[0]-30,p[1]+10,120,70),ht:24,kind:'canopy',pass:1,flat:true,noFac:1,wall:'#e8e8e8',roof:'#f7f7f7',ridge:false,esso:1};prepBuilding(can);
+      
       ESSO={x:p[0]-30,y:p[1]+10,pumps:[[p[0]-60,p[1]+10],[p[0],p[1]+10]]};}}
   // ---- Chinotaria De Waard (Steenweg 45)
   if(WBS.chinees){let best=null,bd=1e9;for(const b of BUILDINGS){if(!b.wb||b.sign||b.wbc)continue;const d=Math.hypot(b.cx-WBS.chinees[0],b.cy-WBS.chinees[1]);if(d<bd){bd=d;best=b;}}if(best&&bd<400)addSign(best,'Chinotaria De Waard','Restaurant','Steenweg 45, Waardenburg');}
@@ -62,7 +62,7 @@ function drawWb2(){const vis=(x,y)=>Math.abs(x-CAM.x)<1400&&Math.abs(y-CAM.y)<14
     else if(b.k==='sandbox'){ctx.strokeStyle='#8d6e63';ctx.lineWidth=5;ctx.strokeRect(-26,-20,52,40);ctx.fillStyle='#e53935';ctx.fillRect(-10,-6,7,7);ctx.fillStyle='#fdd835';ctx.beginPath();ctx.arc(8,6,4,0,TAU);ctx.fill();}
     ctx.restore();}
   for(const k of KIDS){if(!vis(k.x,k.y))continue;ctx.save();ctx.translate(k.x,k.y);ctx.scale(.72,.72);drawPed({x:0,y:0,a:k.a,anim:k.anim,col:k.col,hair:k.hair,state:k.mv?'flee':'idle',kind:'p',wet:0},false);ctx.restore();}
-  if(ESSO&&vis(ESSO.x,ESSO.y)){for(const q of ESSO.pumps){ctx.fillStyle='rgba(0,0,0,.3)';ctx.fillRect(q[0]-6,q[1]-12,16,28);ctx.fillStyle='#e53935';ctx.fillRect(q[0]-8,q[1]-14,16,28);ctx.fillStyle='#fff';ctx.fillRect(q[0]-5,q[1]-10,10,8);ctx.fillStyle='#0d47a1';ctx.fillRect(q[0]-8,q[1]+8,16,4);}}
+  if(false){for(const q of ESSO.pumps){ctx.fillStyle='rgba(0,0,0,.3)';ctx.fillRect(q[0]-6,q[1]-12,16,28);ctx.fillStyle='#e53935';ctx.fillRect(q[0]-8,q[1]-14,16,28);ctx.fillStyle='#fff';ctx.fillRect(q[0]-5,q[1]-10,10,8);ctx.fillStyle='#0d47a1';ctx.fillRect(q[0]-8,q[1]+8,16,4);}}
   if(PICNIC&&vis(PICNIC.x,PICNIC.y)){ctx.save();ctx.translate(PICNIC.x,PICNIC.y);ctx.rotate(PICNIC.a);ctx.fillStyle='rgba(0,0,0,.28)';ctx.fillRect(-22,-12,48,30);ctx.fillStyle='#8d6e63';ctx.fillRect(-26,-20,52,8);ctx.fillRect(-26,12,52,8);ctx.fillStyle='#a1887f';ctx.fillRect(-24,-10,48,20);ctx.strokeStyle='rgba(60,40,30,.6)';ctx.lineWidth=1;for(let x=-16;x<=16;x+=8){ctx.beginPath();ctx.moveTo(x,-10);ctx.lineTo(x,10);ctx.stroke();}ctx.fillStyle='#e53935';ctx.fillRect(-6,-4,8,6);ctx.restore();}}
 // ---- eten bij De Waard en tanken
 FOOD['Chinotaria De Waard']={p:9,hp:60,t:'Chinees eten bij De Waard',e:'🥡',say:'Babi pangang en een loempia!'};

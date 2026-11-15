@@ -115,7 +115,8 @@ function drawBuildings(vx0,vy0,vx1,vy1,cx,cy){
     else if(b.kind==='tower'){ctx.strokeStyle='rgba(0,0,0,.4)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(r[0][0],r[0][1]);ctx.lineTo(r[2][0],r[2][1]);ctx.moveTo(r[1][0],r[1][1]);ctx.lineTo(r[3][0],r[3][1]);ctx.stroke();ctx.fillStyle='#d8b54a';ctx.beginPath();ctx.arc(rcx,rcy,4,0,TAU);ctx.fill();}
     else if(b.kind==='gate'){ctx.fillStyle='rgba(0,0,0,.22)';ctx.beginPath();ctx.moveTo(r[0][0]*.85+rcx*.15,r[0][1]*.85+rcy*.15);for(let i=1;i<n;i++)ctx.lineTo(r[i][0]*.85+rcx*.15,r[i][1]*.85+rcy*.15);ctx.fill();}
     else{ctx.strokeStyle='rgba(0,0,0,.18)';ctx.lineWidth=2;ctx.stroke();}
-    if(b.castle)drawCastleTop(b,r,f,cx,cy);if(b.wbc)drawWbCastle(b,r,f,cx,cy);if(b.wt)drawWaterTop(b,f,cx,cy);
+    if(b.castle)drawCastleTop(b,r,f,cx,cy);if(b.wbc)drawWbCastle(b,r,f,cx,cy);if(b.molen)drawMolen(b,r,f,cx,cy);if(b.wt)drawWaterTop(b,f,cx,cy);
+    if(b.oid&&typeof HS!=='undefined'&&HS[b.oid])houseTag(b,rcx,rcy);
     if(b.sign){const sg=b.signC;let a=b.sa;if(a>Math.PI/2)a-=Math.PI;if(a<-Math.PI/2)a+=Math.PI;ctx.save();ctx.translate(rcx,rcy);ctx.rotate(a);ctx.font='800 13px Inter, sans-serif';const tw=ctx.measureText(b.sign).width+12;
       ctx.shadowColor=sg[0];ctx.shadowBlur=14;ctx.fillStyle=sg[0];ctx.fillRect(-tw/2,-10,tw,20);ctx.shadowBlur=0;ctx.strokeStyle='rgba(255,255,255,.7)';ctx.lineWidth=1.2;ctx.strokeRect(-tw/2+1.5,-8.5,tw-3,17);ctx.fillStyle=sg[1];ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(b.sign,0,1);ctx.restore();}}
 }
@@ -148,13 +149,13 @@ function renderWorld(){
   drawSkids(vx0,vy0,vx1,vy1);drawBeach(vx0,vy0,vx1,vy1);drawBarges();
   for(const p of peds)if(p.state==='down'&&inV(p.x,p.y,20))drawPed(p);
   for(const p of peds)if(p.dog&&inV(p.dog.x,p.dog.y,20)){ctx.strokeStyle='rgba(30,20,20,.55)';ctx.lineWidth=.8;if(p.state!=='down'){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.dog.x+Math.cos(p.dog.a)*6,p.dog.y+Math.sin(p.dog.a)*6);ctx.stroke();}drawDog(p.dog);}
-  drawHist();drawActs();if(typeof drawWbBar==='function'){drawTerrace();drawWb2();drawOrchardLife();drawWbBar();drawDrown();}drawCoins();drawJobsWorld();drawGunWorld();drawNetGhosts();
+  drawHist();drawActs();if(typeof drawWbBar==='function'){drawTerrace();drawWb2();drawEsso();drawOrchardLife();drawWbBar();drawDrown();}drawCoins();drawJobsWorld();drawGunWorld();drawNetGhosts();
   for(const p of peds)if(p.state!=='down'&&inV(p.x,p.y,20))drawPed(p);
   if(!P.car&&!P.dead){if(swimming())drawSwimmer();else{const jz=P.jz||0;if(jz>0){ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(P.x+2,P.y+3,6-jz*.05,8-jz*.06,0,0,TAU);ctx.fill();ctx.save();ctx.translate(P.x-jz*.25,P.y-jz*.6);{const js=Math.min(1.7,1+jz/45);ctx.scale(js,js);}ctx.translate(-P.x,-P.y);}
     if(P.squash>0&&!(jz>0)){const q=P.squash/9;ctx.save();ctx.translate(P.x,P.y);ctx.scale(1+.3*q,1-.22*q);ctx.translate(-P.x,-P.y);}
     drawPed({run:P.running,spr:P.ch&&P.ch.spr!=null?PPL_SPR[P.ch.spr[0]][P.ch.spr[1]]:null,x:P.x,y:P.y,a:P.a,anim:jz>0?1.2:P.anim,col:P.ch?P.ch.body:'#ff2e88',hair:P.ch?P.ch.head:'#2b1d0e',state:'walk',kind:'p',wet:0},true);if(jz>0||P.squash>0)ctx.restore();}}
   for(const c of cars)if(!c.dead&&inV(c.x,c.y,60))drawCar(c);
-  drawTrees(vx0,vy0,vx1,vy1,cx,cy);drawBuildings(vx0,vy0,vx1,vy1,cx,cy);drawCables(vx0,vy0,vx1,vy1,cx,cy);drawBridgeSign(vx0,vy0,vx1,vy1,cx,cy);drawStatue(vx0,vy0,vx1,vy1,cx,cy);drawParts();drawBalloons();
+  if(typeof drawRailTop==="function")drawRailTop();drawTrees(vx0,vy0,vx1,vy1,cx,cy);drawBuildings(vx0,vy0,vx1,vy1,cx,cy);drawCables(vx0,vy0,vx1,vy1,cx,cy);drawBridgeSign(vx0,vy0,vx1,vy1,cx,cy);drawStatue(vx0,vy0,vx1,vy1,cx,cy);drawParts();drawBalloons();
   if(!GL.ok)drawEvening(vx0,vy0,vx1,vy1);
   // bovenste laag (niet door de lichtkaart verdonkerd): gloed, markeringen, teksten, HUD
   ctx=fctx;ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,fxc.width,fxc.height);applyCam(ctx);

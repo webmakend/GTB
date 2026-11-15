@@ -3,7 +3,7 @@ function populate(){const v=parkNear(P.x+30,P.y+30,'velzart');v.keep=0;for(let i
 function init(){
   resize();genWorld();buildGraph();buildMini();buildVectorMap();buildPats();initBarges();
   const mk=ROADS.find(r=>r.n==='Markt');SPAWN=mk?mk.p[mk.p.length>>1]:[W/2,H/2];respawn();camZ=1.15;
-  placeStatue();if(typeof buildOrchards==='function')buildOrchards();if(typeof initTerrace==='function')initTerrace();initActs();makeCoins();initJobs();progLoad();initHist();populate();initMission();
+  placeStatue();if(typeof buildOrchards==='function')buildOrchards();if(typeof initTerrace==='function')initTerrace();if(typeof wb3Init==='function')wb3Init();initActs();makeCoins();initJobs();progLoad();initHist();populate();initMission();
   setupTouch();setupMapClick();setupZoom();setupPinch();
 }
 init();

@@ -82,6 +82,8 @@ function genWorld(){
   for(const r of ROADS)stampLine(r.p,r.w/2+(r.fort?44:22),i=>{const t=G[i];if(t===WATER||t===ROAD||t===PLAZA)return;G[i]=WALK;});
   for(const r of ROADS)stampLine(r.p,r.w/2,i=>{if(G[i]===WATER)BRG[i]=1;G[i]=ROAD;});
   for(const r of ROADS)if(r.k==='motorway')stampLine(r.p,r.w/2+10,i=>{MOTO[i]=1;});
+  // spoorlijn (op een dijkje): niet over te steken, behalve via de tunnels onder het spoor door (wegen en paden)
+  for(const r of (WD.rail||[]))stampLine(r.p,24,i=>{if(G[i]===ROAD||G[i]===PATH||G[i]===WATER)return;G[i]=BUILD;});
   for(const r of ROADS)if(r.k!=='motorway')stampLine(r.p,r.w/2+4,i=>{MOTO[i]=0;});
   // bosrand rond Waardenburg: niet doorheen te komen (ook niet over de wegen die de kaart uit lopen)
   // gebouwen
@@ -96,14 +98,14 @@ function genWorld(){
   WD.buildings.forEach(ob=>{if(!ob.wb)return;const c=centroid(ob.p);ob.keep=true;});
   for(const ob of WD.buildings){
     if(!ob.keep)continue;
-    const b={p:ob.p,n:ob.n,kind:ob.b,ws:ob.ws,ms:ob.ms};const a=polyArea(ob.p),h=hsh(ob.p[0][0],ob.p[0][1]);
+    const b={p:ob.p,n:ob.n,kind:ob.b,ws:ob.ws,ms:ob.ms,oid:ob.id};const a=polyArea(ob.p),h=hsh(ob.p[0][0],ob.p[0][1]);
     let m=(ob.b==='apartments'?14:ob.b==='house'?8+(h%4):ob.b==='church'?22:ob.b==='retail'||ob.b==='commercial'?10:ob.b==='shed'||ob.b==='roof'||a<1200?4:9+(h%5));
     if(ob.b==='civic')m=16;if(ob.b==='houseboat')m=4;if(ob.ws&&ob.b!=='church')m=Math.max(m,13+(h%5));if(ob.bs&&ob.b!=='church')m=Math.max(m,10+(h%4));if(ob.ms&&ob.b!=='church'&&ob.b!=='civic')m=Math.max(m,15+(h%5));
     b.ht=m*3.2;b.flat=(ob.b==='retail'||ob.b==='commercial'||ob.b==='industrial'||ob.b==='apartments'||a>25000)&&ob.b!=='church';
     if(b.flat)b.roof=RP(['#5f6266','#55585c','#6b6d70','#4c4f53','#646668']);
     if(ob.b==='church'){b.roof='#5d636a';b.wall='#b8ab95';b.label=ob.n;}
     if(ob.b==='civic'){b.wall='#e1d7c2';b.roof='#3d4146';b.label='Stadhuis';}
-    if(ob.wb){b.wb=1;const t=ob.b;m=t==='house'||t==='detached'||t==='semidetached_house'||t==='terrace'?7+(h%3):t==='apartments'?11:t==='church'?20:t==='garage'||t==='shed'||t==='roof'||t==='greenhouse'||t==='static_caravan'||a<500?3:t==='school'||t==='retail'||t==='commercial'||t==='supermarket'||t==='civic'||t==='office'?7:t==='industrial'||t==='construction'?8:a<1500?4+(h%2):7+(h%3);b.ht=m*3.2;b.flat=['retail','commercial','industrial','school','supermarket','office','civic','construction'].includes(t)||a>9000;if(b.flat){b.ridge=false;b.roof=RP(['#5f6266','#55585c','#6b6d70','#4c4f53']);}if(ob.n&&/kerk|molen|gasthuis|burcht|gemeente/i.test(ob.n)){b.label=ob.n.replace(/^Hervormde Gemeente.*/,'Hervormde kerk Waardenburg');if(ob.b==='church'||/kerk|gemeente/i.test(ob.n)){b.roof='#5d636a';b.wall='#c9bda6';}}if(/kasteel/i.test(ob.n||'')){b.wbc=1;b.label=ob.n;b.wall='#8f4f3a';b.roof='#454b55';b.flat=true;b.ridge=false;b.noFac=1;b.ht=Math.max(b.ht,64);}}
+    if(ob.wb){b.wb=1;const t=ob.b;m=t==='house'||t==='detached'||t==='semidetached_house'||t==='terrace'?7+(h%3):t==='apartments'?11:t==='church'?20:t==='garage'||t==='shed'||t==='roof'||t==='greenhouse'||t==='static_caravan'||a<500?3:t==='school'||t==='retail'||t==='commercial'||t==='supermarket'||t==='civic'||t==='office'?7:t==='industrial'||t==='construction'?8:a<1500?4+(h%2):7+(h%3);b.ht=m*3.2;b.flat=['retail','commercial','industrial','school','supermarket','office','civic','construction'].includes(t)||a>9000;if(b.flat){b.ridge=false;b.roof=RP(['#5f6266','#55585c','#6b6d70','#4c4f53']);}if(ob.n&&/molen/i.test(ob.n)){b.molen=1;b.ht=Math.max(b.ht,40);b.wall='#7a6a58';b.roof='#4a4038';b.flat=true;b.ridge=false;}if(ob.n&&/kerk|molen|gasthuis|burcht|gemeente/i.test(ob.n)){b.label=ob.n.replace(/^Hervormde Gemeente.*/,'Hervormde kerk Waardenburg');if(ob.b==='church'||/kerk|gemeente/i.test(ob.n)){b.roof='#5d636a';b.wall='#c9bda6';}}if(/kasteel/i.test(ob.n||'')){b.wbc=1;b.label=ob.n;b.wall='#8f4f3a';b.roof='#454b55';b.flat=true;b.ridge=false;b.noFac=1;b.ht=Math.max(b.ht,64);}}
     if(ob.n==='Gasthuiskapel')b.label=ob.n;if(ob.n==='Maarten van Rossumhuis'){b.castle=1;b.label='Stadskasteel Zaltbommel';b.wall='#a89a86';b.roof='#6d6a66';b.flat=true;b.ridge=false;b.ht=Math.max(b.ht,52);}
     if(b.flat)b.ridge=false;
     prepBuilding(b);

@@ -22,6 +22,8 @@ function actFind(){
   if(P.car||P.dead||CLUB.on||MG.on||P.peeT>0||swimming()||FPV.on)return null;
   const ja=jobAct();if(ja)return ja;
   {const h=histNear();if(h)return{k:'hist',h,t:'📜 '+h.n+(PRG.hist.includes(h.id)?'':' · lees het verhaal'),btn:'📜<br>LEES'};}
+  if(typeof tennisNear==='function'&&tennisNear())return{k:'tennis',t:'🎾 Tennis spelen bij TV Waardenburg (winst: €30)',btn:'🎾<br>SPEEL'};
+  if(typeof dorpNear==='function'&&dorpNear())return{k:'dorp',t:'🏛 Naar binnen in Dorpshuis De Koeldert',btn:'🏛<br>BINNEN'};
   if(typeof inOrchard==='function'&&inOrchard(P.x,P.y))return{k:'appel',t:'🍎 Appel plukken (+5 ♥)',btn:'🍎<br>PLUK'};
   if(WTOWER&&Math.hypot(P.x-WTOWER.x,P.y-WTOWER.y)<64)return{k:'fpv',sc:'toren',t:'🗼 Beklim de oude watertoren',btn:'🗼<br>KLIM'};
   if(P.bladder>=100&&!carNear())return{k:'pee',t:'',btn:'💦<br>PLAS'};
@@ -37,15 +39,20 @@ function actFind(){
     if(s.n==='Stadskasteel')return{k:'castle',s,t:'Stadskasteel bezoeken (€3)',btn:'🏰<br>€3'};
     if(MODE_SHOPS.has(s.n)&&stars>0)return{k:'outfit',s,t:`Nieuwe outfit bij ${s.n} (€20): politie kwijt`,btn:'👕<br>€20'};
     if(s.c==='Winkel')return s.rob>0?{k:'robbed',s,t:`${s.n}: de kassa is nog leeg`,btn:'',off:1}:{k:'rob',s,t:`${s.n} overvallen!`,btn:'🔫<br>OVERVAL'};}
+  {const hb=typeof houseNear==='function'?houseNear():null;if(hb)return houseAct(hb);}
   if(P.bladder+P.bladP>=20&&!carNear())return{k:'pee',t:'',btn:'💦<br>PLAS'};
   return null;}
 function actTry(){const a=ACT.cur;if(!a)return false;if(a.off)return true;
   if(a.k==='job'){startJob(a.j);return true;}
   if(a.k==='hist'){histRead(a.h);return true;}
   if(a.k==='appel'){applePick();return true;}
-  if(a.k==='stadscafe'){scEnter();return true;}
+  if(a.k==='stadscafe'){scEnter('stadscafe');return true;}
   if(a.k==='esso'){essoFill();return true;}
   if(a.k==='tol'){tollPay();return true;}
+  if(a.k==='tennis'){tnStart();return true;}
+  if(a.k==='dorp'){scEnter('dorpshuis');return true;}
+  if(a.k==='huis'){houseBuy(a.b);return true;}
+  if(a.k==='thuis'){P.hp=P.maxhp;sfx('reward');noteAdd('UITGERUST','Lekker thuis. Je health is weer vol.','#7dff6a',150,'thuis');return true;}
   if(a.k==='fpv'){fpvEnter(a.sc);return true;}
   if(a.k==='zw'){if(P.money<5){say(ACT.zw,'Geen geld, geen spul.');sfx('blip');return true;}addMoney(-5);P.high=60*45;say(ACT.zw,'Niet alles tegelijk, hè!');sfx('whoosh');msg('ZO… DAT IS STERK SPUL','Alles kleurt en je rent harder','#c77dff',170);if(copNear(320))addHeat(1.1);return true;}
   if(a.k==='doc'){if(P.money<2){msg('GEEN GELD','Een consult kost €2','#ff6b6b',110);return true;}addMoney(-2);P.hp=P.maxhp;P.high=0;P.drunk=Math.max(0,P.drunk-2);sfx('reward');msg('WEER HELEMAAL FIT','De huisarts plakt je weer aan elkaar','#7dff6a',140);for(let i=0;i<14;i++)parts.push({x:P.x,y:P.y,vx:rr(-1.5,1.5),vy:rr(-2,-.4),l:40,ml:40,s:1,k:'h'});return true;}
