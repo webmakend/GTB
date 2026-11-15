@@ -17,10 +17,8 @@ function drawTerrace(){for(const t of TERR){if(Math.abs(t.x-CAM.x)>1300||Math.ab
     for(const g of t.guests){if(g.fled&&Math.hypot(g.x-t.x0,g.y-t.y0)>400)continue;if(!g.fled){ctx.fillStyle='#3e2a1e';ctx.fillRect(g.x-6+Math.cos(g.a)*3,g.y-6+Math.sin(g.a)*3,12,12);}
       drawPed({x:g.x,y:g.y,a:g.fled?Math.atan2(g.vy,g.vx):g.a+Math.PI,anim:g.anim,col:g.col,hair:g.hair,state:g.fled?'flee':'idle',kind:'p',wet:0},false);}
     ctx.save();ctx.translate(t.x,t.y);
-    if(!t.down){ctx.fillStyle='#d8d2c4';ctx.beginPath();ctx.arc(0,0,11,0,TAU);ctx.fill();ctx.fillStyle='#e9b13a';ctx.beginPath();ctx.arc(-3,-2,2.6,0,TAU);ctx.fill();ctx.beginPath();ctx.arc(4,2,2.6,0,TAU);ctx.fill();
-      const k=.0016*80,ox=(t.x-CAM.x)*k,oy=(t.y-CAM.y)*k;ctx.fillStyle='rgba(0,0,0,.22)';ctx.beginPath();ctx.arc(10,8,30,0,TAU);ctx.fill();ctx.strokeStyle='#555';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(ox,oy);ctx.stroke();
-      ctx.translate(ox,oy);for(let i=0;i<8;i++){ctx.fillStyle=i%2?t.col:'#f4efe4';ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,30,i/8*TAU,(i+1)/8*TAU);ctx.closePath();ctx.fill();}ctx.fillStyle='#333';ctx.beginPath();ctx.arc(0,0,2.5,0,TAU);ctx.fill();}
-    else{ctx.rotate(t.fa);ctx.fillStyle='#d8d2c4';ctx.fillRect(-11,-4,22,8);ctx.strokeStyle='#555';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(34,0);ctx.stroke();ctx.fillStyle=t.col;ctx.beginPath();ctx.ellipse(46,0,12,28,0,0,TAU);ctx.fill();ctx.fillStyle='#f4efe4';ctx.beginPath();ctx.ellipse(46,0,6,28,0,0,TAU);ctx.fill();ctx.fillStyle='rgba(233,177,58,.7)';ctx.beginPath();ctx.ellipse(-16,10,9,5,0,0,TAU);ctx.fill();}
+    if(!t.down){ctx.fillStyle='#d8d2c4';ctx.beginPath();ctx.arc(0,0,11,0,TAU);ctx.fill();ctx.fillStyle='#e9b13a';ctx.beginPath();ctx.arc(-3,-2,2.6,0,TAU);ctx.fill();ctx.beginPath();ctx.arc(4,2,2.6,0,TAU);ctx.fill();}
+    else{ctx.rotate(t.fa);ctx.fillStyle='#d8d2c4';ctx.fillRect(-11,-4,22,8);ctx.fillStyle='rgba(233,177,58,.7)';ctx.beginPath();ctx.ellipse(-16,10,9,5,0,0,TAU);ctx.fill();}
     ctx.restore();}}
 
 // ---------------- 3D-binnenruimtes (raycaster): 't Stadscafé en Dorpshuis De Koeldert ----------------
@@ -98,10 +96,10 @@ function drawSC(){const R=ROOMS[SC.room],T=R.tex,OBJ=R.objs,g=fctx;g.setTransfor
   for(let y=0;y<H2;y++){const dy=y-hor;if(Math.abs(dy)<1){for(let x=0;x<W2;x++){px[y*W2+x]=0xff100810;zb[y*W2+x]=1e9;}continue;}const floor=dy>0,hgt=floor?camH:(CEIL-camH),dist=hgt*f/Math.abs(dy);
     for(let x=0;x<W2;x++){const rx=(x-W2/2)/f,wx=SC.x+(cy-sy*rx)*dist,wz=SC.z+(sy+cy*rx)*dist;const c=floor?floorC(wx,wz):R.ceil;const pt=R.tint?Math.max(0,1-wx/R.tint)*.6:0;px[y*W2+x]=shade(c,floor?lightAt(wx,wz,dist):(lightAt(wx,wz,dist)*.6),pt);zb[y*W2+x]=dist;}}
   for(let x=0;x<W2;x++){const rx=(x-W2/2)/f,dx=cy-sy*rx,dz=sy+cy*rx;let mx=Math.floor(SC.x),mz=Math.floor(SC.z);const ddx=Math.abs(1/dx),ddz=Math.abs(1/dz),stx=dx<0?-1:1,stz=dz<0?-1:1;let sdx=(dx<0?SC.x-mx:mx+1-SC.x)*ddx,sdz=(dz<0?SC.z-mz:mz+1-SC.z)*ddz;
-    const hits=[];for(let i=0;i<64;i++){let side,d;if(sdx<sdz){d=sdx;sdx+=ddx;mx+=stx;side=0;}else{d=sdz;sdz+=ddz;mz+=stz;side=1;}const c=scCell(mx+.5,mz+.5);if(c==='.')continue;const ex=Math.min(sdx,sdz);hits.push({c,d,ex,side,u:side?SC.x+dx*d-Math.floor(SC.x+dx*d):SC.z+dz*d-Math.floor(SC.z+dz*d)});if((R.h[c]||3)>=2.9)break;}
+    const hits=[];for(let i=0;i<64;i++){let side,d;if(sdx<sdz){d=sdx;sdx+=ddx;mx+=stx;side=0;}else{d=sdz;sdz+=ddz;mz+=stz;side=1;}const c=scCell(mx+.5,mz+.5);if(c==='.')continue;const ex=Math.min(sdx,sdz);hits.push({c,d,ex,side,k:mx+','+mz,u:side?SC.x+dx*d-Math.floor(SC.x+dx*d):SC.z+dz*d-Math.floor(SC.z+dz*d)});if((R.h[c]||3)>=2.9)break;}
     for(let hI=hits.length-1;hI>=0;hI--){const h=hits[hI],H=R.h[h.c]||3,perp=h.d;
-      const top=Math.round(hor-(H-camH)/perp*f),bot=Math.round(hor+camH/perp*f),tx=T[h.c]||T['#'],L=lightAt(SC.x+dx*perp,SC.z+dz*perp,perp)*(h.side?.82:1),pt=R.tint?Math.max(0,1-(SC.x+dx*perp)/R.tint)*.5:0;
-      const tu=Math.floor(h.u*tx.w*(H<2?2:1))%tx.w;for(let y=Math.max(0,top);y<Math.min(H2,bot);y++){const i=y*W2+x;if(zb[i]<perp)continue;const tv=Math.floor((y-top)/(bot-top)*tx.h);px[i]=shade(tx.d[tv*tx.w+tu],L,pt);zb[i]=perp;}
+      const top=Math.round(hor-(H-camH)/perp*f),bot=Math.round(hor+camH/perp*f),tx=(R.ctex&&R.ctex[h.k])||T[h.c]||T['#'],L=lightAt(SC.x+dx*perp,SC.z+dz*perp,perp)*(h.side?.82:1),pt=R.tint?Math.max(0,1-(SC.x+dx*perp)/R.tint)*.5:0;
+      const hu=(R.ctex&&R.ctex[h.k]&&((h.side===0&&dx<0)||(h.side===1&&dz>0)))?1-h.u:h.u,tu=Math.floor(hu*tx.w*(H<2?2:1))%tx.w;for(let y=Math.max(0,top);y<Math.min(H2,bot);y++){const i=y*W2+x;if(zb[i]<perp)continue;const tv=Math.floor((y-top)/(bot-top)*tx.h);px[i]=shade(tx.d[tv*tx.w+tu],L,pt);zb[i]=perp;}
       if(H<camH){const y1=Math.round(hor+(camH-H)/h.ex*f),tt=h.c==='K'?T.topK:SC.room==='intertoys'?T.topI:T.top;for(let y=Math.max(0,y1);y<Math.min(H2,top);y++){const i=y*W2+x;const dd2=(camH-H)*f/(y-hor);if(zb[i]<dd2)continue;const wx=SC.x+dx*dd2,wz=SC.z+dz*dd2;px[i]=shade(tt.d[(Math.floor(wz*8)&31)*32+(Math.floor(wx*8)&31)],lightAt(wx,wz,dd2)*1.1,0);zb[i]=dd2;}}}}
   // sprites: inrichting + andere spelers die ook binnen zijn
   const OTH=scOthers(),pers=[];const SPR=SCSPR;
@@ -118,6 +116,6 @@ function drawSC(){const R=ROOMS[SC.room],T=R.tex,OBJ=R.objs,g=fctx;g.setTransfor
     if(p.s.cm&&p.s.cm.t){const t=String(p.s.cm.t).slice(0,60);g.font='700 12px Inter, sans-serif';const tw=Math.min(220,g.measureText(t).width+16);g.fillStyle='rgba(255,255,255,.95)';rrect(g,p.x-tw/2,p.y-50,tw,22,9);g.fill();g.fillStyle='#111';g.fillText(t,p.x,p.y-39,tw-10);}}
   if(IS_TOUCH){const st=SC.stick,bx=st?st.x:90,by=st?st.y:CH-110;g.strokeStyle='rgba(255,255,255,.3)';g.lineWidth=2;g.beginPath();g.arc(bx,by,52,0,TAU);g.stroke();g.fillStyle='rgba(255,255,255,.75)';g.beginPath();g.arc(bx+(st?st.dx*.8:0),by+(st?st.dy*.8:0),22,0,TAU);g.fill();}
   txt(IS_TOUCH?'Linksonder slepen = lopen · rest = rondkijken':'W/S lopen · A/D draaien · muis slepen = kijken · E = naar buiten',CW/2,CH-16,12,'rgba(255,255,255,.75)','center','Inter, sans-serif');
-  if(SC.room==='dorpshuis'&&(NET.room||NET.http))txt('👥 '+OTH.length+' andere speler'+(OTH.length===1?'':'s')+' binnen',CW/2,uiTop().top+20,13,'#7dff6a','center','Inter, sans-serif');
+  if((SC.room==='dorpshuis'||SC.room.startsWith('h'))&&(NET.room||NET.http))txt('👥 '+OTH.length+' andere speler'+(OTH.length===1?'':'s')+' binnen',CW/2,uiTop().top+20,13,'#7dff6a','center','Inter, sans-serif');
   if(P.drunk>0)txt('🍺 '+(P.drunk>=5?'Lam':P.drunk>=3?'Dronken':'Aangeschoten'),CW-16,uiTop().top+60,14,'#ffd166','right','Inter, sans-serif');
   if(typeof drawNotes==='function'){drawNotes();}ctx=wctx;}

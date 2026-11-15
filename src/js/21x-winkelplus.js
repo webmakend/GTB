@@ -91,16 +91,16 @@ function flameSfx(){if(!AU.c)return;const t=AU.c.currentTime;noiseHit(t,.14,.35,
     if(frameN%3===0)parts.push({x:P.x+Math.cos(P.a)*21,y:P.y+Math.sin(P.a)*21,vx:rr(-.2,.2),vy:-.3,l:10,ml:10,s:1.4,k:'f'});}};}
 
 // ---- winkel of huis licht op als je er langs loopt; tik erop om naar binnen te gaan
-let HILITE=null;
-{const _af=actFind;actFind=function(){const a=_af.apply(this,arguments);HILITE=null;if(a&&!P.car){let b=a.b||(a.s&&a.s.b);if(!b){const s=nearShop();b=s&&s.b;}if(b&&b.p&&!['huisvan','rob','robbed'].includes(a.k))HILITE=b;}return a;};}
+let HILITE=null;const HILITE_K=new Set(['toys','stadscafe','fpv','dorp','thuis','overname']);
+{const _af=actFind;actFind=function(){const a=_af.apply(this,arguments);HILITE=null;if(a&&!P.car){let b=a.b||(a.s&&a.s.b);if(!b&&a.k==='dorp')b=BUILDINGS.find(q=>q.dorp);if(!b){const s=nearShop();b=s&&s.b;}if(b&&b.p&&HILITE_K.has(a.k))HILITE=b;}return a;};}
 function drawHilite(b,r,rcx,rcy){const a=ACT.cur;const bad=a&&(a.k==='rob'||a.k==='robbed'),col=bad?'255,80,80':'255,209,102',pu=.6+.4*Math.sin(frameN*.12);
   ctx.save();ctx.beginPath();ctx.moveTo(r[0][0],r[0][1]);for(let i=1;i<r.length;i++)ctx.lineTo(r[i][0],r[i][1]);ctx.closePath();ctx.fillStyle=`rgba(${col},${.16*pu})`;ctx.fill();
   ctx.shadowColor=`rgb(${col})`;ctx.shadowBlur=18;ctx.strokeStyle=`rgba(${col},${.55+.45*pu})`;ctx.lineWidth=3.5;ctx.stroke();ctx.shadowBlur=0;
   ctx.beginPath();ctx.moveTo(b.p[0][0],b.p[0][1]);for(let i=1;i<b.p.length;i++)ctx.lineTo(b.p[i][0],b.p[i][1]);ctx.closePath();ctx.setLineDash([6,5]);ctx.lineDashOffset=-frameN*.5;ctx.strokeStyle=`rgba(${col},.8)`;ctx.lineWidth=2;ctx.stroke();ctx.setLineDash([]);
-  const t=(IS_TOUCH?'👆 Tik op het gebouw':'🖱 Klik op het gebouw')+(bad?'':' om binnen te gaan');ctx.font='800 12px Inter, sans-serif';const w=ctx.measureText(t).width+16,y=rcy+26;ctx.fillStyle=bad?'rgba(120,20,30,.92)':'rgba(26,10,44,.92)';rrect(ctx,rcx-w/2,y-10,w,20,9);ctx.fill();ctx.fillStyle=`rgb(${col})`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(t,rcx,y+1);ctx.restore();}
+  const t=(IS_TOUCH?'👆 Tik op het gebouw':'🖱 Klik op het gebouw')+(a&&a.k==='overname'?' om binnen te kijken':' om binnen te gaan');ctx.font='800 12px Inter, sans-serif';const w=ctx.measureText(t).width+16,y=rcy+26;ctx.fillStyle=bad?'rgba(120,20,30,.92)':'rgba(26,10,44,.92)';rrect(ctx,rcx-w/2,y-10,w,20,9);ctx.fill();ctx.fillStyle=`rgb(${col})`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(t,rcx,y+1);ctx.restore();}
 window.addEventListener('pointerdown',e=>{if(MODE!=='play'||paused||SC.on||bigMap||!HILITE||!ACT.cur||P.car)return;const tg=e.target;if(!(tg===cv||(tg&&tg.id==='joyZone')||(tg&&tg.id==='lightc')))return;
   const r=cv.getBoundingClientRect(),sx=e.clientX-r.left,sy=e.clientY-r.top,wx=CAM.x+(sx-CW/2)/CAM.z,wy=CAM.y+(sy-CH/2)/CAM.z,b=HILITE,f=Math.min(b.ht,180)*.0022;
   const roof=b.p.map(q=>[q[0]+(q[0]-CAM.x)*f,q[1]+(q[1]-CAM.y)*f]);if(!(pip(wx,wy,b.p)||pip(wx,wy,roof)))return;
-  e.preventDefault();e.stopImmediatePropagation();buzz(15);actTry();},true);
+  e.preventDefault();e.stopImmediatePropagation();buzz(15);if(ACT.cur.k==='overname'&&typeof houseVisit==='function')houseVisit(b);else actTry();},true);
 {const _se=scEnter;scEnter=function(r){ACT.cur=null;HILITE=null;_se(r);};}
 {const _gw=drawGlows;drawGlows=function(){_gw.apply(this,arguments);if(!FLAMES.length)return;ctx.save();ctx.globalCompositeOperation='lighter';for(const f of FLAMES){const a=f.l/f.ml;glow(f.x,f.y,f.r*2.4,`rgba(255,${120+120*a|0},40,${.55*a})`);ctx.fillStyle=`rgba(255,${200+50*a|0},140,${.7*a})`;ctx.beginPath();ctx.arc(f.x,f.y,f.r*(.3+a*.3),0,TAU);ctx.fill();}ctx.restore();};}
