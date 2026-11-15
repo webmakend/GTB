@@ -27,6 +27,7 @@ try {
   $db->exec('CREATE TABLE IF NOT EXISTS dms (id INTEGER PRIMARY KEY AUTOINCREMENT, too TEXT, frm TEXT, nm TEXT, t TEXT, ts INT)');
   $db->exec('CREATE INDEX IF NOT EXISTS i_dm ON dms(too, id)');
   $db->exec('CREATE TABLE IF NOT EXISTS houses (oid TEXT PRIMARY KEY, pid TEXT, nm TEXT, name TEXT, ts INT)');
+  $db->exec('CREATE TABLE IF NOT EXISTS pay (id INTEGER PRIMARY KEY AUTOINCREMENT, too TEXT, nm TEXT, name TEXT, amt INT, ts INT)');
 } catch (Exception $e) { http_response_code(500); echo json_encode(['ok' => false]); exit; }
 
 function top($db) {
@@ -39,13 +40,23 @@ $a = $_GET['a'] ?? '';
 if ($a === 'hello') { echo json_encode(['ok' => true]); exit; }
 if ($a === 'top') { echo json_encode(['ok' => true, 'top' => top($db)]); exit; }
 if ($a === 'houses') { $q = $db->query('SELECT oid,pid,nm,name FROM houses LIMIT 5000'); echo json_encode(['ok' => true, 'houses' => $q->fetchAll(PDO::FETCH_ASSOC)]); exit; }
-if (($a === 'buy' || $a === 'hname') && $_SERVER['REQUEST_METHOD'] === 'POST') {
+if (($a === 'buy' || $a === 'hname' || $a === 'takeover') && $_SERVER['REQUEST_METHOD'] === 'POST') {
   $in = json_decode(file_get_contents('php://input', false, null, 0, 2048), true) ?: [];
   $id = preg_replace('/[^a-zA-Z0-9]/', '', (string)($in['id'] ?? ''));
   $oid = preg_replace('/[^0-9]/', '', (string)($in['oid'] ?? ''));
   $name = mb_substr(trim(preg_replace('/[\x00-\x1F<>]/u', '', (string)($in['name'] ?? 'Mijn huis'))), 0, 24) ?: 'Mijn huis';
   $pl = $db->prepare('SELECT nm,pub FROM players WHERE id = ?'); $pl->execute([$id]); $p = $pl->fetch(PDO::FETCH_ASSOC);
   if (!$p || $oid === '' || !$p['pub']) { echo json_encode(['ok' => false, 'err' => 'onbekend']); exit; }
+  if ($a === 'takeover') {
+    // huis overkopen: de koper betaalt de standaardprijs + 10%, die 10% gaat naar de vorige eigenaar
+    $cut = max(0, min(100000, (int)($in['cut'] ?? 0)));
+    $db->beginTransaction();
+    $q = $db->prepare('SELECT pid,name FROM houses WHERE oid = ?'); $q->execute([$oid]); $h = $q->fetch(PDO::FETCH_ASSOC);
+    if (!$h || $h['pid'] === $p['pub'] || $h['pid'] !== (string)($in['from'] ?? '')) { $db->rollBack(); echo json_encode(['ok' => false]); exit; }
+    $db->prepare('UPDATE houses SET pid = ?, nm = ?, name = ?, ts = ? WHERE oid = ?')->execute([$p['pub'], $p['nm'], 'Mijn huis', time(), $oid]);
+    $db->prepare('INSERT INTO pay (too,nm,name,amt,ts) VALUES (?,?,?,?,?)')->execute([$h['pid'], $p['nm'], $h['name'], $cut, time()]);
+    $db->commit(); echo json_encode(['ok' => true]); exit;
+  }
   if ($a === 'buy') {
     $st2 = $db->prepare('INSERT OR IGNORE INTO houses (oid,pid,nm,name,ts) VALUES (?,?,?,?,?)'); $st2->execute([$oid, $p['pub'], $p['nm'], $name, time()]);
     echo json_encode(['ok' => $st2->rowCount() === 1]); exit;
@@ -73,11 +84,11 @@ $st = [
   'ev' => [],
   'cm' => null,
 ];
-if (in_array($in['in'] ?? '', ['stadscafe', 'dorpshuis'], true)) { $st['in'] = $in['in']; $st['ix'] = round(max(0, min(40, (float)($in['ix'] ?? 0))), 2); $st['iz'] = round(max(0, min(40, (float)($in['iz'] ?? 0))), 2); }
+if (in_array($in['in'] ?? '', ['stadscafe', 'dorpshuis', 'intertoys'], true)) { $st['in'] = $in['in']; $st['ix'] = round(max(0, min(40, (float)($in['ix'] ?? 0))), 2); $st['iz'] = round(max(0, min(40, (float)($in['iz'] ?? 0))), 2); }
 if (is_array($in['cm'] ?? null) && trim((string)($in['cm']['t'] ?? '')) !== '') $st['cm'] = ['i' => max(0, min(1000000000, (int)($in['cm']['i'] ?? 0))), 't' => mb_substr(trim(preg_replace('/[\x00-\x1F<>]/u', '', (string)$in['cm']['t'])), 0, 80)];
 // gebeurtenissen tussen spelers (raak, neergeschoten, vriendschap): alleen bekende soorten, max 12
 foreach (array_slice(is_array($in['ev'] ?? null) ? $in['ev'] : [], 0, 12) as $e) {
-  if (!is_array($e) || !in_array($e['k'] ?? '', ['hit', 'kill', 'frq', 'fok', 'frm', 'dm', 'gift'], true)) continue;
+  if (!is_array($e) || !in_array($e['k'] ?? '', ['hit', 'kill', 'frq', 'fok', 'frm', 'dm', 'gift', 'hsold'], true)) continue;
   if (!preg_match('/^[0-9a-f]{12}$/', (string)($e['to'] ?? ''))) continue;
   $st['ev'][] = ['k' => $e['k'], 'to' => $e['to'], 'i' => max(0, min(1000000000, (int)($e['i'] ?? 0))), 'd' => max(0, min(100000, (int)($e['d'] ?? 0))), 'm' => mb_substr(trim(preg_replace('/[\x00-\x1F<>]/u', '', (string)($e['m'] ?? ''))), 0, 200)];
 }
@@ -105,6 +116,12 @@ $peers = [];
 $q = $db->prepare('SELECT id,state,xp FROM players WHERE seen > ? AND id <> ? ORDER BY seen DESC LIMIT 60');
 $q->execute([time() - 10, $id]);
 foreach ($q as $r) { $s = json_decode($r['state'], true) ?: []; $s['xp'] = (int)$r['xp']; $peers[] = ['peer' => substr(hash('sha256', $r['id']), 0, 10), 'presence' => $s]; }
-$out = ['ok' => true, 'peers' => $peers, 'dm' => $dmOut, 'now' => time()];
+$payOut = [];
+if ($st['pid'] !== '') {
+  $q3 = $db->prepare('SELECT id,nm,name,amt FROM pay WHERE too = ? ORDER BY id LIMIT 10'); $q3->execute([$st['pid']]);
+  $del = $db->prepare('DELETE FROM pay WHERE id = ?');
+  foreach ($q3->fetchAll(PDO::FETCH_ASSOC) as $r) { $payOut[] = ['nm' => $r['nm'], 'name' => $r['name'], 'amt' => (int)$r['amt']]; $del->execute([$r['id']]); }
+}
+$out = ['ok' => true, 'peers' => $peers, 'dm' => $dmOut, 'now' => time(), 'pay' => $payOut];
 if (($in['top'] ?? 0)) $out['top'] = top($db);
 echo json_encode($out);

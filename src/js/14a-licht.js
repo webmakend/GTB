@@ -72,6 +72,7 @@ function lightsRender(vx0,vy0,vx1,vy1){if(!GL.ok)return;const w=GL.world;
   for(const b of barges)if(iv(b.x,b.y,300))dynLight(RAD,b.x,b.y,1.4,1.4,0,0xffd9a0,.6);
   for(const p of BPROPS){if((p.k==='fire'||p.k==='tiki')&&iv(p.x,p.y,150)){const f=p.k==='fire'?.85+.15*Math.sin(frameN*.5+p.x):1;dynLight(RAD,p.x,p.y-6,(p.k==='fire'?2.2:1.6)*f,(p.k==='fire'?2.2:1.6)*f,0,p.k==='fire'?0xff8a3a:0xffc27a,p.k==='fire'?.95:.6);}}
   if(MIS.on&&!MIS.done&&iv(MIS.x,MIS.y,100)){const p=1+.2*Math.sin(frameN*.12);dynLight(RAD,MIS.x,MIS.y,1.5*p,1.5*p,0,0xffd166,.9);}
+  if(typeof FLAMES!=='undefined')for(const f of FLAMES)if(iv(f.x,f.y,80))dynLight(RAD,f.x,f.y,f.r/14,f.r/14,0,0xff8a3a,.9*f.l/f.ml);
   if(!P.car&&!P.dead)dynLight(RAD,P.x,P.y,1.1,1.1,0,0xffe6c8,.35); // zacht 'speler-licht' zodat je jezelf altijd ziet
   for(let i=GL.used;i<GL.pool.length;i++)GL.pool[i].visible=false;
   GL.app.render();if(!GL.shown){GL.shown=true;document.getElementById('lightc').style.display='block';}}
