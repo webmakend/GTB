@@ -23,12 +23,15 @@ try {
   $db->exec('CREATE TABLE IF NOT EXISTS players (id TEXT PRIMARY KEY, nm TEXT, lv INT, xp INT, mu INT, pr INT, eur INT, state TEXT, seen INT, ip TEXT)');
   $db->exec('CREATE INDEX IF NOT EXISTS i_xp ON players(xp DESC)');
   $db->exec('CREATE INDEX IF NOT EXISTS i_seen ON players(seen)');
+  try { $db->exec('ALTER TABLE players ADD COLUMN pub TEXT'); } catch (Exception $e) {}
+  $db->exec('CREATE TABLE IF NOT EXISTS dms (id INTEGER PRIMARY KEY AUTOINCREMENT, too TEXT, frm TEXT, nm TEXT, t TEXT, ts INT)');
+  $db->exec('CREATE INDEX IF NOT EXISTS i_dm ON dms(too, id)');
 } catch (Exception $e) { http_response_code(500); echo json_encode(['ok' => false]); exit; }
 
 function top($db) {
-  $q = $db->query('SELECT id,nm,lv,xp,mu,pr,eur,seen FROM players ORDER BY xp DESC LIMIT 50');
+  $q = $db->query('SELECT id,nm,lv,xp,mu,pr,eur,seen,pub FROM players ORDER BY xp DESC LIMIT 100');
   $out = [];
-  foreach ($q as $r) $out[] = ['id' => substr(hash('sha256', $r['id']), 0, 10), 'nm' => $r['nm'], 'lv' => (int)$r['lv'], 'xp' => (int)$r['xp'], 'mu' => (int)$r['mu'], 'pr' => (int)$r['pr'], 'eur' => (int)$r['eur'], 'on' => (time() - (int)$r['seen']) < 12];
+  foreach ($q as $r) $out[] = ['id' => substr(hash('sha256', $r['id']), 0, 10), 'pid' => (string)$r['pub'], 'nm' => $r['nm'], 'lv' => (int)$r['lv'], 'xp' => (int)$r['xp'], 'mu' => (int)$r['mu'], 'pr' => (int)$r['pr'], 'eur' => (int)$r['eur'], 'seen' => (int)$r['seen'], 'on' => (time() - (int)$r['seen']) < 12];
   return $out;
 }
 $a = $_GET['a'] ?? '';
@@ -57,19 +60,34 @@ $st = [
 if (is_array($in['cm'] ?? null) && trim((string)($in['cm']['t'] ?? '')) !== '') $st['cm'] = ['i' => max(0, min(1000000000, (int)($in['cm']['i'] ?? 0))), 't' => mb_substr(trim(preg_replace('/[\x00-\x1F<>]/u', '', (string)$in['cm']['t'])), 0, 80)];
 // gebeurtenissen tussen spelers (raak, neergeschoten, vriendschap): alleen bekende soorten, max 12
 foreach (array_slice(is_array($in['ev'] ?? null) ? $in['ev'] : [], 0, 12) as $e) {
-  if (!is_array($e) || !in_array($e['k'] ?? '', ['hit', 'kill', 'frq', 'fok', 'frm'], true)) continue;
+  if (!is_array($e) || !in_array($e['k'] ?? '', ['hit', 'kill', 'frq', 'fok', 'frm', 'dm'], true)) continue;
   if (!preg_match('/^[0-9a-f]{12}$/', (string)($e['to'] ?? ''))) continue;
-  $st['ev'][] = ['k' => $e['k'], 'to' => $e['to'], 'i' => max(0, min(1000000000, (int)($e['i'] ?? 0))), 'd' => max(0, min(100000, (int)($e['d'] ?? 0)))];
+  $st['ev'][] = ['k' => $e['k'], 'to' => $e['to'], 'i' => max(0, min(1000000000, (int)($e['i'] ?? 0))), 'd' => max(0, min(100000, (int)($e['d'] ?? 0))), 'm' => mb_substr(trim(preg_replace('/[\x00-\x1F<>]/u', '', (string)($e['m'] ?? ''))), 0, 200)];
 }
 $xp = $num('xp', 0, 50000000);
-$stmt = $db->prepare('INSERT INTO players (id,nm,lv,xp,mu,pr,eur,state,seen,ip) VALUES (?,?,?,?,?,?,?,?,?,?)
-  ON CONFLICT(id) DO UPDATE SET nm=excluded.nm,lv=excluded.lv,xp=MAX(players.xp,excluded.xp),mu=excluded.mu,pr=excluded.pr,eur=excluded.eur,state=excluded.state,seen=excluded.seen,ip=excluded.ip');
-$stmt->execute([$id, $nm, $st['lv'], $xp, $num('mu', 0, 25), $num('pr', 0, 200), $num('eur', -1000000, 100000000), json_encode($st), time(), substr(hash('sha256', $_SERVER['REMOTE_ADDR'] ?? ''), 0, 16)]);
+$stmt = $db->prepare('INSERT INTO players (id,nm,lv,xp,mu,pr,eur,state,seen,ip,pub) VALUES (?,?,?,?,?,?,?,?,?,?,?)
+  ON CONFLICT(id) DO UPDATE SET nm=excluded.nm,lv=excluded.lv,xp=MAX(players.xp,excluded.xp),mu=excluded.mu,pr=excluded.pr,eur=excluded.eur,state=excluded.state,seen=excluded.seen,ip=excluded.ip,pub=excluded.pub');
+$stmt->execute([$id, $nm, $st['lv'], $xp, $num('mu', 0, 25), $num('pr', 0, 200), $num('eur', -1000000, 100000000), json_encode($st), time(), substr(hash('sha256', $_SERVER['REMOTE_ADDR'] ?? ''), 0, 16), $st['pid']]);
+// persoonlijke berichten: versturen (ook als de ander offline is) en je eigen postvak ophalen
+$dmOut = [];
+if ($st['pid'] !== '') {
+  $ins = $db->prepare('INSERT INTO dms (too,frm,nm,t,ts) VALUES (?,?,?,?,?)');
+  foreach (array_slice(is_array($in['dm'] ?? null) ? $in['dm'] : [], 0, 5) as $m) {
+    if (!is_array($m) || !preg_match('/^[0-9a-f]{12}$/', (string)($m['to'] ?? ''))) continue;
+    $t = mb_substr(trim(preg_replace('/[\x00-\x1F<>]/u', '', (string)($m['t'] ?? ''))), 0, 200);
+    if ($t !== '') $ins->execute([$m['to'], $st['pid'], $nm, $t, time()]);
+  }
+  $after = max(0, (int)($in['dmAfter'] ?? 0));
+  $q2 = $db->prepare('SELECT id,frm,nm,t,ts FROM dms WHERE too = ? AND id > ? ORDER BY id LIMIT 30');
+  $q2->execute([$st['pid'], $after]);
+  foreach ($q2 as $r) $dmOut[] = ['id' => (int)$r['id'], 'from' => $r['frm'], 'nm' => $r['nm'], 't' => $r['t'], 'ts' => (int)$r['ts']];
+  if (mt_rand(1, 200) === 1) $db->exec('DELETE FROM dms WHERE ts < ' . (time() - 30 * 86400));
+}
 
 $peers = [];
 $q = $db->prepare('SELECT id,state,xp FROM players WHERE seen > ? AND id <> ? ORDER BY seen DESC LIMIT 60');
 $q->execute([time() - 10, $id]);
 foreach ($q as $r) { $s = json_decode($r['state'], true) ?: []; $s['xp'] = (int)$r['xp']; $peers[] = ['peer' => substr(hash('sha256', $r['id']), 0, 10), 'presence' => $s]; }
-$out = ['ok' => true, 'peers' => $peers];
+$out = ['ok' => true, 'peers' => $peers, 'dm' => $dmOut, 'now' => time()];
 if (($in['top'] ?? 0)) $out['top'] = top($db);
 echo json_encode($out);

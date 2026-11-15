@@ -8,8 +8,8 @@ function pvpPub(){let id=lsGet('gtb_pub');if(!id||id.length!==12){id=Array.from(
 function frGet(){try{return JSON.parse(lsGet('gtb_friends')||'{}')||{};}catch(e){return {};}}
 function frSet(o){lsSet('gtb_friends',JSON.stringify(o));}
 function isFriend(pub){return !!frGet()[pub];}
-function pvpSend(k,to,d){PVP.out.push({k,to,i:++PVP.seq,d:Math.round(d||0),t:performance.now()});if(PVP.out.length>12)PVP.out.shift();NET.lastSent='';}
-function pvpEv(){const now=performance.now();PVP.out=PVP.out.filter(e=>now-e.t<5000);return PVP.out.map(e=>({k:e.k,to:e.to,i:e.i,d:e.d}));}
+function pvpSend(k,to,d,m){PVP.out.push({k,to,i:++PVP.seq,d:Math.round(d||0),m:m||undefined,t:performance.now()});if(PVP.out.length>12)PVP.out.shift();NET.lastSent='';}
+function pvpEv(){const now=performance.now();PVP.out=PVP.out.filter(e=>now-e.t<5000);return PVP.out.map(e=>e.m?{k:e.k,to:e.to,i:e.i,d:e.d,m:e.m}:{k:e.k,to:e.to,i:e.i,d:e.d});}
 function pvpGhosts(){return netOthers().map(p=>p.presence).filter(s=>s.pid&&s.pid!==pvpPub()).map(s=>Object.assign({},s,{x:s.gx??s.x,y:s.gy??s.y}));}
 function pvpByPub(pub){return pvpGhosts().find(s=>s.pid===pub);}
 function pvpTarget(s){return !s.dead&&!isFriend(s.pid)&&!P.dead&&MODE==='play';}
@@ -26,13 +26,14 @@ function pvpRecv(s,e){const nm=String(s.nm||'Speler').slice(0,14),fr=frGet();
   else if(e.k==='kill'){const amt=clamp(e.d,0,100000);addMoney(amt);addXP(35);sfx('kassa');noteAdd('RAAK! '+nm.toUpperCase()+' LIGT NEER','+€'+amt+' uit zijn zakken','#7dff6a',220);}
   else if(e.k==='frq'){if(fr[s.pid]){pvpSend('fok',s.pid);return;}if(PVP.sent[s.pid]){pvpAddFriend(s.pid,nm);pvpSend('fok',s.pid);return;}PVP.req[s.pid]=nm;sfx('blip');buzz(20);}
   else if(e.k==='fok'){if(!fr[s.pid]&&(PVP.sent[s.pid]||PVP.req[s.pid])){pvpAddFriend(s.pid,nm);noteAdd('NIEUWE VRIEND','Jij en '+nm+' zijn nu vrienden','#4ade80',200);}}
+  else if(e.k==='dm'){if(e.m)dmGot(s.pid,nm,String(e.m).slice(0,200),Date.now());}
   else if(e.k==='frm'){if(fr[s.pid]){delete fr[s.pid];frSet(fr);noteAdd('VRIENDSCHAP VOORBIJ',nm+' is geen vriend meer','#ff9f1c',200);}}}
 function pvpAddFriend(pub,nm){const fr=frGet();fr[pub]=nm;frSet(fr);delete PVP.req[pub];delete PVP.sent[pub];sfx('reward');}
 function pvpAsk(pub){const s=pvpByPub(pub);if(!s)return;PVP.sent[pub]=s.nm||'Speler';pvpSend('frq',pub);noteAdd('VERZOEK VERSTUURD','Wacht tot '+(s.nm||'de speler')+' accepteert','#36d1ff',160);}
 function pvpAccept(pub){const nm=PVP.req[pub];if(!nm)return;pvpAddFriend(pub,nm);pvpSend('fok',pub);noteAdd('NIEUWE VRIEND','Jij en '+nm+' zijn nu vrienden','#4ade80',200);}
 function pvpUnfriend(pub){const fr=frGet(),nm=fr[pub];if(!nm)return;delete fr[pub];frSet(fr);pvpSend('frm',pub);noteAdd('ONTVRIEND',nm+' is geen vriend meer · jullie kunnen weer op elkaar schieten','#ff9f1c',200);}
 // kaartjes in de lijst links: binnengekomen vriendschapsverzoeken (tik = accepteren)
-function pvpCards(add){for(const pub in PVP.req)add('VRIENDSCHAPSVERZOEK',IS_TOUCH?'TIK':'',PVP.req[pub]+' wil vrienden worden · tik om te accepteren','#4ade80',()=>pvpAccept(pub),.8+.2*Math.sin(frameN*.12));}
+function pvpCards(add){dmCards(add);for(const pub in PVP.req)add('VRIENDSCHAPSVERZOEK',IS_TOUCH?'TIK':'',PVP.req[pub]+' wil vrienden worden · tik om te accepteren','#4ade80',()=>pvpAccept(pub),.8+.2*Math.sin(frameN*.12));}
 // geld kwijt als een andere speler jou neerschiet (mag in het rood)
 const _wasted0=wasted;
 wasted=function(t,why){const wasDead=P.dead;_wasted0(t,why);if(wasDead||!P.dead)return;const b=PVP.by;if(b&&performance.now()-PVP.byT<2500){PVP.by=null;const amt=Math.round(50+Math.max(0,P.money)*.15);P.money-=amt;P.moneyF=20;pvpSend('kill',b.pid,amt);
