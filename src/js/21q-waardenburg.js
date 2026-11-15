@@ -13,10 +13,11 @@ function wbStep(){if(!WB||!BRIDGE)return;if(!WBOPEN&&(PRG.wb||MIS.done))wbUnlock
     if(s>b.s-6&&s<b.s+600&&Math.abs(l)<110){const ns=b.s-8,nx=BRIDGE.A[0]+BRIDGE.ux*ns-BRIDGE.uy*l,ny=BRIDGE.A[1]+BRIDGE.uy*ns+BRIDGE.ux*l;
       if(P.car){P.car.x=nx;P.car.y=ny;P.car.vx*=-.25;P.car.vy*=-.25;}else{P.x=nx;P.y=ny;}
       if(frameN-WBX.msgT>150){WBX.msgT=frameN;sfx('slap');noteAdd('BRUG AFGESLOTEN','Waardenburg speel je vrij door alle missies te halen','#ff6b6b',200,'wbslot');}}}
-  // stroming: midden in de Waal kom je zwemmend niet verder
-  if(swimming()){const yS=WB.bb[3]+80,yZ=FORTBB[1]-60;if(P.y>yS&&P.y<yZ){const mid=(yS+yZ)/2,half=(yZ-yS)/2,k=1-Math.abs(P.y-mid)/half;
-      if(k>.35){const dir=P.y<mid?-1:1;P.y+=dir*(k-.35)*7;P.x+=1.6*k;if(frameN-WBX.curT>200){WBX.curT=frameN;noteAdd('TE VEEL STROMING','Midden in de Waal sleurt de stroming je terug. Neem de brug.','#36d1ff',200,'stroming');buzz(30);}
-        if(frameN%5===0)parts.push({x:P.x+rr(-20,20),y:P.y+rr(-20,20),vx:2,vy:0,l:30,ml:30,s:3,k:'p'});}}}
+  // diep water: 2 meter vanaf de kant wordt het donkerblauw, daar verdrink je binnen 5 seconden
+  if(swimming()&&isDeep(P.x,P.y)){P.drown=(P.drown||0)+1/60;if(frameN%6===0)parts.push({x:P.x+rr(-6,6),y:P.y+rr(-6,6),vx:0,vy:-.3,l:24,ml:24,s:2,k:'p'});
+    if(frameN-WBX.curT>240){WBX.curT=frameN;noteAdd('TE DIEP!','Zwem terug naar de kant, anders verdrink je','#36d1ff',200,'diep');buzz([40,60,40]);}
+    if(P.drown>=5){P.drown=0;P.lastHit='Verdronken in diep water';wasted('WASTED','Verdronken in diep water');}}
+  else if(P.drown)P.drown=Math.max(0,P.drown-2/60);
   if(inWB(o.x,o.y)&&!WBX.ann){WBX.ann=true;missionBanner('WELKOM IN WAARDENBURG','Dorp aan de Waal · kasteel, PLUS en v.v. WNC','#ffd166',220);addXP(60);}}
 function drawWbBar(){if(!WB||!BRIDGE)return;const b=wbBar();if(Math.abs(b.x-CAM.x)>1500||Math.abs(b.y-CAM.y)>1500)return;const ang=Math.atan2(b.uy,b.ux)+Math.PI/2,hw=66;
   ctx.save();ctx.translate(b.x,b.y);ctx.rotate(ang);
@@ -24,3 +25,10 @@ function drawWbBar(){if(!WB||!BRIDGE)return;const b=wbBar();if(Math.abs(b.x-CAM.
   ctx.save();ctx.translate(-hw,0);ctx.rotate(-WBX.barA*1.35);const L=hw*2;for(let i=0;i<8;i++){ctx.fillStyle=i%2?'#ffffff':'#e5312b';ctx.fillRect(i*L/8,-3,L/8+.5,6);}ctx.restore();
   if(!WBOPEN){ctx.rotate(-ang);ctx.font='800 13px Inter, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';const t='⛔ WAARDENBURG · OP SLOT';const w=ctx.measureText(t).width+16;ctx.fillStyle='rgba(20,8,30,.85)';rrect(ctx,-w/2,-44,w,22,6);ctx.fill();ctx.fillStyle='#ffd166';ctx.fillText(t,0,-33);}
   ctx.restore();}
+
+let DEEP=null;function buildDeep(){DEEP=new Uint8Array(GW*GH);const D=new Uint8Array(GW*GH).fill(9),q=[];for(let i=0;i<G.length;i++)if(G[i]!==WATER||BRG[i]){D[i]=0;q.push(i);}
+  for(let h=0;h<q.length;h++){const i=q[h],d=D[i];if(d>=3)continue;const x=i%GW,y=(i/GW)|0;for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=GW||ny>=GH)continue;const k=ny*GW+nx;if(D[k]>d+1){D[k]=d+1;q.push(k);}}}
+  for(let i=0;i<G.length;i++)DEEP[i]=D[i]>=2?1:0;}
+function isDeep(x,y){if(!DEEP)buildDeep();return DEEP[cellIdx(x,y)]===1;}
+function drawDrown(){if(!P.drown||P.drown<.05||P.dead)return;const t=Math.ceil(5-P.drown);ctx.save();ctx.font='900 20px Inter, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineWidth=4;ctx.strokeStyle='rgba(0,0,0,.6)';const y=P.y-30-Math.sin(frameN*.2)*2;
+  ctx.strokeText('💧 '+t,P.x,y);ctx.fillStyle=t<=2?'#ff4d4d':'#7fd4ff';ctx.fillText('💧 '+t,P.x,y);ctx.restore();}

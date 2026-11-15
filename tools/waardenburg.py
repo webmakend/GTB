@@ -3,7 +3,7 @@
 import xml.etree.ElementTree as ET,json,math,sys,subprocess,os,re,copy
 ZOSM,WOSM,GAME,OUT=sys.argv[1:5]
 CUT=dict(minlat=51.8255,maxlat=51.8384,minlon=5.2475,maxlon=5.2683)
-GAP=2400       # px open water tussen de oever van Zaltbommel-kaart (y=0) en de zuidoever van Waardenburg
+GAP=500        # px open water tussen de oever van Zaltbommel-kaart (y=0) en de zuidoever van Waardenburg
 TOP=160        # marge boven Waardenburg
 zb=ET.parse(ZOSM).getroot().find('bounds')
 r=ET.parse(WOSM).getroot()
@@ -38,15 +38,65 @@ src=src.replace("DRIVE={","DRIVE={'motorway':14,'motorway_link':6,'trunk':10,'pr
 open('/tmp/wb/o2w.py','w').write(src)
 subprocess.run([sys.executable,'/tmp/wb/o2w.py','/tmp/wb/wb_cut.osm','/tmp/wb/wb_world.json'],check=True)
 d=json.load(open('/tmp/wb/wb_world.json'))
+# ---- alles links (west) van de A2 weg; rondom water. Landvorm = bbox (ingesprongen) rechts van de snelweg
+import numpy as np
+_mp=np.array([q for r in d['roads'] if r['k']=='motorway' for q in r['p']])
+_a,_b=np.linalg.lstsq(np.c_[_mp[:,1],np.ones(len(_mp))],_mp[:,0],rcond=None)[0]
+_res=_mp[:,0]-(_a*_mp[:,1]+_b);WOFF=_res.min()-110
+def east(x,y):return x-(_a*y+_b)>WOFF
+
 # zelfde verschuiving als island.py voor Zaltbommel
 zw=json.load(open('/tmp/wb/z_world.json'));F=zw['fort'];x0=min(p[0] for p in F)-720;y0=min(p[1] for p in F)-720
 la0,la1,lo0=float(zb.get('minlat')),float(zb.get('maxlat')),float(zb.get('minlon'))
 kx=math.cos(math.radians((la0+la1)/2))*111320;ky=110540
 PX=lambda lo:((lo-lo0)*kx+50)*9-x0;PY=lambda la:((la1-la)*ky+50)*9-y0
-yS=PY(CUT['minlat']);dy=-GAP-yS        # zuidrand Waardenburg komt GAP boven y=0
+TRIM=2100
+yS=PY(CUT['minlat'])-160-TRIM;dy=-GAP-yS        # zuidrand Waardenburg komt GAP boven y=0
 bx0,bx1,by0,by1=PX(CUT['minlon']),PX(CUT['maxlon']),PY(CUT['maxlat'])+dy,-GAP
 g=json.load(open(GAME))
-ZY=int(round(-by0+TOP))
+# landpolygoon in ruwe wb_world-coördinaten: bbox 160px ingesprongen, west begrensd door de snelweg, golvende oever
+import math as _m
+def _pipf(x,y,P):
+    c=False;j=len(P)-1
+    for i in range(len(P)):
+        if (P[i][1]>y)!=(P[j][1]>y) and x<(P[j][0]-P[i][0])*(y-P[i][1])/(P[j][1]-P[i][1])+P[i][0]:c=not c
+        j=i
+    return c
+RX0,RX1=((CUT['minlon']-lo0)*kx+50)*9,((CUT['maxlon']-lo0)*kx+50)*9;RY0,RY1=((la1-CUT['maxlat'])*ky+50)*9,((la1-CUT['minlat'])*ky+50)*9
+IN=160;yt,yb=RY0+IN,RY1-IN-TRIM;xr=RX1-IN-500
+def wl(y):return _a*y+_b+WOFF
+land=[]
+def add_edge(p0,p1,amp,ph):
+    L=_m.hypot(p1[0]-p0[0],p1[1]-p0[1]);n=max(2,int(L/170));nx,ny=-(p1[1]-p0[1])/L,(p1[0]-p0[0])/L
+    for k in range(n):
+        t=k/n;w=_m.sin(t*L*.0021+ph)*amp+_m.sin(t*L*.0077+ph*2)*amp*.4 if 0<k else 0
+        land.append([p0[0]+(p1[0]-p0[0])*t+nx*w,p0[1]+(p1[1]-p0[1])*t+ny*w])
+C=[[max(wl(yt),RX0+IN),yt],[xr,yt],[xr,yb],[max(wl(yb),RX0+IN),yb]]
+add_edge(C[0],C[1],45,1);add_edge(C[1],C[2],45,2);add_edge(C[2],C[3],45,3);add_edge(C[3],C[0],25,4)
+okp=lambda x,y:_pipf(x,y,land)
+cen=lambda p:(sum(q[0] for q in p)/len(p),sum(q[1] for q in p)/len(p))
+for k in('water','green','parking','plaza'):d[k]=[p for p in d[k] if okp(*cen(p))]
+d['buildings']=[b for b in d['buildings'] if okp(*cen(b['p']))]
+def cutline(pts,js=None):
+    out=[];cur=[];cj=[]
+    for i,q in enumerate(pts):
+        if okp(q[0],q[1]):cur.append(q);cj.append(js[i] if js else None)
+        else:
+            if len(cur)>1:out.append((cur,cj))
+            cur=[];cj=[]
+    if len(cur)>1:out.append((cur,cj))
+    return out
+nr=[]
+for r in d['roads']:
+    for pts,js in cutline(r['p'],r['j']):nr.append(dict(r,p=pts,j=js))
+d['roads']=nr
+npth=[]
+for p in d['paths']:
+    for pts,_ in cutline(p['p']):npth.append(dict(p,p=pts))
+d['paths']=npth
+d['pois']=[p for p in d['pois'] if okp(p['x'],p['y'])]
+d['addr']=[a for a in d['addr'] if okp(a['x'],a['y'])]
+ZY=int(round(-(by0+IN)+TOP))
 def sh(p,ddy):return [[int(round(q[0]-x0)),int(round(q[1]-y0+ddy))] for q in p]
 def shz(p):return [[q[0],q[1]+ZY] for q in p]
 # Zaltbommel omlaag schuiven
@@ -84,7 +134,7 @@ for cat,name,adr,pc,pl in rows:
         miss.append(name+' ('+adr+')');continue
     q=W2([[hit['x'],hit['y']]])[0];wbz.append({'n':name,'c':cat,'adr':adr,'x':q[0],'y':q[1]})
 g['wbiz']=wbz
-g['wb']={'bb':[int(bx0),int(by0+ZY),int(bx1),int(by1+ZY)],'zy':ZY}
-g['H']=g['H']+ZY;g['W']=max(g['W'],int(bx1)+200)
+WL=W2(land);g['wb']={'bb':[min(q[0] for q in WL),min(q[1] for q in WL),max(q[0] for q in WL),max(q[1] for q in WL)],'zy':ZY,'land':WL}
+g['H']=g['H']+ZY;g['W']=max(g['W'],int(max(q[0] for q in WL))+250)
 json.dump(g,open(OUT,'w'),separators=(',',':'))
 print('ZY',ZY,'W',g['W'],'H',g['H'],'wb bb',g['wb']['bb'],'gebouwen',nb,'wegen',len(d['roads']),'paden',len(d['paths']),'adressen',len(wbz),'niet gevonden:',miss)

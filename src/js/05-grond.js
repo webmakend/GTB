@@ -20,14 +20,15 @@ function renderChunk(ci,cj){
   const c=document.createElement('canvas');c.width=c.height=CS;const g=c.getContext('2d');const ox=ci*CS,oy=cj*CS,X1=ox+CS,Y1=oy+CS;
   const pat=k=>g.createPattern(PATS[k],'repeat');
   g.translate(-ox,-oy);g.lineCap='round';g.lineJoin='round';
-  g.fillStyle=pat('water');g.fillRect(ox,oy,CS,CS);
+  g.fillStyle=pat('water');g.fillRect(ox,oy,CS,CS);g.fillStyle='rgba(8,22,60,.62)';g.fillRect(ox,oy,CS,CS);
+  g.save();g.lineJoin='round';g.strokeStyle=pat('water');g.lineWidth=46;for(const L of LANDS){if(!L.bb)L.bb=bbox(L);if(!inBox(L.bb,ox,oy,X1,Y1,40))continue;pathPoly(g,L);g.closePath();g.stroke();}if(BEACH&&inBox(BEACH.bb,ox,oy,X1,Y1,40)){pathPoly(g,BEACH);g.closePath();g.stroke();}g.lineWidth=22;g.strokeStyle='rgba(120,190,220,.25)';for(const L of LANDS){if(!inBox(L.bb,ox,oy,X1,Y1,40))continue;pathPoly(g,L);g.closePath();g.stroke();}g.restore();
   if(BEACH&&inBox(BEACH.bb,ox,oy,X1,Y1,40)){pathPoly(g,BEACH);g.closePath();g.strokeStyle='rgba(225,210,160,.55)';g.lineWidth=26;g.stroke();g.fillStyle=pat('sand');g.fill();g.strokeStyle='rgba(150,125,80,.35)';g.lineWidth=6;g.stroke();}
   g.save();g.beginPath();for(const L of LANDS){pathPoly(g,L,true);g.closePath();}g.strokeStyle='#8f8a80';g.lineWidth=12;g.stroke();g.clip();g.fillStyle=pat('grass');g.fillRect(ox,oy,CS,CS);
-  if(WB&&inBox(WB.bb,ox,oy,X1,Y1,WBF)){const [x0,y0,x1,y1]=WB.bb;g.fillStyle='#2c4a24';g.fillRect(x0,y0,WBF,y1-y0+120);g.fillRect(x1-WBF,y0,WBF,y1-y0+120);g.fillRect(x0,y0,x1-x0,WBF);g.fillStyle='rgba(0,0,0,.18)';g.fillRect(x0+WBF-30,y0+WBF-30,30,y1-y0);g.fillRect(x1-WBF,y0+WBF-30,30,y1-y0);g.fillRect(x0+WBF,y0+WBF-30,x1-x0-2*WBF,30);}
+
   const fillPolys=(list,style,stroke,lw)=>{for(const p of list){if(!p.bb)p.bb=bbox(p);if(!inBox(p.bb,ox,oy,X1,Y1,20))continue;pathPoly(g,p);g.closePath();g.fillStyle=style;g.fill();if(stroke){g.strokeStyle=stroke;g.lineWidth=lw;g.stroke();}}};
   fillPolys(WD.green,pat('park'));
   fillPolys(WD.sand,pat('sand'));
-  fillPolys(WATERS,pat('water'),'#8f8a80',6);
+  for(const p of WATERS){if(!p.bb)p.bb=bbox(p);if(!inBox(p.bb,ox,oy,X1,Y1,20))continue;pathPoly(g,p);g.closePath();g.fillStyle=pat('water');g.fill();g.fillStyle='rgba(8,22,60,.62)';g.fill();g.save();g.clip();g.strokeStyle=pat('water');g.lineWidth=40;g.stroke();g.restore();g.strokeStyle='#8f8a80';g.lineWidth=6;g.stroke();}
   fillPolys(WD.islands,pat('park'),'#8f8a80',5);
   fillPolys(WD.parking,PATS.conc?pat('conc'):'#8e8f8f','#77787a',2);
   g.restore();

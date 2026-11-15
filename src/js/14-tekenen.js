@@ -148,7 +148,7 @@ function renderWorld(){
   drawSkids(vx0,vy0,vx1,vy1);drawBeach(vx0,vy0,vx1,vy1);drawBarges();
   for(const p of peds)if(p.state==='down'&&inV(p.x,p.y,20))drawPed(p);
   for(const p of peds)if(p.dog&&inV(p.dog.x,p.dog.y,20)){ctx.strokeStyle='rgba(30,20,20,.55)';ctx.lineWidth=.8;if(p.state!=='down'){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.dog.x+Math.cos(p.dog.a)*6,p.dog.y+Math.sin(p.dog.a)*6);ctx.stroke();}drawDog(p.dog);}
-  drawHist();drawActs();if(typeof drawWbBar==='function')drawWbBar();drawCoins();drawJobsWorld();drawGunWorld();drawNetGhosts();
+  drawHist();drawActs();if(typeof drawWbBar==='function'){drawWbBar();drawDrown();}drawCoins();drawJobsWorld();drawGunWorld();drawNetGhosts();
   for(const p of peds)if(p.state!=='down'&&inV(p.x,p.y,20))drawPed(p);
   if(!P.car&&!P.dead){if(swimming())drawSwimmer();else{const jz=P.jz||0;if(jz>0){ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(P.x+2,P.y+3,6-jz*.05,8-jz*.06,0,0,TAU);ctx.fill();ctx.save();ctx.translate(P.x-jz*.25,P.y-jz*.6);{const js=Math.min(1.7,1+jz/45);ctx.scale(js,js);}ctx.translate(-P.x,-P.y);}
     if(P.squash>0&&!(jz>0)){const q=P.squash/9;ctx.save();ctx.translate(P.x,P.y);ctx.scale(1+.3*q,1-.22*q);ctx.translate(-P.x,-P.y);}
