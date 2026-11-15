@@ -24,7 +24,7 @@ function lbRows(){const me={pid:pvpPub(),nm:netName().slice(0,14),lv:PRG.lvl,xp:
   for(const p of netOthers()){const s=p.presence,k=s.pid||p.peer;const o=M.get(k)||{};M.set(k,Object.assign(o,{pid:s.pid||'',nm:String(s.nm||'Speler').slice(0,14),lv:s.lv|0,xp:Math.max(o.xp|0,s.xp|0),eur:s.eur|0,on:true,seen:Date.now()}));}
   for(const k in S){if(M.has(k))continue;M.set(k,{pid:k,nm:S[k].nm,lv:S[k].lv,xp:S[k].xp,eur:S[k].eur,on:false,seen:S[k].ts});}
   for(const k in fr)if(!M.has(k))M.set(k,{pid:k,nm:fr[k],lv:0,xp:0,eur:0,on:false,seen:(S[k]||{}).ts||0});
-  let rows=[...M.values()].sort((a,b)=>b.xp-a.xp);rows.forEach((r,i)=>r.rank=i+1);
+  let rows=[...M.values()].sort((a,b)=>b.xp-a.xp);rows.forEach((r,i)=>r.rank=i+1);rows.sort((a,b)=>(b.me?2:b.on?1:0)-(a.me?2:a.on?1:0)||a.rank-b.rank);
   if(LB.tab==='online')rows=rows.filter(r=>r.on);if(LB.tab==='vrienden')rows=rows.filter(r=>r.me||fr[r.pid]);return rows;}
 function lbOpen(){let ov=document.getElementById('lbOv');if(!ov){ov=document.createElement('div');ov.id='lbOv';document.body.appendChild(ov);ov.addEventListener('click',e=>{if(e.target===ov){e.preventDefault();lbClose();}});
     ['pointerdown','touchstart','touchmove','wheel'].forEach(t=>ov.addEventListener(t,e=>e.stopPropagation(),{passive:true}));

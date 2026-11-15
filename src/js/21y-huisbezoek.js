@@ -30,7 +30,7 @@ function houseObjs(oid){const o=[{x:3,z:4.2,y:0,h:.85,w:2.2,s:'bank'},{x:3,z:1.3
   if(hHash(oid)%2)o.push({x:4.2,z:3.2,y:0,h:.45,w:.6,s:'kat'});for(const [x,z] of [[3,3],[10,3.5],[7,8],[3,8.5]])o.push({x,z,y:2.55,h:.22,w:.9,s:'tl',lamp:1});return o;}
 function houseRoom(b){const id='h'+b.oid,h=HS[b.oid]||{},nm=String(h.t||'Huis').slice(0,10);let R=ROOMS[id];
   if(!R){R=ROOMS[id]={map:HROOM_MAP,h:{H:2.8,W:2.8,D:2.8,K:.95,F:1.9,B:.55,T:.75},spawn:[6.9,9.2,-Math.PI/2],floor:'parquet',ceil:0xfff4f4f0,tint:0,music:0,oid:String(b.oid)};R.tex=houseTex(b.oid);R.objs=houseObjs(b.oid);R.ctex={};}
-  R.name='🏠 '+nm.toUpperCase()+(h.o?' · VAN '+String(h.o).toUpperCase():'');R.hint='Loop rond · 🎨 spuit iets op de muur met de spuitbus';return id;}
+  R.name=nm.toUpperCase()+(h.o?' · VAN '+String(h.o).toUpperCase():'');R.hint='Loop rond · 🎨 spuit iets op de muur met de spuitbus';return id;}
 function houseVisit(b){if(!b||!HS[b.oid])return;if(!SCSPR)SCSPR=scSprites();houseSprites(SCSPR);const id=houseRoom(b);scEnter(id);tagsLoad(String(b.oid));}
 // eigen huis: uitrusten en naar binnen
 {const _at=actTry;actTry=function(){const a=ACT.cur;if(a&&a.k==='thuis'){const r=_at.apply(this,arguments);houseVisit(a.b);return r;}return _at.apply(this,arguments);};}

@@ -41,7 +41,12 @@ function top($db) {
 $a = $_GET['a'] ?? '';
 if ($a === 'hello') { echo json_encode(['ok' => true]); exit; }
 if ($a === 'top') { echo json_encode(['ok' => true, 'top' => top($db)]); exit; }
-if ($a === 'houses') { $q = $db->query('SELECT oid,pid,nm,name FROM houses LIMIT 5000'); echo json_encode(['ok' => true, 'houses' => $q->fetchAll(PDO::FETCH_ASSOC)]); exit; }
+if ($a === 'houses') {
+  // met de verzameling van de eigenaar (voor de vitrine in het huis)
+  $q = $db->query('SELECT h.oid,h.pid,h.nm,h.name,(SELECT state FROM players p WHERE p.pub = h.pid ORDER BY seen DESC LIMIT 1) AS st FROM houses h LIMIT 5000'); $out = [];
+  foreach ($q as $r) { $s = json_decode((string)$r['st'], true) ?: []; $out[] = ['oid' => $r['oid'], 'pid' => $r['pid'], 'nm' => $r['nm'], 'name' => $r['name'], 'sq' => (string)($s['sq'] ?? '')]; }
+  echo json_encode(['ok' => true, 'houses' => $out]); exit;
+}
 if ($a === 'tags') { $oid = preg_replace('/[^0-9]/', '', (string)($_GET['oid'] ?? '')); $q = $db->prepare('SELECT k,t,c,tid FROM tags WHERE oid = ? ORDER BY id DESC LIMIT 60'); $q->execute([$oid]); $out = []; foreach (array_reverse($q->fetchAll(PDO::FETCH_ASSOC)) as $r) $out[] = [$r['k'], $r['t'], $r['c'], $r['tid']]; echo json_encode(['ok' => true, 'tags' => $out]); exit; }
 if ($a === 'tag' && $_SERVER['REQUEST_METHOD'] === 'POST') {
   // graffiti op een muur in iemands huis
@@ -97,6 +102,7 @@ $st = [
   'eur' => $num('eur', -1000000, 100000000), 'dead' => $num('dead', 0, 1),
   'pid' => preg_match('/^[0-9a-f]{12}$/', (string)($in['pid'] ?? '')) ? $in['pid'] : '',
   'ev' => [],
+  'sq' => substr(preg_replace('/[^a-z_:,0-9]/', '', (string)($in['sq'] ?? '')), 0, 400),
   'cm' => null,
 ];
 if (in_array($in['in'] ?? '', ['stadscafe', 'dorpshuis', 'intertoys'], true) || preg_match('/^h[0-9]{1,15}$/', (string)($in['in'] ?? ''))) { $st['in'] = $in['in']; $st['ix'] = round(max(0, min(40, (float)($in['ix'] ?? 0))), 2); $st['iz'] = round(max(0, min(40, (float)($in['iz'] ?? 0))), 2); }
