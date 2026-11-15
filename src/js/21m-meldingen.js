@@ -26,7 +26,7 @@ function drawNotes(){HUDX.cards=[];if(MG.on||bigMap)return;ctx=fctx;const U=HUDX
   if(PRG.bonus){add('DAGBONUS · DAG '+PRG.bonus.day,'+€'+PRG.bonus.cash,'Tik om te claimen','#4ade80',()=>progClaim(),.75+.25*Math.sin(frameN*.12));}
   if(typeof pvpCards==='function')pvpCards(add);
   // actie in de buurt (tik = doen)
-  if(ACT.cur&&!ACT.cur.off&&!P.dead&&!P.car){const a=ACT.cur;add(a.k==='rob'?'OVERVAL':a.k==='pee'?'PLASNOOD':a.k==='job'?'KLUS':'ACTIE',IS_TOUCH?'TIK':'E',a.k==='pee'?'Tik hier om tegen een muur te plassen':a.t,a.k==='rob'?'#ff4d4d':'#ffd166',()=>{actTry();});}
+  if(ACT.cur&&!ACT.cur.off&&!P.dead&&(!P.car||ACT.cur.k==='esso')){const a=ACT.cur;add(a.k==='rob'?'OVERVAL':a.k==='pee'?'PLASNOOD':a.k==='job'?'KLUS':'ACTIE',IS_TOUCH?'TIK':'E',a.k==='pee'?'Tik hier om tegen een muur te plassen':a.t,a.k==='rob'?'#ff4d4d':'#ffd166',()=>{actTry();});}
   // statusregels (drank, plasnood, spul, energie, combo)
   const st=[];if(P.drunk>0)st.push(['🍺 '+(P.drunk>=5?'Lam':P.drunk>=3?'Dronken':'Aangeschoten'),'#ffd166']);if(P.bladder+P.bladP>=20)st.push(['🚽 Plasnood '+Math.min(100,P.bladder|0)+'%',P.bladder>=100&&(frameN>>4)%2?'#ff4d4d':'#7fd4ff']);if(P.high>0)st.push(['🌀 Spul '+Math.ceil(P.high/60)+'s','#c77dff']);if(P.boost>0)st.push(['⚡ Energie '+Math.ceil(P.boost/60)+'s','#36d1ff']);
   if(PRG.combo>0&&PRG.comboT>0)st.push(['✖ Combo ×'+(1+PRG.combo),'#c77dff']);

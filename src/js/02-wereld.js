@@ -2,7 +2,7 @@
 const WD=JSON.parse(document.getElementById('wdata').textContent);
 const W=WD.W,H=WD.H,T=16,GW=Math.ceil(W/T),GH=Math.ceil(H/T);
 const GRASS=0,ROAD=1,WALK=2,BUILD=3,WATER=4,PARK=5,PLAZA=6,PATH=7,SAND=8;
-const G=new Uint8Array(GW*GH),BRG=new Uint8Array(GW*GH);
+const G=new Uint8Array(GW*GH),BRG=new Uint8Array(GW*GH),MOTO=new Uint8Array(GW*GH);
 const FORT=WD.fort,FORTBB=bbox(FORT);let BRIDGE=null,LAMPS=[],KLIP=null;
 const inFort=(x,y)=>x>FORTBB[0]&&x<FORTBB[2]&&y>FORTBB[1]&&y<FORTBB[3]&&pip(x,y,FORT);
 // ---- Waardenburg: eiland ten noorden van de Waal (alles oostelijk van de A2), rondom water; via de Martinus Nijhoffbrug na de laatste missie
@@ -29,7 +29,10 @@ function stampLine(p,hw,fn){for(let i=0;i<p.length-1;i++)stampSeg(p[i][0],p[i][1
   if(!A)return;let B=null,bj='brug_einde';
   if(WB){let by=-1;for(const r of WD.roads){if(!r.wb||!/^motorway|trunk|primary|secondary/.test(r.k))continue;for(const i of [0,r.p.length-1]){const q=r.p[i];if(q[1]>by&&Math.abs(q[0]-A[0])<3500){by=q[1];B=q;bj=r.j[i];}}}}
   if(!B)B=[W-90,70];const dx=B[0]-A[0],dy=B[1]-A[1],L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L;
-  WD.roads.push({n:'Martinus Nijhoffbrug',k:'tertiary',w:120,bridge:1,lock:WB?1:0,p:[A,B],j:[jid,bj]});BRIDGE={A,B,ux,uy,L};})();
+  WD.roads.push({n:'Martinus Nijhoffbrug',k:'tertiary',w:120,bridge:1,lock:WB?1:0,p:[A,B],j:[jid,bj]});BRIDGE={A,B,ux,uy,L};
+  // afrit: van het eind van de brug naar de afslag Waardenburg (lopen op de A2 kan niet)
+  if(WB){let lk=null,lj=null,ld=1e9;for(const r of WD.roads){if(!r.wb||r.k!=='motorway_link')continue;for(const i of [0,r.p.length-1]){const q=r.p[i],d=Math.hypot(q[0]-B[0],q[1]-B[1]);if(d<ld){ld=d;lk=q;lj=r.j[i];}}}
+    if(lk&&ld<700)WD.roads.push({n:'Afrit Waardenburg',k:'motorway_link',w:80,wb:1,p:[B,lk],j:[bj,lj]});}})();
 const ROADS=WD.roads.map(r=>{const m=r.p[r.p.length>>1];return{...r,fort:inFort(m[0],m[1]),bb:bbox(r.p)};});
 for(const r of ROADS)r.brick=r.k==='pedestrian'||(r.fort&&r.k!=='tertiary');
 const PATHS=WD.paths.map(p=>({...p,bb:bbox(p.p)}));
@@ -78,6 +81,8 @@ function genWorld(){
   for(const p of [])stampLine(p.p,p.w/2+2,i=>{if(G[i]===WATER)BRG[i]=1;if(G[i]!==ROAD)G[i]=PATH;});
   for(const r of ROADS)stampLine(r.p,r.w/2+(r.fort?44:22),i=>{const t=G[i];if(t===WATER||t===ROAD||t===PLAZA)return;G[i]=WALK;});
   for(const r of ROADS)stampLine(r.p,r.w/2,i=>{if(G[i]===WATER)BRG[i]=1;G[i]=ROAD;});
+  for(const r of ROADS)if(r.k==='motorway')stampLine(r.p,r.w/2+10,i=>{MOTO[i]=1;});
+  for(const r of ROADS)if(r.k!=='motorway')stampLine(r.p,r.w/2+4,i=>{MOTO[i]=0;});
   // bosrand rond Waardenburg: niet doorheen te komen (ook niet over de wegen die de kaart uit lopen)
   // gebouwen
   // alleen hoofdstraten, kerken, winkels en horeca: overige huizen worden tuin en groen
@@ -168,7 +173,7 @@ function genWorld(){
   for(const z of (WD.wbiz||[])){if(z.c==='Kasteel'){LANDMARKS.push({n:z.n,x:z.x,y:z.y});continue;}if(z.c==='Voetbal'){LANDMARKS.push({n:'Sportpark '+z.n,x:z.x,y:z.y});continue;}
     signOn(z.n,z.x,z.y,z.c==='Scholen'?'School':'Winkel',z.adr+', Waardenburg');}
   {const RC={pub:'Restaurant',restaurant:'Restaurant',fast_food:'Restaurant',ice_cream:'Restaurant',bakery:'Winkel',butcher:'Winkel',convenience:'Winkel',supermarket:'Winkel',florist:'Winkel',bicycle:'Winkel',fuel:'Winkel',interior_decoration:'Winkel',kitchen:'Winkel'};
-   for(const p of WD.pois){if(!p.wb||!RC[p.k]||(WD.wbiz||[]).some(z=>z.n===p.n))continue;signOn(p.n,p.x,p.y,RC[p.k],'Waardenburg');}}
+   for(const p of WD.pois){if(!p.wb||!RC[p.k]||p.n==='Esso'||p.n==='De Waard'||(WD.wbiz||[]).some(z=>z.n===p.n))continue;signOn(p.n,p.x,p.y,RC[p.k],'Waardenburg');}}
   // terrassen
   for(const p of WD.seating){const b=bbox(p),col=RP(['#e9e2d0','#1d6b4a','#5a1622','#f2f2f2','#c43b2f']);for(let y=b[1]+16;y<b[3]-8;y+=34)for(let x=b[0]+16;x<b[2]-8;x+=34)if(pip(x,y,p))TERRACE.push({x,y,c:col});}
   // lantaarnpalen
@@ -196,6 +201,7 @@ function genWorld(){
   for(let i=0;i<60000&&TREES.filter(t=>t.h).length<420;i++){const x=R(FORTBB[0]-300,FORTBB[2]+300),y=R(FORTBB[1]-300,FORTBB[3]+300),t=cellAt(x,y);if(!(t===PARK||t===GRASS))continue;if(t===GRASS&&rnd()<.55)continue;
     const r=R(22,34);let ok=true;for(const [dx,dy] of [[r,0],[-r,0],[0,r],[0,-r]]){const tt=cellAt(x+dx,y+dy);if(tt===BUILD||tt===ROAD||tt===WATER){ok=false;break;}}if(!ok)continue;
     if(TREES.some(q=>Math.abs(q.x-x)<r+(q.r||14)*.7&&Math.abs(q.y-y)<r+(q.r||14)*.7))continue;TREES.push({x,y,r,h:R(46,74),c:RP(['#2f5a28','#355f2c','#2b5226','#3b6a30','#284a22'])});}
+  if(typeof wbExtras==='function')wbExtras();
 }
 function nearestRoadDir(x,y){let bd=1e18,ang=0;for(const r of ROADS){if(x<r.bb[0]-300||x>r.bb[2]+300||y<r.bb[1]-300||y>r.bb[3]+300)continue;for(let i=0;i<r.p.length-1;i++){const a=r.p[i],b=r.p[i+1],dx=b[0]-a[0],dy=b[1]-a[1],L2=dx*dx+dy*dy||1;let t=((x-a[0])*dx+(y-a[1])*dy)/L2;t=clamp(t,0,1);const qx=a[0]+dx*t-x,qy=a[1]+dy*t-y,d=qx*qx+qy*qy;if(d<bd){bd=d;ang=Math.atan2(dy,dx);}}}return ang;}
 

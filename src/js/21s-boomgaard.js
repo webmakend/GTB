@@ -20,7 +20,7 @@ function orchardStep(){if(APPLE_CD>0)APPLE_CD--;if(!FARMERS.length)return;const 
     if(f.state==='pick'){f.pick--;f.anim+=.2;if(f.pick<=0){f.state='walk';f.crate=Math.min(6,f.crate+1);}}
     else{const t=f.row[f.i],dx=t.x-f.x,dy=t.y+14-f.y,d=Math.hypot(dx,dy);if(d<2){if(Math.random()<.5){f.state='pick';f.pick=90+Math.random()*120;}f.i+=f.dir;if(f.i<0||f.i>=f.row.length){f.dir*=-1;f.i+=2*f.dir;f.i=clamp(f.i,0,f.row.length-1);}}
       else{f.x+=dx/d*.55;f.y+=dy/d*.55;f.a=Math.atan2(dy,dx);f.anim+=.18;}}
-    const pd=Math.hypot(f.x-o2.x,f.y-o2.y);if(pd<120&&f.talkCd<=0&&Math.random()<.01){bubbles=bubbles.filter(b=>b.p!==f);bubbles.push({p:f,t:rpick(SAY_FARM),life:200});f.talkCd=500;}}}
+    const pd=Math.hypot(f.x-o2.x,f.y-o2.y);if(pd<120&&f.talkCd<=0&&Math.random()<.01){bubbles=bubbles.filter(b=>b.p!==f);bubbles.push({p:f,t:rpick(SAY_FARM),life:200,keep:1});f.talkCd=500;}}}
 function drawOrchardGround(g,ox,oy,X1,Y1){for(const o of ORCH){if(!inBox(o.bb,ox,oy,X1,Y1,30))continue;g.save();pathPoly(g,o);g.closePath();g.fillStyle='#7aa356';g.fill();g.clip();
     // gemaaide grasstroken tussen de rijen
     const ca=Math.cos(o.ang),sa=Math.sin(o.ang);g.strokeStyle='rgba(60,90,40,.35)';g.lineWidth=18;for(const r of o.rows){g.beginPath();g.moveTo(r[0].x-ca*30,r[0].y-sa*30);g.lineTo(r[r.length-1].x+ca*30,r[r.length-1].y+sa*30);g.stroke();}g.restore();}

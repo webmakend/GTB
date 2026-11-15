@@ -25,7 +25,7 @@ function runLoader(fast){
 
 // ---- korte filmische intro vóór het startscherm (tik = overslaan)
 let CINE_DONE=false;
-function playCine(){if(CINE_DONE)return;CINE_DONE=true;const d=document.createElement('div');d.id='cine';
+function playCine(){if(CINE_DONE)return;CINE_DONE=true;if(lsGet('gtb_cine')&&lsGet('gtb_save_v1'))return;lsSet('gtb_cine','1');const d=document.createElement('div');d.id='cine';
   const L=[['ZALTBOMMEL','Een vestingstad aan de Waal.'],['','Grachten. Klinkers. Een kerk van 800 jaar.'],['','Rustig. Gezellig.'],['','Té rustig.']];
   d.innerHTML=`<div class="cbg" style="background-image:url('${ARTS[1]}')"></div><div class="cbar t"></div><div class="cbar b"></div><div class="csir"></div><div class="ctx"></div><div class="cflash"></div><div class="clogo"><img src="assets/logo.png" alt=""><b>GRAND THEFT BOMMEL</b></div><div class="cskip">TIK OM OVER TE SLAAN ›</div>`;
   document.body.appendChild(d);const tx=d.querySelector('.ctx'),tm=[];let gone=false;

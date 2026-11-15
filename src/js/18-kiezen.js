@@ -25,7 +25,7 @@ function speak(txt,ch){try{const ss=window.speechSynthesis;if(!ss)return;ss.canc
 let chosen=false;
 function choose(i){if(chosen)return;chosen=true;clearInterval(autoIv);const pc=PICK[i]||CHARS[0],ch=pc.save?pc.base:pc;P.ch=ch;const SV=pc.save||null;P.maxhp=100;P.hp=P.maxhp;const line=SV?('Daar ben ik weer!'):(LINES[ch.id]||"Yeah, let's go!");
   const L2=document.getElementById('lets'),T2=document.getElementById('letsT');L2.style.setProperty('--c',ch.c);T2.style.setProperty('--c',ch.c);T2.textContent=line.toUpperCase();L2.style.display='flex';T2.style.animation='none';void T2.offsetWidth;T2.style.animation='';
-  speak(line,ch);sfx('sting');const go=()=>{document.getElementById('pick').style.display='none';document.getElementById('intro').style.display='none';clearInterval(slideTimer);startPlay();if(SV)applySave(SV);};
+  speak(line,ch);sfx('sting');const go=()=>{document.getElementById('pick').style.display='none';document.getElementById('intro').style.display='none';clearInterval(slideTimer);startPlay();if(SV)applySave(SV);if(typeof areaPick==='function')setTimeout(()=>areaPick(SV),350);};
   setTimeout(()=>{L2.style.display='none';chosen=false;if(SV)go();else{const nw=()=>{try{localStorage.removeItem(SAVE_KEY);}catch(e){}go();setTimeout(()=>writeSave(true),400);};askName(nw,()=>{if(!lsGet('gtb_name'))lsSet('gtb_name',ch.name.charAt(0)+ch.name.slice(1).toLowerCase());nw();},(getSave()||{}).name||lsGet('gtb_name')||'');}},1700);}
 if(window.speechSynthesis){try{speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();}catch(e){}}
 document.getElementById('pPrev').addEventListener('click',()=>scrollToCard(Math.max(0,pickIdx-1),true));

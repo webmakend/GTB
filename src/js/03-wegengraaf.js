@@ -4,7 +4,7 @@ function buildGraph(){
   const map=new Map(),NPC={tertiary:1,residential:1,unclassified:1,living_street:1,motorway:1,motorway_link:1,secondary:1,trunk:1};
   const node=(k,x,y)=>{let id=k?map.get(k):undefined;if(id===undefined){id=NODES.length;NODES.push({x,y,adj:[]});if(k)map.set(k,id);}return id;};
   ROADS.forEach((r,ri)=>{if(!NPC[r.k])return;let prev=-1;
-    r.p.forEach((q,i)=>{const id=node(r.j[i]?'j'+r.j[i]:null,q[0],q[1]);if(prev>=0&&prev!==id){const A=NODES[prev],B=NODES[id],len=Math.hypot(B.x-A.x,B.y-A.y);if(len>2){EDGES.push({a:prev,b:id,len,w:r.w,n:r.n,lock:r.lock?1:0,spd:r.k==='tertiary'?3.8:/^motorway|trunk/.test(r.k)?4.6:r.fort?2.5:3.1});A.adj.push(EDGES.length-1);B.adj.push(EDGES.length-1);}}prev=id;});});
+    r.p.forEach((q,i)=>{const id=node(r.j[i]?'j'+r.j[i]:null,q[0],q[1]);if(prev>=0&&prev!==id){const A=NODES[prev],B=NODES[id],len=Math.hypot(B.x-A.x,B.y-A.y);if(len>2){EDGES.push({a:prev,b:id,len,w:r.w,n:r.n,lock:r.lock?1:0,spd:r.k==='tertiary'?3.8:r.k==='motorway'?7.4:/^motorway|trunk/.test(r.k)?4.4:r.fort?2.5:3.1});A.adj.push(EDGES.length-1);B.adj.push(EDGES.length-1);}}prev=id;});});
 }
 function nearestEdge(x,y){let best=null,bd=1e18;for(let i=0;i<EDGES.length;i++){const e=EDGES[i],A=NODES[e.a],B=NODES[e.b];if(Math.abs(A.x-x)>900&&Math.abs(B.x-x)>900)continue;const dx=B.x-A.x,dy=B.y-A.y;let t=((x-A.x)*dx+(y-A.y)*dy)/(e.len*e.len);t=clamp(t,0,1);const qx=A.x+dx*t-x,qy=A.y+dy*t-y,d=qx*qx+qy*qy;if(d<bd){bd=d;best={ei:i,t,d:Math.sqrt(d)};}}
   if(!best){for(let i=0;i<EDGES.length;i++){const e=EDGES[i],A=NODES[e.a],d=Math.hypot(A.x-x,A.y-y);if(d<bd){bd=d;best={ei:i,t:0,d};}}}return best;}

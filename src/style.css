@@ -178,3 +178,12 @@ button{font-family:inherit}
 #lbProf .pfSend{display:flex;gap:6px;margin-top:8px}#lbProf .pfSend input{flex:1;min-width:0;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:#0b0418;color:#fff;font:600 16px Inter;outline:none}#lbProf .pfSend input:disabled{opacity:.5}
 #lbProf .pfGo{width:42px;border-radius:10px;background:#ff2e88;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer}
 #lbProf .pfBtns{margin-top:8px}#lbProf .pfFr{display:block;text-align:center;padding:10px;border-radius:10px;background:#2563eb;font:800 13px Inter;cursor:pointer}#lbProf .pfFr.un{background:#7f1d1d}#lbProf .pfFr.acc{background:#16a34a}#lbProf .pfFr.off{background:#2e2a44;opacity:.75;cursor:default}
+/* ===== startgebied kiezen ===== */
+#areaOv{position:fixed;inset:0;z-index:75;display:none;align-items:center;justify-content:center;background:rgba(10,4,24,.82);font-family:Inter,sans-serif;color:#fff}
+#areaOv .arBox{width:min(90vw,380px);display:flex;flex-direction:column;gap:12px}
+#areaOv .arBox>b{font:400 30px Anton,Impact,sans-serif;color:#ffd166;text-align:center;letter-spacing:1px;margin-bottom:4px}
+#areaOv .arB{padding:18px 18px 16px;border-radius:16px;font:400 26px Anton,Impact,sans-serif;letter-spacing:1px;cursor:pointer;border:2px solid;box-shadow:0 0 18px rgba(0,0,0,.4)}
+#areaOv .arB small{display:block;font:700 12px Inter,sans-serif;letter-spacing:.5px;opacity:.85;margin-top:4px}
+#areaOv .arB.zb{background:linear-gradient(135deg,#7b2ff7,#ff2e88);border-color:#ff9fd0}
+#areaOv .arB.wb{background:linear-gradient(135deg,#1e7a4a,#2bb673);border-color:#9fffcf}
+#areaOv .arB.cont{background:linear-gradient(135deg,#ff9f1c,#ff5e3a);border-color:#ffd8a8}

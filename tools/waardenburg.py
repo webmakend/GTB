@@ -135,6 +135,14 @@ for cat,name,adr,pc,pl in rows:
             pts=[q for x in rr for q in x['p']];q=pts[len(pts)//2];q=W2([q])[0];wbz.append({'n':name,'c':cat,'adr':adr,'x':q[0],'y':q[1],'approx':1});continue
         miss.append(name+' ('+adr+')');continue
     q=W2([[hit['x'],hit['y']]])[0];wbz.append({'n':name,'c':cat,'adr':adr,'x':q[0],'y':q[1]})
+spots={}
+for key,st,hn in [('picknick','weerdenborch','20'),('esso','dorpsstraat','8'),('chinees','steenweg','45')]:
+    h=A.get((st,hn))
+    if h:q=W2([[h['x'],h['y']]])[0];spots[key]=q
+rr=[x for x in d['roads'] if x['n']=='Koningin Julianaplantsoen']
+if rr:
+    pts=[q for x in rr for q in x['p']];spots['speeltuin']=W2([[sum(q[0] for q in pts)/len(pts),sum(q[1] for q in pts)/len(pts)]])[0]
+g['wbspot']=spots
 g['wbiz']=wbz;g['orchard']=[W2(p) for p in d['orchard']]
 WL=W2(land);g['wb']={'bb':[min(q[0] for q in WL),min(q[1] for q in WL),max(q[0] for q in WL),max(q[1] for q in WL)],'zy':ZY,'land':WL}
 g['H']=g['H']+ZY;g['W']=max(g['W'],int(max(q[0] for q in WL))+250)

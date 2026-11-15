@@ -13,7 +13,7 @@ const tbL=(ic,t)=>ICO[ic]+'<span>'+t+'</span>';
 function updTouchUI(){if(frameN%30===0){const jb=document.getElementById('joyBase');if(jb&&!jb.classList.contains('drag'))JOYIDLE();}
   const bJ=document.getElementById('bJump');if(bJ._t!==1){bJ.innerHTML=ICO.run;bJ._t=1;}bJ.style.display=P.car||P.dead||swimming()?'none':'flex';const base=lvlBase(PRG.lvl),pr=clamp((PRG.xp-base)/need(PRG.lvl),0,1);bJ.style.setProperty('--p',(pr*100).toFixed(1)+'%');
   const bA=document.getElementById('bAct'),bC=document.getElementById('bCar'),bX=document.getElementById('bX');
-  const ac=P.car?'car':P.wid;if(bA._t!==ac){bA._t=ac;const W=WPN[P.wid];bA.innerHTML=P.car?ICO.brake:(W&&W.ic>=0?`<i class="wico" style="background-position:0 ${(W.ic/8*100).toFixed(3)}%"></i>`:ICO.balloon);}
+  const ac=P.car?'car':P.wid;if(bA._t!==ac){bA._t=ac;const W=WPN[P.wid];bA.innerHTML=P.car?ICO.brake:(W&&W.emo?`<i style="font-style:normal;font-size:30px;filter:drop-shadow(0 0 4px #ff2e88)">${W.emo}</i>`:W&&W.ic>=0?`<i class="wico" style="background-position:0 ${(W.ic/8*100).toFixed(3)}%"></i>`:ICO.balloon);}
   const xs=P.car&&!P.car.t.bike;bX.style.display=xs&&!P.dead?'flex':'none';if(bX._t!==1){bX.innerHTML=ICO.radio;bX._t=1;}
   const ws=P.inv.length>1&&!P.car&&!P.dead&&!swimming();for(const id of ['wPrev','wNext']){const e=document.getElementById(id);if(e)e.style.display=ws?'flex':'none';}
   const show=(!!P.car||!!carNear())&&!P.dead,ct=P.car?ICO.exit:ICO.car;bC.style.display=show?'flex':'none';if(bC._t!==ct){bC.innerHTML=ct;bC._t=ct;}bC.classList.toggle('pulse',!P.car);}
