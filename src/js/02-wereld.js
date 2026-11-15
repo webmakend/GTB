@@ -99,7 +99,7 @@ function genWorld(){
     if(b.flat)b.roof=RP(['#5f6266','#55585c','#6b6d70','#4c4f53','#646668']);
     if(ob.b==='church'){b.roof='#5d636a';b.wall='#b8ab95';b.label=ob.n;}
     if(ob.b==='civic'){b.wall='#e1d7c2';b.roof='#3d4146';b.label='Stadhuis';}
-    if(ob.wb){b.wb=1;if(ob.n&&/kerk|molen|gasthuis|burcht|gemeente/i.test(ob.n)){b.label=ob.n.replace(/^Hervormde Gemeente.*/,'Hervormde kerk Waardenburg');if(ob.b==='church'||/kerk|gemeente/i.test(ob.n)){b.roof='#5d636a';b.wall='#c9bda6';}}if(/kasteel/i.test(ob.n||'')){b.castle=1;b.label=ob.n;b.wall='#9a7a5e';b.roof='#5b4a40';b.flat=true;b.ridge=false;b.ht=Math.max(b.ht,58);}}
+    if(ob.wb){b.wb=1;if(ob.n&&/kerk|molen|gasthuis|burcht|gemeente/i.test(ob.n)){b.label=ob.n.replace(/^Hervormde Gemeente.*/,'Hervormde kerk Waardenburg');if(ob.b==='church'||/kerk|gemeente/i.test(ob.n)){b.roof='#5d636a';b.wall='#c9bda6';}}if(/kasteel/i.test(ob.n||'')){b.wbc=1;b.label=ob.n;b.wall='#8f4f3a';b.roof='#454b55';b.flat=true;b.ridge=false;b.noFac=1;b.ht=Math.max(b.ht,64);}}
     if(ob.n==='Gasthuiskapel')b.label=ob.n;if(ob.n==='Maarten van Rossumhuis'){b.castle=1;b.label='Stadskasteel Zaltbommel';b.wall='#a89a86';b.roof='#6d6a66';b.flat=true;b.ridge=false;b.ht=Math.max(b.ht,52);}
     if(b.flat)b.ridge=false;
     prepBuilding(b);
@@ -163,7 +163,7 @@ function genWorld(){
 
   // winkels en horeca
   const used=new Set();
-  const signOn=(name,x,y,cat,adr)=>{let best=null,bd=1e9;for(const b of BUILDINGS){if(b.pass||b.kind==='tower'||b.wt||used.has(b))continue;if(Math.abs(b.cx-x)>260||Math.abs(b.cy-y)>260)continue;const d=pip(x,y,b.p)?0:Math.hypot(b.cx-x,b.cy-y);if(d<bd){bd=d;best=b;}}
+  const signOn=(name,x,y,cat,adr)=>{let best=null,bd=1e9;for(const b of BUILDINGS){if(b.pass||b.kind==='tower'||b.wt||b.wbc||used.has(b))continue;if(Math.abs(b.cx-x)>260||Math.abs(b.cy-y)>260)continue;const d=pip(x,y,b.p)?0:Math.hypot(b.cx-x,b.cy-y);if(d<bd){bd=d;best=b;}}
     if(best){used.add(best);SHOPS.push({b:best,n:name,c:cat,rob:0});best.sign=name;best.signC=signCol(name,cat);best.sa=nearestRoadDir(best.cx,best.cy);LANDMARKS.push({n:name,x:best.cx,y:best.cy,shop:1,c:best.signC[0],cat,adr});}};
   for(const z of WD.biz)signOn(z.n,z.x,z.y,z.c,z.adr);
   for(const z of (WD.wbiz||[])){if(z.c==='Kasteel'){LANDMARKS.push({n:z.n,x:z.x,y:z.y});continue;}if(z.c==='Voetbal'){LANDMARKS.push({n:'Sportpark '+z.n,x:z.x,y:z.y});continue;}

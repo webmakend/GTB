@@ -4356,7 +4356,7 @@ function genWorld(){
     if(b.flat)b.roof=RP(['#5f6266','#55585c','#6b6d70','#4c4f53','#646668']);
     if(ob.b==='church'){b.roof='#5d636a';b.wall='#b8ab95';b.label=ob.n;}
     if(ob.b==='civic'){b.wall='#e1d7c2';b.roof='#3d4146';b.label='Stadhuis';}
-    if(ob.wb){b.wb=1;if(ob.n&&/kerk|molen|gasthuis|burcht|gemeente/i.test(ob.n)){b.label=ob.n.replace(/^Hervormde Gemeente.*/,'Hervormde kerk Waardenburg');if(ob.b==='church'||/kerk|gemeente/i.test(ob.n)){b.roof='#5d636a';b.wall='#c9bda6';}}if(/kasteel/i.test(ob.n||'')){b.castle=1;b.label=ob.n;b.wall='#9a7a5e';b.roof='#5b4a40';b.flat=true;b.ridge=false;b.ht=Math.max(b.ht,58);}}
+    if(ob.wb){b.wb=1;if(ob.n&&/kerk|molen|gasthuis|burcht|gemeente/i.test(ob.n)){b.label=ob.n.replace(/^Hervormde Gemeente.*/,'Hervormde kerk Waardenburg');if(ob.b==='church'||/kerk|gemeente/i.test(ob.n)){b.roof='#5d636a';b.wall='#c9bda6';}}if(/kasteel/i.test(ob.n||'')){b.wbc=1;b.label=ob.n;b.wall='#8f4f3a';b.roof='#454b55';b.flat=true;b.ridge=false;b.noFac=1;b.ht=Math.max(b.ht,64);}}
     if(ob.n==='Gasthuiskapel')b.label=ob.n;if(ob.n==='Maarten van Rossumhuis'){b.castle=1;b.label='Stadskasteel Zaltbommel';b.wall='#a89a86';b.roof='#6d6a66';b.flat=true;b.ridge=false;b.ht=Math.max(b.ht,52);}
     if(b.flat)b.ridge=false;
     prepBuilding(b);
@@ -4420,7 +4420,7 @@ function genWorld(){
 
   // winkels en horeca
   const used=new Set();
-  const signOn=(name,x,y,cat,adr)=>{let best=null,bd=1e9;for(const b of BUILDINGS){if(b.pass||b.kind==='tower'||b.wt||used.has(b))continue;if(Math.abs(b.cx-x)>260||Math.abs(b.cy-y)>260)continue;const d=pip(x,y,b.p)?0:Math.hypot(b.cx-x,b.cy-y);if(d<bd){bd=d;best=b;}}
+  const signOn=(name,x,y,cat,adr)=>{let best=null,bd=1e9;for(const b of BUILDINGS){if(b.pass||b.kind==='tower'||b.wt||b.wbc||used.has(b))continue;if(Math.abs(b.cx-x)>260||Math.abs(b.cy-y)>260)continue;const d=pip(x,y,b.p)?0:Math.hypot(b.cx-x,b.cy-y);if(d<bd){bd=d;best=b;}}
     if(best){used.add(best);SHOPS.push({b:best,n:name,c:cat,rob:0});best.sign=name;best.signC=signCol(name,cat);best.sa=nearestRoadDir(best.cx,best.cy);LANDMARKS.push({n:name,x:best.cx,y:best.cy,shop:1,c:best.signC[0],cat,adr});}};
   for(const z of WD.biz)signOn(z.n,z.x,z.y,z.c,z.adr);
   for(const z of (WD.wbiz||[])){if(z.c==='Kasteel'){LANDMARKS.push({n:z.n,x:z.x,y:z.y});continue;}if(z.c==='Voetbal'){LANDMARKS.push({n:'Sportpark '+z.n,x:z.x,y:z.y});continue;}
@@ -4526,20 +4526,21 @@ function renderChunk(ci,cj){
   fillPolys(WD.sand,pat('sand'));
   fillPolys(WATERS,pat('water'),'#8f8a80',6);
   fillPolys(WD.islands,pat('park'),'#8f8a80',5);
-  fillPolys(WD.parking,'#8e8f8f','#77787a',2);
+  fillPolys(WD.parking,PATS.conc?pat('conc'):'#8e8f8f','#77787a',2);
   g.restore();
   // stoepen
   const RV=ROADS.filter(r=>inBox(r.bb,ox,oy,X1,Y1,r.w+70));
   g.strokeStyle=pat('pave');for(const r of RV){g.lineWidth=r.w+(r.fort?88:44);pathPoly(g,r.p);g.stroke();}
   fillPolys(WD.plaza,pat('plaza'));
   // paden en fietspaden
-  for(const p of PATHS){if(!inBox(p.bb,ox,oy,X1,Y1,30))continue;g.strokeStyle=p.k==='cycleway'?'#a3584a':p.k==='footway'?'#c7c0b2':p.k==='track'?'#a89474':'#b7a684';g.lineWidth=p.w;for(const q of p.segs){pathPoly(g,q);g.stroke();}}
+  for(const p of PATHS){if(!inBox(p.bb,ox,oy,X1,Y1,30))continue;g.strokeStyle=p.k==='cycleway'?'#a3584a':p.k==='footway'?(PATS.tiles?pat('tiles'):'#c7c0b2'):p.k==='track'||p.k==='path'?(PATS.dirt?pat('dirt'):'#a89474'):'#b7a684';g.lineWidth=p.w;for(const q of p.segs){pathPoly(g,q);g.stroke();}}
   // rijbaan
   g.strokeStyle='#6d6a64';for(const r of RV){if(r.k==='pedestrian')continue;g.lineWidth=r.w+4;pathPoly(g,r.p);g.stroke();}
   for(const r of RV){g.strokeStyle=r.k==='pedestrian'?pat('plaza'):r.brick?pat('brick'):pat('asphalt');g.lineWidth=r.w;pathPoly(g,r.p);g.stroke();}
   for(const r of RV){if(!r.bridge)continue;g.strokeStyle='#e8e2d4';g.lineWidth=3;for(const o of [-r.w/2+6,r.w/2-6]){const dx=r.p[1][0]-r.p[0][0],dy=r.p[1][1]-r.p[0][1],l=Math.hypot(dx,dy),nx=-dy/l*o,ny=dx/l*o;g.beginPath();g.moveTo(r.p[0][0]+nx,r.p[0][1]+ny);g.lineTo(r.p[1][0]+nx,r.p[1][1]+ny);g.stroke();}}
   for(const r of RV){if(r.brick||r.w<60)continue;g.setLineDash([22,20]);g.strokeStyle='rgba(255,255,255,.75)';g.lineWidth=2.5;pathPoly(g,r.p);g.stroke();g.setLineDash([]);
     if(r.k!=='pedestrian'&&!r.bridge)for(let k=0;k<r.p.length-1;k++){const a=r.p[k],q=r.p[k+1],dx=q[0]-a[0],dy=q[1]-a[1],l=Math.hypot(dx,dy)||1;for(const o of [-r.w/2+5,r.w/2-5]){const nx=-dy/l*o,ny=dx/l*o;g.strokeStyle='rgba(255,255,255,.55)';g.lineWidth=1.6;g.beginPath();g.moveTo(a[0]+nx,a[1]+ny);g.lineTo(q[0]+nx,q[1]+ny);g.stroke();}}}
+  drawZebras(g,ox,oy,X1,Y1);
   // brugleuningen
   g.fillStyle='#d6d0c4';
   const cx0=Math.floor(ox/T),cy0=Math.floor(oy/T);
@@ -4564,6 +4565,24 @@ function renderChunk(ci,cj){
 }
 function getChunk(ci,cj){const k=ci+','+cj;let c=chunkCache.get(k);if(c){chunkCache.delete(k);chunkCache.set(k,c);return c;}c=renderChunk(ci,cj);chunkCache.set(k,c);if(chunkCache.size>Math.max(IS_TOUCH?42:70,Math.ceil(CW/viewZ()/CS+2)*Math.ceil(CH/viewZ()/CS+2)+10))chunkCache.delete(chunkCache.keys().next().value);return c;}
 
+
+// ---- echte straattexturen (asfalt, klinkers/stoeptegels, beton) uit de modulaire city-kit
+const STREET=new Image();STREET.src='assets/street.webp';
+STREET.onload=()=>{if(!PATS)buildPats();const cut=(x,w,h,dk)=>{const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');g.drawImage(STREET,x,0,w,h,0,0,w,h);if(dk){g.fillStyle=dk;g.fillRect(0,0,w,h);}return c;};
+  PATS.asphalt=cut(0,128,128,'rgba(20,22,28,.28)');PATS.pave=cut(128,96,96,'rgba(0,0,0,.08)');PATS.tiles=cut(224,96,96);PATS.conc=cut(320,96,96,'rgba(0,0,0,.12)');PATS.dirt=cut(416,96,96);chunkCache.clear();};
+// zebrapaden op kruispunten (alleen in de bebouwde kom) en putdeksels
+let ZEBRAS=null,MANH=null;
+function buildZebras(){ZEBRAS=[];MANH=[];const deg=new Map(),wmax=new Map();
+  for(const r of ROADS){if(r.k==='service'||r.bridge||/^motorway/.test(r.k))continue;r.p.forEach((q,i)=>{const j=r.j[i];if(!j)return;deg.set(j,(deg.get(j)||0)+1+(i>0&&i<r.p.length-1?1:0));wmax.set(j,Math.max(wmax.get(j)||0,r.w));});}
+  for(const r of ROADS){if(r.k==='service'||r.k==='pedestrian'||r.bridge||/^motorway/.test(r.k)||r.w<50)continue;
+    r.p.forEach((q,i)=>{const j=r.j[i];if(!j||(deg.get(j)||0)<3)return;for(const nb of [i-1,i+1]){if(nb<0||nb>=r.p.length)continue;const o=r.p[nb],dx=o[0]-q[0],dy=o[1]-q[1],L=Math.hypot(dx,dy);const d=(wmax.get(j)||r.w)/2+26;if(L<d+40)continue;
+      if(!(inFort(q[0],q[1])||inWB(q[0],q[1])))continue;ZEBRAS.push({x:q[0]+dx/L*d,y:q[1]+dy/L*d,ux:dx/L,uy:dy/L,w:r.w});}});
+    let acc=hsh(r.p[0][0]|0,r.p[0][1]|0)%300;for(let i=0;i<r.p.length-1;i++){const a=r.p[i],b=r.p[i+1],L=Math.hypot(b[0]-a[0],b[1]-a[1]);while(acc<L){const t=acc/L,s=((acc*7)%3-1)*r.w*.18;MANH.push({x:a[0]+(b[0]-a[0])*t-(b[1]-a[1])/L*s,y:a[1]+(b[1]-a[1])*t+(b[0]-a[0])/L*s});acc+=520;}acc-=L;}}}
+function drawZebras(g,ox,oy,X1,Y1){if(!ZEBRAS)buildZebras();
+  for(const z of ZEBRAS){if(z.x<ox-80||z.x>X1+80||z.y<oy-80||z.y>Y1+80)continue;const nx=-z.uy,ny=z.ux,half=z.w/2-4;g.fillStyle='rgba(240,240,236,.88)';
+    for(let s=-half;s<half-6;s+=14){g.beginPath();const x0=z.x+nx*s,y0=z.y+ny*s;g.moveTo(x0-z.ux*13,y0-z.uy*13);g.lineTo(x0+z.ux*13,y0+z.uy*13);g.lineTo(x0+z.ux*13+nx*7,y0+z.uy*13+ny*7);g.lineTo(x0-z.ux*13+nx*7,y0-z.uy*13+ny*7);g.closePath();g.fill();}
+    g.strokeStyle='rgba(240,240,236,.85)';g.lineWidth=3;g.beginPath();g.moveTo(z.x+z.ux*22-nx*half,z.y+z.uy*22-ny*half);g.lineTo(z.x+z.ux*22,z.y+z.uy*22);g.stroke();}
+  for(const m of MANH){if(m.x<ox-10||m.x>X1+10||m.y<oy-10||m.y>Y1+10)continue;g.fillStyle='#2b2c2f';g.beginPath();g.arc(m.x,m.y,5.5,0,TAU);g.fill();g.strokeStyle='#55575c';g.lineWidth=1.2;g.stroke();g.strokeStyle='rgba(0,0,0,.4)';g.lineWidth=.8;g.beginPath();g.moveTo(m.x-3.5,m.y);g.lineTo(m.x+3.5,m.y);g.moveTo(m.x,m.y-3.5);g.lineTo(m.x,m.y+3.5);g.stroke();}}
 
 // ---- 06-voertuigen.js
 // ====================== voertuigen ======================
@@ -5130,7 +5149,7 @@ function drawBuildings(vx0,vy0,vx1,vy1,cx,cy){
     else if(b.kind==='tower'){ctx.strokeStyle='rgba(0,0,0,.4)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(r[0][0],r[0][1]);ctx.lineTo(r[2][0],r[2][1]);ctx.moveTo(r[1][0],r[1][1]);ctx.lineTo(r[3][0],r[3][1]);ctx.stroke();ctx.fillStyle='#d8b54a';ctx.beginPath();ctx.arc(rcx,rcy,4,0,TAU);ctx.fill();}
     else if(b.kind==='gate'){ctx.fillStyle='rgba(0,0,0,.22)';ctx.beginPath();ctx.moveTo(r[0][0]*.85+rcx*.15,r[0][1]*.85+rcy*.15);for(let i=1;i<n;i++)ctx.lineTo(r[i][0]*.85+rcx*.15,r[i][1]*.85+rcy*.15);ctx.fill();}
     else{ctx.strokeStyle='rgba(0,0,0,.18)';ctx.lineWidth=2;ctx.stroke();}
-    if(b.castle)drawCastleTop(b,r,f,cx,cy);if(b.wt)drawWaterTop(b,f,cx,cy);
+    if(b.castle)drawCastleTop(b,r,f,cx,cy);if(b.wbc)drawWbCastle(b,r,f,cx,cy);if(b.wt)drawWaterTop(b,f,cx,cy);
     if(b.sign){const sg=b.signC;let a=b.sa;if(a>Math.PI/2)a-=Math.PI;if(a<-Math.PI/2)a+=Math.PI;ctx.save();ctx.translate(rcx,rcy);ctx.rotate(a);ctx.font='800 13px Inter, sans-serif';const tw=ctx.measureText(b.sign).width+12;
       ctx.shadowColor=sg[0];ctx.shadowBlur=14;ctx.fillStyle=sg[0];ctx.fillRect(-tw/2,-10,tw,20);ctx.shadowBlur=0;ctx.strokeStyle='rgba(255,255,255,.7)';ctx.lineWidth=1.2;ctx.strokeRect(-tw/2+1.5,-8.5,tw-3,17);ctx.fillStyle=sg[1];ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(b.sign,0,1);ctx.restore();}}
 }
@@ -5222,6 +5241,36 @@ const ROOF_MX=new DOMMatrix();let ROOF_P=null;
 function roofPat(tile){if(!ROOF_P){const mk=(f)=>{const c=document.createElement('canvas');c.width=16;c.height=10;const g=c.getContext('2d');f(g);return wctx.createPattern(c,'repeat');};
   ROOF_P={tile:mk(g=>{g.fillStyle='rgba(0,0,0,.32)';g.fillRect(0,9,16,1);g.fillStyle='rgba(255,255,255,.07)';g.fillRect(0,0,16,1);g.fillStyle='rgba(0,0,0,.22)';g.fillRect(4,0,1,9);g.fillRect(12,0,1,4);}),
    flat:mk(g=>{g.fillStyle='rgba(0,0,0,.08)';g.fillRect(0,0,16,1);g.fillRect(0,0,1,10);g.fillStyle='rgba(255,255,255,.04)';g.fillRect(8,5,1,1);})};}return tile?ROOF_P.tile:ROOF_P.flat;}
+
+// ---- Kasteel Waardenburg: baksteen, leien en rode pannen, ronde traptoren met spits, klokkentorentje, schoorstenen en dakkapellen
+function drawWbCastle(b,r,f,cx,cy){const n=r.length-1,c=centroid(r.slice(0,n));ctx.save();
+  // dak: binnenrand (nok) en graten naar de hoeken
+  const inner=r.slice(0,n).map(q=>[q[0]+(c[0]-q[0])*.42,q[1]+(c[1]-q[1])*.42]);
+  ctx.beginPath();ctx.moveTo(r[0][0],r[0][1]);for(let i=1;i<n;i++)ctx.lineTo(r[i][0],r[i][1]);ctx.closePath();ctx.clip();
+  // oostvleugel met rode pannen
+  const bx=b.bb[0]+(b.bb[2]-b.bb[0])*.62;const ex=bx+(bx-cx)*f;ctx.fillStyle='#a2503a';ctx.fillRect(ex,b.bb[1]-400,2000,3000);
+  ctx.strokeStyle='rgba(60,20,10,.35)';ctx.lineWidth=1;for(let y=b.bb[1]-300;y<b.bb[3]+300;y+=5){ctx.beginPath();ctx.moveTo(ex,y);ctx.lineTo(ex+800,y);ctx.stroke();}
+  ctx.strokeStyle='rgba(0,0,0,.28)';ctx.lineWidth=1.4;for(let i=0;i<n;i+=2){ctx.beginPath();ctx.moveTo(r[i][0],r[i][1]);ctx.lineTo(inner[i][0],inner[i][1]);ctx.stroke();}
+  ctx.strokeStyle='rgba(20,20,30,.5)';ctx.lineWidth=2.4;ctx.beginPath();ctx.moveTo(inner[0][0],inner[0][1]);for(let i=1;i<n;i++)ctx.lineTo(inner[i][0],inner[i][1]);ctx.closePath();ctx.stroke();
+  // dakkapellen en dakramen
+  for(let i=0;i<n;i+=3){const q=r[i],m=[q[0]*.7+inner[i][0]*.3,q[1]*.7+inner[i][1]*.3];ctx.fillStyle='#2e333b';ctx.fillRect(m[0]-4,m[1]-4,8,8);ctx.fillStyle='#e9e3d6';ctx.fillRect(m[0]-2.5,m[1]-1,5,3);}
+  ctx.restore();
+  // schoorstenen
+  for(const t of [.2,.48,.8]){const q=r[Math.floor(t*n)],m=[q[0]*.6+c[0]*.4,q[1]*.6+c[1]*.4],x=m[0]+(m[0]-cx)*f*.15,y=m[1]+(m[1]-cy)*f*.15;ctx.fillStyle='#7a3b2c';ctx.fillRect(x-5,y-5,10,10);ctx.fillStyle='#2a2020';ctx.fillRect(x-3,y-3,6,6);}
+  // ronde traptoren (zuidzijde) met leien spits
+  let si=0;for(let i=0;i<n;i++)if(b.p[i][1]>b.p[si][1]||(b.p[i][1]===b.p[si][1]&&Math.abs(b.p[i][0]-b.cx)<Math.abs(b.p[si][0]-b.cx)))si=i;
+  const tb=[b.p[si][0]*.6+b.cx*.4,b.p[si][1]*.85+b.cy*.15],f2=f*1.6,tt=[tb[0]+(tb[0]-cx)*f2,tb[1]+(tb[1]-cy)*f2],R=19;
+  ctx.fillStyle='#7d4231';ctx.beginPath();ctx.moveTo(tb[0]-R,tb[1]);ctx.lineTo(tt[0]-R,tt[1]);ctx.lineTo(tt[0]+R,tt[1]);ctx.lineTo(tb[0]+R,tb[1]);ctx.closePath();ctx.fill();
+  const cg=ctx.createRadialGradient(tt[0]-6,tt[1]-6,2,tt[0],tt[1],R+2);cg.addColorStop(0,'#6a7484');cg.addColorStop(1,'#2a2f38');ctx.fillStyle=cg;ctx.beginPath();ctx.arc(tt[0],tt[1],R+2,0,TAU);ctx.fill();
+  ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=1;for(let a=0;a<TAU;a+=TAU/10){ctx.beginPath();ctx.moveTo(tt[0],tt[1]);ctx.lineTo(tt[0]+Math.cos(a)*(R+2),tt[1]+Math.sin(a)*(R+2));ctx.stroke();}
+  ctx.fillStyle='#c9a64a';ctx.beginPath();ctx.arc(tt[0],tt[1],2.5,0,TAU);ctx.fill();
+  // klokkentorentje (noordoost) met spitse leien kap en windvaan
+  let ni=0;for(let i=0;i<n;i++)if(b.p[i][0]-b.p[i][1]>b.p[ni][0]-b.p[ni][1])ni=i;
+  const qb=[b.p[ni][0]*.78+b.cx*.22,b.p[ni][1]*.78+b.cy*.22],f3=f*2.05,qt=[qb[0]+(qb[0]-cx)*f3,qb[1]+(qb[1]-cy)*f3],S2=17;
+  ctx.fillStyle='#8a4834';ctx.beginPath();ctx.moveTo(qb[0]-S2,qb[1]+S2);ctx.lineTo(qt[0]-S2,qt[1]+S2);ctx.lineTo(qt[0]+S2,qt[1]+S2);ctx.lineTo(qb[0]+S2,qb[1]+S2);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#6e3a2a';ctx.beginPath();ctx.moveTo(qb[0]+S2,qb[1]-S2);ctx.lineTo(qt[0]+S2,qt[1]-S2);ctx.lineTo(qt[0]+S2,qt[1]+S2);ctx.lineTo(qb[0]+S2,qb[1]+S2);ctx.closePath();ctx.fill();
+  const pk=[qt[0]+(qt[0]-cx)*.05,qt[1]+(qt[1]-cy)*.05];for(const [a,b2,col] of [[[-1,-1],[1,-1],'#59616d'],[[1,-1],[1,1],'#3b414b'],[[1,1],[-1,1],'#2e333b'],[[-1,1],[-1,-1],'#4a515c']]){ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(qt[0]+a[0]*S2,qt[1]+a[1]*S2);ctx.lineTo(qt[0]+b2[0]*S2,qt[1]+b2[1]*S2);ctx.lineTo(pk[0],pk[1]);ctx.closePath();ctx.fill();}
+  ctx.fillStyle='#c9a64a';ctx.beginPath();ctx.arc(pk[0],pk[1],2.4,0,TAU);ctx.fill();}
 
 // ---- 14a-licht.js
 // ====================== licht (PixiJS / WebGL-lichtkaart) ======================

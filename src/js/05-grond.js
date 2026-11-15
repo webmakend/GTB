@@ -29,20 +29,21 @@ function renderChunk(ci,cj){
   fillPolys(WD.sand,pat('sand'));
   fillPolys(WATERS,pat('water'),'#8f8a80',6);
   fillPolys(WD.islands,pat('park'),'#8f8a80',5);
-  fillPolys(WD.parking,'#8e8f8f','#77787a',2);
+  fillPolys(WD.parking,PATS.conc?pat('conc'):'#8e8f8f','#77787a',2);
   g.restore();
   // stoepen
   const RV=ROADS.filter(r=>inBox(r.bb,ox,oy,X1,Y1,r.w+70));
   g.strokeStyle=pat('pave');for(const r of RV){g.lineWidth=r.w+(r.fort?88:44);pathPoly(g,r.p);g.stroke();}
   fillPolys(WD.plaza,pat('plaza'));
   // paden en fietspaden
-  for(const p of PATHS){if(!inBox(p.bb,ox,oy,X1,Y1,30))continue;g.strokeStyle=p.k==='cycleway'?'#a3584a':p.k==='footway'?'#c7c0b2':p.k==='track'?'#a89474':'#b7a684';g.lineWidth=p.w;for(const q of p.segs){pathPoly(g,q);g.stroke();}}
+  for(const p of PATHS){if(!inBox(p.bb,ox,oy,X1,Y1,30))continue;g.strokeStyle=p.k==='cycleway'?'#a3584a':p.k==='footway'?(PATS.tiles?pat('tiles'):'#c7c0b2'):p.k==='track'||p.k==='path'?(PATS.dirt?pat('dirt'):'#a89474'):'#b7a684';g.lineWidth=p.w;for(const q of p.segs){pathPoly(g,q);g.stroke();}}
   // rijbaan
   g.strokeStyle='#6d6a64';for(const r of RV){if(r.k==='pedestrian')continue;g.lineWidth=r.w+4;pathPoly(g,r.p);g.stroke();}
   for(const r of RV){g.strokeStyle=r.k==='pedestrian'?pat('plaza'):r.brick?pat('brick'):pat('asphalt');g.lineWidth=r.w;pathPoly(g,r.p);g.stroke();}
   for(const r of RV){if(!r.bridge)continue;g.strokeStyle='#e8e2d4';g.lineWidth=3;for(const o of [-r.w/2+6,r.w/2-6]){const dx=r.p[1][0]-r.p[0][0],dy=r.p[1][1]-r.p[0][1],l=Math.hypot(dx,dy),nx=-dy/l*o,ny=dx/l*o;g.beginPath();g.moveTo(r.p[0][0]+nx,r.p[0][1]+ny);g.lineTo(r.p[1][0]+nx,r.p[1][1]+ny);g.stroke();}}
   for(const r of RV){if(r.brick||r.w<60)continue;g.setLineDash([22,20]);g.strokeStyle='rgba(255,255,255,.75)';g.lineWidth=2.5;pathPoly(g,r.p);g.stroke();g.setLineDash([]);
     if(r.k!=='pedestrian'&&!r.bridge)for(let k=0;k<r.p.length-1;k++){const a=r.p[k],q=r.p[k+1],dx=q[0]-a[0],dy=q[1]-a[1],l=Math.hypot(dx,dy)||1;for(const o of [-r.w/2+5,r.w/2-5]){const nx=-dy/l*o,ny=dx/l*o;g.strokeStyle='rgba(255,255,255,.55)';g.lineWidth=1.6;g.beginPath();g.moveTo(a[0]+nx,a[1]+ny);g.lineTo(q[0]+nx,q[1]+ny);g.stroke();}}}
+  drawZebras(g,ox,oy,X1,Y1);
   // brugleuningen
   g.fillStyle='#d6d0c4';
   const cx0=Math.floor(ox/T),cy0=Math.floor(oy/T);
@@ -67,3 +68,21 @@ function renderChunk(ci,cj){
 }
 function getChunk(ci,cj){const k=ci+','+cj;let c=chunkCache.get(k);if(c){chunkCache.delete(k);chunkCache.set(k,c);return c;}c=renderChunk(ci,cj);chunkCache.set(k,c);if(chunkCache.size>Math.max(IS_TOUCH?42:70,Math.ceil(CW/viewZ()/CS+2)*Math.ceil(CH/viewZ()/CS+2)+10))chunkCache.delete(chunkCache.keys().next().value);return c;}
 
+
+// ---- echte straattexturen (asfalt, klinkers/stoeptegels, beton) uit de modulaire city-kit
+const STREET=new Image();STREET.src='assets/street.webp';
+STREET.onload=()=>{if(!PATS)buildPats();const cut=(x,w,h,dk)=>{const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');g.drawImage(STREET,x,0,w,h,0,0,w,h);if(dk){g.fillStyle=dk;g.fillRect(0,0,w,h);}return c;};
+  PATS.asphalt=cut(0,128,128,'rgba(20,22,28,.28)');PATS.pave=cut(128,96,96,'rgba(0,0,0,.08)');PATS.tiles=cut(224,96,96);PATS.conc=cut(320,96,96,'rgba(0,0,0,.12)');PATS.dirt=cut(416,96,96);chunkCache.clear();};
+// zebrapaden op kruispunten (alleen in de bebouwde kom) en putdeksels
+let ZEBRAS=null,MANH=null;
+function buildZebras(){ZEBRAS=[];MANH=[];const deg=new Map(),wmax=new Map();
+  for(const r of ROADS){if(r.k==='service'||r.bridge||/^motorway/.test(r.k))continue;r.p.forEach((q,i)=>{const j=r.j[i];if(!j)return;deg.set(j,(deg.get(j)||0)+1+(i>0&&i<r.p.length-1?1:0));wmax.set(j,Math.max(wmax.get(j)||0,r.w));});}
+  for(const r of ROADS){if(r.k==='service'||r.k==='pedestrian'||r.bridge||/^motorway/.test(r.k)||r.w<50)continue;
+    r.p.forEach((q,i)=>{const j=r.j[i];if(!j||(deg.get(j)||0)<3)return;for(const nb of [i-1,i+1]){if(nb<0||nb>=r.p.length)continue;const o=r.p[nb],dx=o[0]-q[0],dy=o[1]-q[1],L=Math.hypot(dx,dy);const d=(wmax.get(j)||r.w)/2+26;if(L<d+40)continue;
+      if(!(inFort(q[0],q[1])||inWB(q[0],q[1])))continue;ZEBRAS.push({x:q[0]+dx/L*d,y:q[1]+dy/L*d,ux:dx/L,uy:dy/L,w:r.w});}});
+    let acc=hsh(r.p[0][0]|0,r.p[0][1]|0)%300;for(let i=0;i<r.p.length-1;i++){const a=r.p[i],b=r.p[i+1],L=Math.hypot(b[0]-a[0],b[1]-a[1]);while(acc<L){const t=acc/L,s=((acc*7)%3-1)*r.w*.18;MANH.push({x:a[0]+(b[0]-a[0])*t-(b[1]-a[1])/L*s,y:a[1]+(b[1]-a[1])*t+(b[0]-a[0])/L*s});acc+=520;}acc-=L;}}}
+function drawZebras(g,ox,oy,X1,Y1){if(!ZEBRAS)buildZebras();
+  for(const z of ZEBRAS){if(z.x<ox-80||z.x>X1+80||z.y<oy-80||z.y>Y1+80)continue;const nx=-z.uy,ny=z.ux,half=z.w/2-4;g.fillStyle='rgba(240,240,236,.88)';
+    for(let s=-half;s<half-6;s+=14){g.beginPath();const x0=z.x+nx*s,y0=z.y+ny*s;g.moveTo(x0-z.ux*13,y0-z.uy*13);g.lineTo(x0+z.ux*13,y0+z.uy*13);g.lineTo(x0+z.ux*13+nx*7,y0+z.uy*13+ny*7);g.lineTo(x0-z.ux*13+nx*7,y0-z.uy*13+ny*7);g.closePath();g.fill();}
+    g.strokeStyle='rgba(240,240,236,.85)';g.lineWidth=3;g.beginPath();g.moveTo(z.x+z.ux*22-nx*half,z.y+z.uy*22-ny*half);g.lineTo(z.x+z.ux*22,z.y+z.uy*22);g.stroke();}
+  for(const m of MANH){if(m.x<ox-10||m.x>X1+10||m.y<oy-10||m.y>Y1+10)continue;g.fillStyle='#2b2c2f';g.beginPath();g.arc(m.x,m.y,5.5,0,TAU);g.fill();g.strokeStyle='#55575c';g.lineWidth=1.2;g.stroke();g.strokeStyle='rgba(0,0,0,.4)';g.lineWidth=.8;g.beginPath();g.moveTo(m.x-3.5,m.y);g.lineTo(m.x+3.5,m.y);g.moveTo(m.x,m.y-3.5);g.lineTo(m.x,m.y+3.5);g.stroke();}}
