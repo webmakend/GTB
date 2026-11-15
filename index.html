@@ -5226,7 +5226,7 @@ function renderWorld(){
     if(P.squash>0&&!(jz>0)){const q=P.squash/9;ctx.save();ctx.translate(P.x,P.y);ctx.scale(1+.3*q,1-.22*q);ctx.translate(-P.x,-P.y);}
     drawPed({run:P.running,spr:P.ch&&P.ch.spr!=null?PPL_SPR[P.ch.spr[0]][P.ch.spr[1]]:null,x:P.x,y:P.y,a:P.a,anim:jz>0?1.2:P.anim,col:P.ch?P.ch.body:'#ff2e88',hair:P.ch?P.ch.head:'#2b1d0e',state:'walk',kind:'p',wet:0},true);if(jz>0||P.squash>0)ctx.restore();}}
   for(const c of cars)if(!c.dead&&inV(c.x,c.y,60))drawCar(c);
-  if(typeof drawRailTop==="function")drawRailTop();drawTrees(vx0,vy0,vx1,vy1,cx,cy);drawBuildings(vx0,vy0,vx1,vy1,cx,cy);drawCables(vx0,vy0,vx1,vy1,cx,cy);drawBridgeSign(vx0,vy0,vx1,vy1,cx,cy);drawStatue(vx0,vy0,vx1,vy1,cx,cy);drawParts();drawBalloons();
+  if(typeof drawRailTop==="function")drawRailTop();drawTrees(vx0,vy0,vx1,vy1,cx,cy);drawBuildings(vx0,vy0,vx1,vy1,cx,cy);if(typeof drawVisitPins==='function')drawVisitPins(cx,cy);drawCables(vx0,vy0,vx1,vy1,cx,cy);drawBridgeSign(vx0,vy0,vx1,vy1,cx,cy);drawStatue(vx0,vy0,vx1,vy1,cx,cy);drawParts();drawBalloons();
   if(!GL.ok)drawEvening(vx0,vy0,vx1,vy1);
   // bovenste laag (niet door de lichtkaart verdonkerd): gloed, markeringen, teksten, HUD
   ctx=fctx;ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,fxc.width,fxc.height);applyCam(ctx);
@@ -5470,22 +5470,25 @@ function mapOverlay(){let ov=document.getElementById('mapOv');
   if(!ov){ov=document.createElement('div');ov.id='mapOv';ov.style.cssText='position:fixed;inset:0;z-index:45;display:none;background:rgba(8,4,20,.92);touch-action:none';
     const c=document.createElement('canvas');c.id='mapC';c.style.cssText='position:absolute;inset:0;width:100%;height:100%';ov.appendChild(c);
     const b=document.createElement('div');b.textContent='✕  SLUITEN';b.style.cssText='position:absolute;right:calc(var(--sr) + 14px);top:calc(var(--st) + 14px);padding:10px 16px;border-radius:12px;background:#ff2e88;color:#fff;font:800 14px Inter,sans-serif;letter-spacing:1px;cursor:pointer';ov.appendChild(b);
-    ov.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();bigMap=false;});document.body.appendChild(ov);}
+    ov.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();const r=ov.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,M=window.BMAP;
+      if(typeof MAPSP!=='undefined'&&MAPSP.btn&&x>MAPSP.btn[0]&&x<MAPSP.btn[0]+MAPSP.btn[2]&&y>MAPSP.btn[1]&&y<MAPSP.btn[1]+MAPSP.btn[3]){mapSpawnDo();return;}
+      if(M&&x>M.x0&&x<M.x0+M.w&&y>M.y0&&y<M.y0+M.h&&MODE==='play'&&typeof MAPSP!=='undefined'){const wx=M.bx0+(x-M.x0)/M.s,wy=M.by0+(y-M.y0)/M.s;const q=snap(wx,wy);if(q&&mapSpawnOk(q[0],q[1])){MAPSP.t=q;sfx('blip');}else{MAPSP.t=null;MAPSP.err=60;}return;}
+      bigMap=false;if(typeof MAPSP!=='undefined')MAPSP.t=null;});document.body.appendChild(ov);}
   ov.style.display=bigMap?'block':'none';if(!bigMap)return;const c=document.getElementById('mapC');if(c.width!==Math.round(CW*DPR)||c.height!==Math.round(CH*DPR)){c.width=Math.round(CW*DPR);c.height=Math.round(CH*DPR);}
   const keep=ctx;ctx=c.getContext('2d');ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,CW,CH);drawBigMap();ctx=keep;}
 function drawBigMap(){
   const ub=WBOPEN&&WB?[Math.min(FORTBB[0],WB.bb[0]),WB.bb[1],Math.max(FORTBB[2],WB.bb[2]),FORTBB[3]]:FORTBB,bx0=ub[0]-250,by0=ub[1]-250,bw=ub[2]-ub[0]+500,bh=ub[3]-ub[1]+500,top=uiTop().bottom+34;
   const s=Math.min((CW-20)/bw,(CH-top-30)/bh),w=bw*s,h=bh*s,x0=(CW-w)/2,y0=top+(CH-top-30-h)/2;
   if(MAPC){ctx.imageSmoothingQuality='high';ctx.drawImage(MAPC,bx0*MAPS,by0*MAPS,bw*MAPS,bh*MAPS,x0,y0,w,h);}ctx.strokeStyle='rgba(255,255,255,.8)';ctx.lineWidth=2;ctx.strokeRect(x0,y0,w,h);
-  const mp=(x,y)=>[x0+(x-bx0)*s,y0+(y-by0)*s],fs=clamp(w/95,8.5,12);ctx.font=`700 ${fs}px Inter, sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
-  const placed=[];
+  window.BMAP={x0,y0,w,h,s,bx0,by0};const mp=(x,y)=>[x0+(x-bx0)*s,y0+(y-by0)*s],fs=clamp(w/95,8.5,12);ctx.font=`700 ${fs}px Inter, sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+  const placed=[];ctx.save();ctx.beginPath();ctx.rect(x0,y0,w,h);ctx.clip();
   for(const l of LANDMARKS.slice().sort((a,b)=>(a.shop?1:0)-(b.shop?1:0))){const [x,y]=mp(l.x,l.y);ctx.fillStyle=l.shop?(l.c||'#fff'):'#ffd166';ctx.beginPath();ctx.arc(x,y,l.shop?3:4.5,0,TAU);ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=1;ctx.stroke();
     const tw=ctx.measureText(l.n).width;let ly=y-fs;if(placed.some(q=>Math.abs(q[0]-x)<(q[2]+tw)/2+2&&Math.abs(q[1]-ly)<fs+1))ly=y+fs;if(placed.some(q=>Math.abs(q[0]-x)<(q[2]+tw)/2+2&&Math.abs(q[1]-ly)<fs+1))continue;placed.push([x,ly,tw]);
     ctx.lineWidth=3;ctx.strokeStyle='rgba(0,0,0,.75)';ctx.strokeText(l.n,x,ly);ctx.fillStyle='#fff';ctx.fillText(l.n,x,ly);}
   if(MIS.on&&!MIS.done){const [qx,qy]=mp(MIS.x,MIS.y),r=9+3*Math.sin(frameN*.15);ctx.strokeStyle='#ffd166';ctx.lineWidth=3;ctx.beginPath();ctx.arc(qx,qy,r,0,TAU);ctx.stroke();ctx.lineWidth=3;ctx.strokeStyle='rgba(0,0,0,.8)';ctx.strokeText('MISSIE',qx,qy-r-8);ctx.fillStyle='#ffd166';ctx.fillText('MISSIE',qx,qy-r-8);}
-  histBigMap(mp);jobBigMap(mp,fs);progBigMap(mp,fs);
+  histBigMap(mp);jobBigMap(mp,fs);progBigMap(mp,fs);ctx.restore();
   const [px,py]=mp(me().x,me().y);ctx.fillStyle=(frameN>>4)&1?'#fff':'#ff2e88';ctx.beginPath();ctx.arc(px,py,7,0,TAU);ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.stroke();
-  txt(WBOPEN?'KAART · ZALTBOMMEL & WAARDENBURG':'KAART · VESTING ZALTBOMMEL',CW/2,top-30,clamp(CW/22,16,22),'#ffd166','center');txt('tik ergens om te sluiten · ✕ rechtsboven',CW/2,top-10,11,'rgba(255,255,255,.7)','center','Inter, sans-serif');txt('Kaartdata © OpenStreetMap-bijdragers',x0+w,y0+h+4,10,'rgba(255,255,255,.6)','right','Inter, sans-serif');}
+  txt(WBOPEN?'KAART · ZALTBOMMEL & WAARDENBURG':'KAART · VESTING ZALTBOMMEL',CW/2,top-30,clamp(CW/22,16,22),'#ffd166','center');txt('tik buiten de kaart om te sluiten · ✕ rechtsboven',CW/2,top-10,11,'rgba(255,255,255,.7)','center','Inter, sans-serif');txt('Kaartdata © OpenStreetMap-bijdragers',x0+w,y0+h+4,10,'rgba(255,255,255,.6)','right','Inter, sans-serif');}
 
 // ---- WASTED / BUSTED in GTA-stijl (Pricedown als die er is, anders een vette fallback)
 const DEATH_FONT="'Pricedown','Pricedown Bl','Pricedown Black',Anton,Impact,sans-serif";
@@ -6008,6 +6011,7 @@ function actFind(){
   const z=ACT.zw;if(z&&Math.hypot(P.x-z.x,P.y-z.y)<46)return{k:'zw',t:P.high>0?'De zwerver: "Rustig aan, maat"':'Spul kopen bij de zwerver (€5)',btn:'💊<br>€5',off:P.high>0};
   const s=nearShop();
   if(s){if(s.n==='Café Henkie')return null;
+    if(s.n==='Intertoys')return{k:'toys',t:'🧸 Naar binnen bij Intertoys',btn:'🧸<br>BINNEN'};
     if(s.n==="'t Stadscafé")return{k:'stadscafe',t:"🍺 Naar binnen bij 't Stadscafé",btn:'🍺<br>BINNEN'};
     if(s.n==='Huisarts')return{k:'doc',s,t:P.hp>=P.maxhp?'Huisarts: je bent kerngezond':'Naar de dokter: volle health (€2)',btn:'🩺<br>€2',off:P.hp>=P.maxhp};
     const f=FOOD[s.n];if(f)return{k:'eat',s,f,t:`${f.t} (€${f.p})`,btn:`${f.e}<br>€${f.p}`};
@@ -6028,6 +6032,7 @@ function actTry(){const a=ACT.cur;if(!a)return false;if(a.off)return true;
   if(a.k==='esso'){essoFill();return true;}
   if(a.k==='tol'){tollPay();return true;}
   if(a.k==='tennis'){tnStart();return true;}
+  if(a.k==='toys'){scEnter('intertoys');return true;}
   if(a.k==='dorp'){scEnter('dorpshuis');return true;}
   if(a.k==='huis'){houseBuy(a.b);return true;}
   if(a.k==='thuis'){P.hp=P.maxhp;sfx('reward');noteAdd('UITGERUST','Lekker thuis. Je health is weer vol.','#7dff6a',150,'thuis');return true;}
@@ -6300,7 +6305,7 @@ const ACH={fiets:['Fietsendief','Steel je eerste fiets'],overval:['Handen omhoog
   kasteel:['Cultuursnuiver','Het Stadskasteel bezocht'],uitzicht:['Hoog en droog','Boven op de oude watertoren'],klus3:['Klusjesman','3 klussen gedaan'],race:['Bommel GP','Straatrace gewonnen'],rijk:['Binnen!','€500 op zak'],schat:['Schatzoeker','De schat van Maarten van Rossum'],schutter:['Scherpschutter','Alle flessen geraakt']};
 const COINS=[];
 function progLoad(){try{const s=JSON.parse(lsGet(PRG_KEY)||'null');if(s)Object.assign(PRG,s,{toasts:[],combo:0,comboT:0,dirty:false,dailyDone:false,reveal:0});}catch(e){}PRG.lvl=lvlOf(PRG.xp);P.inv=Array.isArray(PRG.inv)?PRG.inv.slice():(PRG.gun?['balloon','pistol']:['balloon']);syncWpn();applyLevelPerks();}
-function progSave(){const o={xp:PRG.xp,coins:PRG.coins,ach:PRG.ach,day:PRG.day,streak:PRG.streak,gun:P.gun,inv:P.inv,wb:PRG.wb?1:0,robs:PRG.robs,jobs:PRG.jobs,races:PRG.races,hist:PRG.hist};lsSet(PRG_KEY,JSON.stringify(o));PRG.dirty=false;}
+function progSave(){const o={xp:PRG.xp,coins:PRG.coins,ach:PRG.ach,day:PRG.day,streak:PRG.streak,gun:P.gun,inv:P.inv,wb:PRG.wb?1:0,robs:PRG.robs,jobs:PRG.jobs,races:PRG.races,hist:PRG.hist,sqz:PRG.sqz||{}};lsSet(PRG_KEY,JSON.stringify(o));PRG.dirty=false;}
 function need(l){return Math.round(120*Math.pow(l,1.45));}
 function lvlOf(xp){let l=1,t=0;while(xp>=t+need(l)){t+=need(l);l++;}return l;}
 function lvlBase(l){let t=0;for(let i=1;i<l;i++)t+=need(i);return t;}
@@ -6555,6 +6560,7 @@ function drawNotes(){HUDX.cards=[];if(MG.on||bigMap)return;ctx=fctx;const U=HUDX
   // dagbonus (tik om te claimen)
   if(PRG.bonus){add('DAGBONUS · DAG '+PRG.bonus.day,'+€'+PRG.bonus.cash,'Tik om te claimen','#4ade80',()=>progClaim(),.75+.25*Math.sin(frameN*.12));}
   if(typeof pvpCards==='function')pvpCards(add);
+  if(typeof sqzHud==='function')sqzHud(add);
   // actie in de buurt (tik = doen)
   if(ACT.cur&&!ACT.cur.off&&!P.dead&&(!P.car||ACT.cur.k==='esso'||ACT.cur.k==='tol')){const a=ACT.cur;add(a.k==='rob'?'OVERVAL':a.k==='pee'?'PLASNOOD':a.k==='job'?'KLUS':'ACTIE',IS_TOUCH?'TIK':'E',a.k==='pee'?'Tik hier om tegen een muur te plassen':a.t,a.k==='rob'?'#ff4d4d':'#ffd166',()=>{actTry();});}
   // statusregels (drank, plasnood, spul, energie, combo)
@@ -7088,7 +7094,7 @@ function scBtns(on){let ex=document.getElementById('scExit'),dr=document.getElem
 function scFree(x,z){return scCell(x,z)==='.';}
 function scStep(){SC.t++;frameN++;const k=keys;let fw=SC.mv.f,tn=SC.mv.t;const typing=document.activeElement&&document.activeElement.tagName==='INPUT';if(!typing){if(k.ArrowLeft||k.KeyA)tn=-1;if(k.ArrowRight||k.KeyD)tn=1;if(k.ArrowUp||k.KeyW)fw=1;if(k.ArrowDown||k.KeyS)fw=-1;}SC.yaw+=tn*.04;
   if(Math.abs(fw)>.05){const sp=.055*fw,nx=SC.x+Math.cos(SC.yaw)*sp,nz=SC.z+Math.sin(SC.yaw)*sp,r=.25;if(scFree(nx+Math.sign(nx-SC.x)*r,SC.z))SC.x=nx;if(scFree(SC.x,nz+Math.sign(nz-SC.z)*r))SC.z=nz;SC.bob+=Math.abs(fw)*.18;if(SC.t%24===0)sfx('step');}
-  const bar=SC.room==='stadscafe'?'B':'K',atBar=scCell(SC.x+Math.cos(SC.yaw)*.9,SC.z+Math.sin(SC.yaw)*.9)===bar||scCell(SC.x+Math.cos(SC.yaw)*.55,SC.z+Math.sin(SC.yaw)*.55)===bar;const dr=document.getElementById('scDrink');if(dr){dr.style.display=atBar?'block':'none';dr.textContent=SC.room==='stadscafe'?'🍺 BIERTJE BESTELLEN (€2)':'☕ KOFFIE MET KOEK (€2)';}
+  const bar=SC.room==='stadscafe'?'B':SC.room==='intertoys'?'#none':'K',atBar=scCell(SC.x+Math.cos(SC.yaw)*.9,SC.z+Math.sin(SC.yaw)*.9)===bar||scCell(SC.x+Math.cos(SC.yaw)*.55,SC.z+Math.sin(SC.yaw)*.55)===bar;const dr=document.getElementById('scDrink');if(dr){dr.style.display=atBar?'block':'none';dr.textContent=SC.room==='stadscafe'?'🍺 BIERTJE BESTELLEN (€2)':'☕ KOFFIE MET KOEK (€2)';}
   if(atBar&&(pressed.Enter||pressed.Space))buyBeer();if(!typing&&(pressed.KeyE||pressed.Escape))scExit();if(scCell(SC.x+Math.cos(SC.yaw)*.4,SC.z+Math.sin(SC.yaw)*.4)==='D'&&Math.abs(fw)>.05)scExit();for(const kk in pressed)pressed[kk]=false;
   if(P.drunk>0&&SC.t%600===0)P.drunk=Math.max(0,P.drunk-1);}
 function scOthers(){if(!(NET.room||NET.http))return [];return netOthers().map(p=>p.presence).filter(s=>s.in===SC.room&&typeof s.ix==='number');}
@@ -7097,7 +7103,7 @@ function drawSC(){const R=ROOMS[SC.room],T=R.tex,OBJ=R.objs,g=fctx;g.setTransfor
   const W2=RW,H2=RH,px=SCB.px,zb=SCB.zb,fov=1.15,f=(W2/2)/Math.tan(fov/2),camH=1.62,CEIL=Math.max(...Object.values(R.h)),hor=H2*.47+Math.sin(SC.bob)*2+(P.drunk>2?Math.sin(SC.t*.03)*P.drunk*1.5:0),cy=Math.cos(SC.yaw),sy=Math.sin(SC.yaw);
   const shade=(c,k,pt)=>{let r=c&255,gg=(c>>8)&255,b=(c>>16)&255;r=r*k+pt*40;gg=gg*k;b=b*k+pt*60;return 0xff000000|(Math.min(255,b)<<16)|(Math.min(255,gg)<<8)|Math.min(255,r);};
   const lightAt=(x,z,d)=>{let l=.55/(1+d*.09);for(const o of OBJ)if(o.lamp){const q=(x-o.x)**2+(z-o.z)**2;l+=.55/(1+q*.6);}return Math.min(1.25,l);};
-  const floorC=R.floor==='check'?(wx,wz)=>(((Math.floor(wx*2)+Math.floor(wz*2))&1)?0xffc4d8e6:0xff2a2626):(wx,wz)=>{const bx=Math.floor(wx*4),bz=Math.floor(wz*1.2+((bx&1)*.5));const v=((bx*73856093)^(bz*19349663))&15;return 0xff000000|((60+v)<<16)|((110+v*2)<<8)|(170+v*3);};
+  const floorC=R.floor==='tiles'?(wx,wz)=>(((Math.floor(wx*1.6)+Math.floor(wz*1.6))&1)?0xffdcdcdc:0xffcfcfcf):R.floor==='check'?(wx,wz)=>(((Math.floor(wx*2)+Math.floor(wz*2))&1)?0xffc4d8e6:0xff2a2626):(wx,wz)=>{const bx=Math.floor(wx*4),bz=Math.floor(wz*1.2+((bx&1)*.5));const v=((bx*73856093)^(bz*19349663))&15;return 0xff000000|((60+v)<<16)|((110+v*2)<<8)|(170+v*3);};
   for(let y=0;y<H2;y++){const dy=y-hor;if(Math.abs(dy)<1){for(let x=0;x<W2;x++){px[y*W2+x]=0xff100810;zb[y*W2+x]=1e9;}continue;}const floor=dy>0,hgt=floor?camH:(CEIL-camH),dist=hgt*f/Math.abs(dy);
     for(let x=0;x<W2;x++){const rx=(x-W2/2)/f,wx=SC.x+(cy-sy*rx)*dist,wz=SC.z+(sy+cy*rx)*dist;const c=floor?floorC(wx,wz):R.ceil;const pt=R.tint?Math.max(0,1-wx/R.tint)*.6:0;px[y*W2+x]=shade(c,floor?lightAt(wx,wz,dist):(lightAt(wx,wz,dist)*.6),pt);zb[y*W2+x]=dist;}}
   for(let x=0;x<W2;x++){const rx=(x-W2/2)/f,dx=cy-sy*rx,dz=sy+cy*rx;let mx=Math.floor(SC.x),mz=Math.floor(SC.z);const ddx=Math.abs(1/dx),ddz=Math.abs(1/dz),stx=dx<0?-1:1,stz=dz<0?-1:1;let sdx=(dx<0?SC.x-mx:mx+1-SC.x)*ddx,sdz=(dz<0?SC.z-mz:mz+1-SC.z)*ddz;
@@ -7105,7 +7111,7 @@ function drawSC(){const R=ROOMS[SC.room],T=R.tex,OBJ=R.objs,g=fctx;g.setTransfor
     for(let hI=hits.length-1;hI>=0;hI--){const h=hits[hI],H=R.h[h.c]||3,perp=h.d;
       const top=Math.round(hor-(H-camH)/perp*f),bot=Math.round(hor+camH/perp*f),tx=T[h.c]||T['#'],L=lightAt(SC.x+dx*perp,SC.z+dz*perp,perp)*(h.side?.82:1),pt=R.tint?Math.max(0,1-(SC.x+dx*perp)/R.tint)*.5:0;
       const tu=Math.floor(h.u*tx.w*(H<2?2:1))%tx.w;for(let y=Math.max(0,top);y<Math.min(H2,bot);y++){const i=y*W2+x;if(zb[i]<perp)continue;const tv=Math.floor((y-top)/(bot-top)*tx.h);px[i]=shade(tx.d[tv*tx.w+tu],L,pt);zb[i]=perp;}
-      if(H<camH){const y1=Math.round(hor+(camH-H)/h.ex*f),tt=h.c==='K'?T.topK:T.top;for(let y=Math.max(0,y1);y<Math.min(H2,top);y++){const i=y*W2+x;const dd2=(camH-H)*f/(y-hor);if(zb[i]<dd2)continue;const wx=SC.x+dx*dd2,wz=SC.z+dz*dd2;px[i]=shade(tt.d[(Math.floor(wz*8)&31)*32+(Math.floor(wx*8)&31)],lightAt(wx,wz,dd2)*1.1,0);zb[i]=dd2;}}}}
+      if(H<camH){const y1=Math.round(hor+(camH-H)/h.ex*f),tt=h.c==='K'?T.topK:SC.room==='intertoys'?T.topI:T.top;for(let y=Math.max(0,y1);y<Math.min(H2,top);y++){const i=y*W2+x;const dd2=(camH-H)*f/(y-hor);if(zb[i]<dd2)continue;const wx=SC.x+dx*dd2,wz=SC.z+dz*dd2;px[i]=shade(tt.d[(Math.floor(wz*8)&31)*32+(Math.floor(wx*8)&31)],lightAt(wx,wz,dd2)*1.1,0);zb[i]=dd2;}}}}
   // sprites: inrichting + andere spelers die ook binnen zijn
   const OTH=scOthers(),pers=[];const SPR=SCSPR;
   const all=OBJ.map(o=>({o})).concat(OTH.map(s=>{const ch=CHARS.find(c=>c.id===s.ch);const key='pl_'+(s.ch||'x');if(!SPR[key])SPR[key]=mkTex(32,80,(g)=>{g.fillStyle='#2a2a30';g.fillRect(10,52,5,28);g.fillRect(17,52,5,28);g.fillStyle=ch?ch.c:'#7b2ff7';g.fillRect(7,22,18,32);g.fillRect(4,24,4,22);g.fillRect(24,24,4,22);g.fillStyle=ch?ch.skin||'#e0b48f':'#e0b48f';g.beginPath();g.arc(16,13,8,0,6.3);g.fill();g.fillStyle=ch?ch.hairC||'#222':'#222';g.beginPath();g.arc(16,10,8,3.1,6.3);g.fill();});return {o:{x:s.ix,z:s.iz,y:0,h:1.75,w:.6,s:key},pl:s};}));
@@ -7217,6 +7223,74 @@ function houseName(b){let d=document.getElementById('hnDlg');if(!d){d=document.c
   const ok=()=>{const t=inp.value.replace(/[<>]/g,'').trim().slice(0,24)||'Mijn huis';d.style.display='none';paused=false;inp.blur();HS[b.oid].t=t;MYH[b.oid]=t;lsSet('gtb_myhouses',JSON.stringify(MYH));noteAdd('HUIS GEKOCHT!','"'+t+'" is nu van jou. Iedereen ziet de naam op het dak.','#7dff6a',260);
     if(NET.http)fetch('api.php?a=hname',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:netPid(),oid:String(b.oid),name:t})}).catch(()=>{});};d.querySelector('.hnOk').onclick=ok;}
 function houseTag(b,x,y){const h=HS[b.oid];if(!h)return;const mine=h.p===pvpPub(),t='🏠 '+(h.t||'Huis');ctx.font='800 15px Inter, sans-serif';const w=Math.max(ctx.measureText(t).width,ctx.measureText(h.o||'').width*.8)+18;ctx.fillStyle=mine?'rgba(255,209,102,.96)':'rgba(30,20,50,.9)';rrect(ctx,x-w/2,y-19,w,38,8);ctx.fill();ctx.fillStyle=mine?'#2a1a00':'#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(t,x,y-6);ctx.font='700 12px Inter, sans-serif';ctx.fillStyle=mine?'#5a3a00':'#c7b8ff';ctx.fillText(h.o||'',x,y+10);}
+
+// ---- 21w-intertoys.js
+// ====================== bezoekbare winkels duidelijk aangeven, Intertoys (3D) met Squeezy-axolotls, cadeau geven, spawnen via de kaart ======================
+// ---- Squeezies: zachte axolotl-knijpbeestjes in allerlei kleuren
+const SQZ=[{k:'roze',n:'Roze',c:'#f7a8c8',g:'#e0447e'},{k:'lila',n:'Lila',c:'#cdb6ec',g:'#6a3fc1'},{k:'blauw',n:'Blauw',c:'#9fd2f5',g:'#2a6fd6'},{k:'geel',n:'Geel',c:'#f9e27a',g:'#e8901c'},{k:'groen',n:'Groen',c:'#bfeaa0',g:'#3f9a3a'},{k:'koraal',n:'Koraal',c:'#f6a39a',g:'#d8433a'},{k:'paars',n:'Paars',c:'#8f8ce0',g:'#4b2fb0'},{k:'creme',n:'Crème',c:'#f3e6cf',g:'#e2b23c'}];
+function sqzCount(){const o=PRG.sqz||{};return Object.values(o).reduce((a,b)=>a+b,0);}
+function sqzAdd(k,n){PRG.sqz=PRG.sqz||{};PRG.sqz[k]=(PRG.sqz[k]||0)+n;if(PRG.sqz[k]<=0)delete PRG.sqz[k];PRG.dirty=true;try{progSave();}catch(e){}}
+function drawAxo(g,x,y,r,col){const c=col.c,gl=col.g;g.save();g.translate(x,y);
+  for(const sd of [-1,1])for(let i=0;i<3;i++){g.fillStyle=gl;g.beginPath();const a=(-.7+i*.55)*sd,bx=sd*r*.78,by=-r*.35;g.ellipse(bx+Math.cos(a)*r*.35*sd*0+sd*r*.25,by+(i-1)*r*.28,r*.32,r*.12,(i-1)*.45*sd,0,TAU);g.fill();}
+  g.fillStyle=c;g.beginPath();g.ellipse(0,r*.45,r*.72,r*.62,0,0,TAU);g.fill();g.beginPath();g.ellipse(0,-r*.15,r*.85,r*.7,0,0,TAU);g.fill();
+  g.fillStyle='rgba(255,255,255,.35)';g.beginPath();g.ellipse(-r*.35,-r*.45,r*.25,r*.14,-.4,0,TAU);g.fill();
+  g.fillStyle='#222';g.beginPath();g.arc(-r*.32,-r*.12,r*.1,0,TAU);g.arc(r*.32,-r*.12,r*.1,0,TAU);g.fill();g.fillStyle='#fff';g.beginPath();g.arc(-r*.29,-r*.16,r*.035,0,TAU);g.arc(r*.35,-r*.16,r*.035,0,TAU);g.fill();
+  g.strokeStyle='#222';g.lineWidth=Math.max(1,r*.06);g.beginPath();g.moveTo(-r*.13,r*.06);g.quadraticCurveTo(-r*.065,r*.15,0,r*.06);g.quadraticCurveTo(r*.065,r*.15,r*.13,r*.06);g.stroke();
+  g.fillStyle='rgba(240,90,140,.45)';g.beginPath();g.ellipse(-r*.5,r*.05,r*.12,r*.07,0,0,TAU);g.ellipse(r*.5,r*.05,r*.12,r*.07,0,0,TAU);g.fill();
+  g.fillStyle=c;g.strokeStyle='rgba(0,0,0,.12)';g.lineWidth=1;for(const sd of [-1,1]){g.beginPath();g.ellipse(sd*r*.42,r*.45,r*.14,r*.2,sd*.3,0,TAU);g.fill();g.stroke();}g.restore();}
+// ---- linksboven: aantal gekochte Squeezies
+function sqzHud(add){const n=sqzCount();if(!n)return;const o=PRG.sqz,ks=Object.keys(o);add('SQUEEZIES',ks.length>1?ks.length+' kleuren':'',`${n} stuks: `+ks.map(k=>{const s=SQZ.find(q=>q.k===k);return (s?s.n:k)+' ×'+o[k];}).join(', '),'#f7a8c8',null);}
+// ---- Intertoys als 3D-winkel
+ROOMS.intertoys={name:'INTERTOYS ZALTBOMMEL',hint:'Loop naar het schap met de Squeezies (achterin rechts)',music:0,spawn:[6.5,10.4,-Math.PI/2],floor:'tiles',ceil:0xffe8e8e8,tint:0,
+  map:['IIIIIIIIIIIIIIIIIIIIIIII','I......................I','I.SSSSSS..TTTTTT..1234.I','I......................I','I.SSSSSS..TTTTTT..5678.I','I......................I','I.SSSSSS..TTTTTT.......I','I......................I','I.CCCC.................I','I.C....................W','I......................W','WWWWWDDWWWWWWWWWWWWWWWWW'],
+  h:{I:3.2,W:3.2,D:3.2,S:1.8,T:1.8,C:1.0,'1':1.55,'2':1.55,'3':1.55,'4':1.55,'5':1.55,'6':1.55,'7':1.55,'8':1.55}};
+function itTex(T){const mk=mkTex;
+  T.I=mk(64,64,(g,w,h)=>{g.fillStyle='#f4f1ec';g.fillRect(0,0,w,h);g.fillStyle='#e30613';g.fillRect(0,0,w,14);g.fillStyle='#fff';g.font='900 10px Inter, sans-serif';g.textAlign='center';g.fillText('intertoys',32,11);g.fillStyle='#ffd400';g.fillRect(0,14,w,3);g.fillStyle='#ddd';g.fillRect(0,56,w,8);});
+  const shelf=(cols,kind)=>mk(64,64,(g,w,h)=>{g.fillStyle='#e30613';g.fillRect(0,0,w,h);g.fillStyle='#fafafa';for(let y=4;y<64;y+=20)g.fillRect(2,y,60,16);for(let y=4,r=0;y<64;y+=20,r++)for(let x=4;x<60;x+=10){g.fillStyle=cols[(x/10+r*2|0)%cols.length];if(kind==='box')g.fillRect(x,y+2,8,13);else{g.beginPath();g.arc(x+4,y+10,4,0,6.3);g.fill();g.fillRect(x+1,y+2,6,5);}}});
+  T.S=shelf(['#1e88e5','#43a047','#fdd835','#8e24aa','#fb8c00','#e53935'],'box');T.T=shelf(['#ec407a','#26c6da','#ffca28','#7e57c2','#66bb6a'],'toy');
+  SQZ.forEach((s,i)=>{T[String(i+1)]=mk(64,64,(g,w,h)=>{g.fillStyle='#ffd400';g.fillRect(0,0,w,h);g.fillStyle='#fffdf5';g.fillRect(2,2,60,60);g.fillStyle='#e30613';g.fillRect(0,0,w,9);g.fillStyle='#fff';g.font='900 7px Inter, sans-serif';g.textAlign='center';g.fillText('SQUEEZY · €3',32,7);for(const [x,y] of [[16,24],[44,24],[16,48],[44,48]])drawAxo(g,x,y,10,s);});});
+  T.C=mk(64,64,(g,w,h)=>{g.fillStyle='#e30613';g.fillRect(0,0,w,h);g.fillStyle='#ffd400';g.fillRect(0,0,w,8);g.fillStyle='#fff';g.font='900 9px Inter';g.textAlign='center';g.fillText('KASSA',32,36);});
+  T.topI=mk(32,32,(g,w,h)=>{g.fillStyle='#ececec';g.fillRect(0,0,w,h);});return T;}
+function itObjs(){const o=[{x:2.4,z:9.4,y:0,h:1.7,w:.6,s:'kassa'},{x:3,z:5.2,y:0,h:1.6,w:.6,s:'gast2'},{x:13,z:7.3,y:0,h:1.2,w:.5,s:'kind'},{x:20.5,z:6.5,y:0,h:1.3,w:1.2,s:'beer'},{x:21.5,z:9.5,y:0,h:2.2,w:.8,s:'ballon'}];for(const [x,z] of [[5,3],[12,5],[19,7],[8,9.5]])o.push({x,z,y:2.9,h:.25,w:1.1,s:'tl',lamp:1});return o;}
+function itSprites(S){const mk=mkTex;S.kassa=mk(32,80,(g)=>{g.fillStyle='#2a2a30';g.fillRect(10,52,5,28);g.fillRect(17,52,5,28);g.fillStyle='#e30613';g.fillRect(7,22,18,32);g.fillRect(4,24,4,22);g.fillRect(24,24,4,22);g.fillStyle='#e0b48f';g.beginPath();g.arc(16,13,8,0,6.3);g.fill();g.fillStyle='#6b3e1e';g.beginPath();g.arc(16,10,8,3.1,6.3);g.fill();g.fillRect(8,9,3,14);g.fillRect(21,9,3,14);});
+  S.kind=mk(32,64,(g)=>{g.fillStyle='#1e88e5';g.fillRect(10,40,5,24);g.fillRect(17,40,5,24);g.fillStyle='#fdd835';g.fillRect(8,18,16,24);g.fillStyle='#e0b48f';g.beginPath();g.arc(16,11,8,0,6.3);g.fill();g.fillStyle='#222';g.beginPath();g.arc(16,8,8,3.1,6.3);g.fill();drawAxo(g,25,30,5,SQZ[0]);});
+  S.beer=mk(64,64,(g)=>{g.fillStyle='#a0682f';g.beginPath();g.arc(32,40,22,0,6.3);g.fill();g.beginPath();g.arc(32,16,15,0,6.3);g.fill();g.beginPath();g.arc(20,5,6,0,6.3);g.arc(44,5,6,0,6.3);g.fill();g.fillStyle='#e8c69a';g.beginPath();g.arc(32,20,6,0,6.3);g.arc(32,44,12,0,6.3);g.fill();g.fillStyle='#222';g.beginPath();g.arc(27,13,2,0,6.3);g.arc(37,13,2,0,6.3);g.arc(32,19,2,0,6.3);g.fill();g.fillStyle='#e30613';g.fillRect(24,28,16,5);});
+  S.ballon=mk(32,96,(g)=>{for(const [x,y,c] of [[10,14,'#e53935'],[22,10,'#fdd835'],[16,26,'#1e88e5']]){g.fillStyle=c;g.beginPath();g.ellipse(x,y,8,10,0,0,6.3);g.fill();}g.strokeStyle='#888';g.beginPath();g.moveTo(16,36);g.lineTo(16,96);g.stroke();});}
+(function(){const _sc=scEnter;scEnter=function(room){if(room==='intertoys'){const R=ROOMS.intertoys;if(!R.tex){R.tex=itTex(scTex());}if(!SCSPR)SCSPR=scSprites();if(!SCSPR.kassa)itSprites(SCSPR);if(!R.objs)R.objs=itObjs();}_sc(room);};})();
+// vloer van de winkel: lichte tegels
+// Squeezy-knop als je voor het schap staat
+function sqzFacing(){if(!SC.on||SC.room!=='intertoys')return -1;for(const d of [.6,.95]){const c=scCell(SC.x+Math.cos(SC.yaw)*d,SC.z+Math.sin(SC.yaw)*d);if(c>='1'&&c<='8')return +c-1;}return -1;}
+function sqzBuy(i){const s=SQZ[i];if(!s)return;if(P.money<3){noteAdd('TE WEINIG GELD','Een Squeezy kost €3','#ff6b6b',150,'sqzgeld');return;}addMoney(-3);sqzAdd(s.k,1);sfx('kassa');buzz(20);noteAdd('SQUEEZY GEKOCHT','Een '+s.n.toLowerCase()+' axolotl! Je hebt er nu '+sqzCount()+'. Geef ze aan vrienden via hun profiel.','#f7a8c8',220,'sqz');if(typeof voiceSay==='function'&&Math.random()<.5)voiceSay('Wat een schatje!');}
+setInterval(()=>{let b=document.getElementById('sqzBtn');const i=sqzFacing();if(i<0){if(b)b.style.display='none';return;}if(!b){b=document.createElement('div');b.id='sqzBtn';b.className='scBtn';b.style.cssText+='right:calc(var(--sr) + 14px);bottom:calc(var(--sb) + 40px);white-space:nowrap;background:linear-gradient(90deg,#e30613,#ff2e88)';b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();sqzBuy(+b.dataset.i);});document.body.appendChild(b);}
+  b.dataset.i=i;b.style.display='block';const t='🧸 '+SQZ[i].n+' kopen · €3';if(b.textContent!==t)b.textContent=t;},120);
+window.addEventListener('keydown',e=>{if(SC.on&&SC.room==='intertoys'&&(e.code==='Enter'||e.code==='Space')){const i=sqzFacing();if(i>=0)sqzBuy(i);}});
+// ---- cadeau geven aan een vriend (moet online zijn)
+function sqzGive(pub,k){const s=pvpByPub(pub);if(!s){noteAdd('NIET ONLINE','Je vriend moet online zijn om een cadeautje te krijgen','#ff9f1c',160);return;}if(!(PRG.sqz&&PRG.sqz[k]>0))return;const i=SQZ.findIndex(q=>q.k===k);sqzAdd(k,-1);pvpSend('gift',pub,i);sfx('reward');noteAdd('CADEAU GEGEVEN','Je gaf '+(s.nm||'je vriend')+' een '+SQZ[i].n.toLowerCase()+' Squeezy','#f7a8c8',200);}
+{const _r=pvpRecv;pvpRecv=function(s,e){if(e.k==='gift'){const q=SQZ[e.d];if(!q)return;sqzAdd(q.k,1);sfx('reward');buzz([30,40,30]);noteAdd('CADEAU!',String(s.nm||'Een vriend').slice(0,14)+' gaf je een '+q.n.toLowerCase()+' Squeezy','#f7a8c8',300);return;}_r(s,e);};}
+{const _pr=profRender;profRender=function(){_pr();const pub=LB.prof,fr=frGet();if(!fr[pub]||!sqzCount())return;const PF=document.getElementById('lbProf'),bx=PF.querySelector('.pfBtns');const d=document.createElement('div');d.className='pfGift';d.innerHTML='<small>🎁 Geef een Squeezy:</small>';
+  for(const k of Object.keys(PRG.sqz)){const s=SQZ.find(q=>q.k===k);if(!s)continue;const c=document.createElement('canvas');c.width=56;c.height=56;drawAxo(c.getContext('2d'),28,30,18,s);const w=document.createElement('span');w.appendChild(c);const n=document.createElement('b');n.textContent='×'+PRG.sqz[k];w.appendChild(n);w.addEventListener('click',e=>{e.preventDefault();sqzGive(pub,k);profRender();});d.appendChild(w);}bx.parentNode.insertBefore(d,bx);};}
+// ---- bezoekbare winkels/cafés: zwevende pin met icoon boven het pand (+ op de minikaart)
+function visitIcon(s){const n=s.n;if(n==='Intertoys')return'🧸';if(n==="'t Stadscafé"||n==='Café Henkie')return'🍺';if(n==='Huisarts')return'🩺';if(FOOD[n])return FOOD[n].e;if(n==='Albert Heijn'||n==='Lidl'||n==='Gall & Gall')return'🛒';if(n==='CinCin')return'🍷';if(s.c==='Kapper / Barbershop')return'💈';if(n==='Stadskasteel')return'🏰';if(n==='Esso')return'⛽';if(typeof MODE_SHOPS!=='undefined'&&MODE_SHOPS.has(n))return'👕';return null;}
+let VISIT=null;function visitList(){if(VISIT)return VISIT;VISIT=[];for(const s of SHOPS){const ic=visitIcon(s);if(ic)VISIT.push({x:s.b.cx,y:s.b.cy,b:s.b,ic,n:s.n});}for(const b of BUILDINGS)if(b.dorp)VISIT.push({x:b.cx,y:b.cy,b,ic:'🏛',n:'Dorpshuis De Koeldert'});if(typeof TENNIS!=='undefined'&&TENNIS)VISIT.push({x:TENNIS.x,y:TENNIS.y,ic:'🎾',n:'Tennis'});if(typeof ESSO!=='undefined'&&ESSO&&!VISIT.some(v=>v.n==='Esso'))VISIT.push({x:ESSO.x,y:ESSO.y,ic:'⛽',n:'Esso'});return VISIT;}
+function drawVisitPins(cx,cy){const o=me();for(const v of visitList()){if(Math.abs(v.x-cx)>1100||Math.abs(v.y-cy)>1100)continue;const ht=v.b?Math.min(v.b.ht||30,180):20,f=ht*.0022,x=v.x+(v.x-cx)*f,y=v.y+(v.y-cy)*f-18+Math.sin(frameN*.06+v.x)*4,d=Math.hypot(v.x-o.x,v.y-o.y);
+    ctx.save();ctx.globalAlpha=.25+.15*Math.sin(frameN*.08);ctx.fillStyle='#ffd166';ctx.beginPath();ctx.arc(x,y,24,0,TAU);ctx.fill();ctx.globalAlpha=1;ctx.fillStyle='#1a0a2c';ctx.strokeStyle='#ffd166';ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,16,0,TAU);ctx.fill();ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x-6,y+14);ctx.lineTo(x,y+24);ctx.lineTo(x+6,y+14);ctx.fill();ctx.font='16px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(v.ic,x,y+1);
+    if(d<420){ctx.font='800 12px Inter, sans-serif';const w=ctx.measureText(v.n).width+14;ctx.fillStyle='rgba(26,10,44,.9)';rrect(ctx,x-w/2,y-42,w,20,9);ctx.fill();ctx.fillStyle='#ffd166';ctx.fillText(v.n,x,y-32);}ctx.restore();}}
+{const _nm=netMinimap;netMinimap=function(mp,cxm,cym,S){for(const v of visitList()){const [x,y]=mp(v.x,v.y);if(Math.hypot(x-cxm,y-cym)>S/2-6)continue;ctx.fillStyle='#ffd166';ctx.beginPath();ctx.arc(x,y,3,0,TAU);ctx.fill();ctx.strokeStyle='#1a0a2c';ctx.lineWidth=1;ctx.stroke();}_nm(mp,cxm,cym,S);};}
+// ---- spawnen via de grote kaart (€10)
+const MAPSP={t:null};
+function mapSpawnOk(x,y){const c=cellAt(x,y);if(c===WATER||c===BUILD)return false;if(typeof inWB==='function'&&inWB(x,y)&&!WBOPEN)return false;return true;}
+function mapSpawnDo(){const t=MAPSP.t;if(!t)return;if(P.money<10){noteAdd('TE WEINIG GELD','Spawnen kost €10','#ff6b6b',150);return;}if(P.car){P.car.driver=null;P.car=null;}addMoney(-10);P.x=t[0];P.y=t[1];camX=P.x;camY=P.y;MAPSP.t=null;bigMap=false;try{populate();}catch(e){}sfx('reward');ring(P.x,P.y,40,'rgba(255,209,102,.9)');noteAdd('GESPAWND','Je bent hier neergezet (−€10)','#ffd166',150);}
+{const _bm=drawBigMap;drawBigMap=function(){_bm();const M=window.BMAP;if(!M||MODE!=='play')return;MAPSP.btn=null;
+  txt('📍 Tik op de kaart om ergens te spawnen (€10)',CW/2,M.y0+M.h+18,12,'#ffd166','center','Inter, sans-serif');
+  if(MAPSP.err>0){MAPSP.err--;txt('Daar kun je niet spawnen',CW/2,M.y0+M.h+36,12,'#ff6b6b','center','Inter, sans-serif');}
+  const t=MAPSP.t;if(!t)return;const x=M.x0+(t[0]-M.bx0)*M.s,y=M.y0+(t[1]-M.by0)*M.s,r=8+3*Math.sin(frameN*.2);
+  ctx.strokeStyle='#ffd166';ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.stroke();ctx.font='20px sans-serif';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('📍',x,y-4);
+  const lb='📍 HIER SPAWNEN (€10)';ctx.font='900 15px Inter, sans-serif';const bw=ctx.measureText(lb).width+30,bh=40;let bx=clamp(x-bw/2,8,CW-bw-8),by=y+16;if(by+bh>CH-8)by=y-bh-34;
+  ctx.fillStyle='#ff2e88';ctx.shadowColor='#ff2e88';ctx.shadowBlur=16;rrect(ctx,bx,by,bw,bh,12);ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#fff';ctx.textBaseline='middle';ctx.fillText(lb,bx+bw/2,by+bh/2+1);MAPSP.btn=[bx,by,bw,bh];};}
+
+{const _af=actFind;actFind=function(){if(SC.on)return null;return _af.apply(this,arguments);};}
+{const st=document.createElement('style');st.textContent='.pfGift{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:6px 0;color:#f7a8c8;font:700 12px Inter,sans-serif}.pfGift small{width:100%}.pfGift span{position:relative;cursor:pointer;background:#2a1a40;border:1px solid #f7a8c8;border-radius:10px;padding:2px}.pfGift canvas{position:static!important;inset:auto!important;width:42px!important;height:42px!important;display:block;pointer-events:none}.pfGift b{position:absolute;right:3px;bottom:1px;font-size:11px;color:#fff;text-shadow:0 1px 2px #000}';document.head.appendChild(st);}
 
 // ---- 22-start.js
 // ====================== start ======================

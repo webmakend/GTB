@@ -25,6 +25,7 @@ function drawNotes(){HUDX.cards=[];if(MG.on||bigMap)return;ctx=fctx;const U=HUDX
   // dagbonus (tik om te claimen)
   if(PRG.bonus){add('DAGBONUS · DAG '+PRG.bonus.day,'+€'+PRG.bonus.cash,'Tik om te claimen','#4ade80',()=>progClaim(),.75+.25*Math.sin(frameN*.12));}
   if(typeof pvpCards==='function')pvpCards(add);
+  if(typeof sqzHud==='function')sqzHud(add);
   // actie in de buurt (tik = doen)
   if(ACT.cur&&!ACT.cur.off&&!P.dead&&(!P.car||ACT.cur.k==='esso'||ACT.cur.k==='tol')){const a=ACT.cur;add(a.k==='rob'?'OVERVAL':a.k==='pee'?'PLASNOOD':a.k==='job'?'KLUS':'ACTIE',IS_TOUCH?'TIK':'E',a.k==='pee'?'Tik hier om tegen een muur te plassen':a.t,a.k==='rob'?'#ff4d4d':'#ffd166',()=>{actTry();});}
   // statusregels (drank, plasnood, spul, energie, combo)

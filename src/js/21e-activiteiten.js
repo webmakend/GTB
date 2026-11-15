@@ -30,6 +30,7 @@ function actFind(){
   const z=ACT.zw;if(z&&Math.hypot(P.x-z.x,P.y-z.y)<46)return{k:'zw',t:P.high>0?'De zwerver: "Rustig aan, maat"':'Spul kopen bij de zwerver (€5)',btn:'💊<br>€5',off:P.high>0};
   const s=nearShop();
   if(s){if(s.n==='Café Henkie')return null;
+    if(s.n==='Intertoys')return{k:'toys',t:'🧸 Naar binnen bij Intertoys',btn:'🧸<br>BINNEN'};
     if(s.n==="'t Stadscafé")return{k:'stadscafe',t:"🍺 Naar binnen bij 't Stadscafé",btn:'🍺<br>BINNEN'};
     if(s.n==='Huisarts')return{k:'doc',s,t:P.hp>=P.maxhp?'Huisarts: je bent kerngezond':'Naar de dokter: volle health (€2)',btn:'🩺<br>€2',off:P.hp>=P.maxhp};
     const f=FOOD[s.n];if(f)return{k:'eat',s,f,t:`${f.t} (€${f.p})`,btn:`${f.e}<br>€${f.p}`};
@@ -50,6 +51,7 @@ function actTry(){const a=ACT.cur;if(!a)return false;if(a.off)return true;
   if(a.k==='esso'){essoFill();return true;}
   if(a.k==='tol'){tollPay();return true;}
   if(a.k==='tennis'){tnStart();return true;}
+  if(a.k==='toys'){scEnter('intertoys');return true;}
   if(a.k==='dorp'){scEnter('dorpshuis');return true;}
   if(a.k==='huis'){houseBuy(a.b);return true;}
   if(a.k==='thuis'){P.hp=P.maxhp;sfx('reward');noteAdd('UITGERUST','Lekker thuis. Je health is weer vol.','#7dff6a',150,'thuis');return true;}

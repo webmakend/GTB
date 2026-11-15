@@ -69,22 +69,25 @@ function mapOverlay(){let ov=document.getElementById('mapOv');
   if(!ov){ov=document.createElement('div');ov.id='mapOv';ov.style.cssText='position:fixed;inset:0;z-index:45;display:none;background:rgba(8,4,20,.92);touch-action:none';
     const c=document.createElement('canvas');c.id='mapC';c.style.cssText='position:absolute;inset:0;width:100%;height:100%';ov.appendChild(c);
     const b=document.createElement('div');b.textContent='✕  SLUITEN';b.style.cssText='position:absolute;right:calc(var(--sr) + 14px);top:calc(var(--st) + 14px);padding:10px 16px;border-radius:12px;background:#ff2e88;color:#fff;font:800 14px Inter,sans-serif;letter-spacing:1px;cursor:pointer';ov.appendChild(b);
-    ov.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();bigMap=false;});document.body.appendChild(ov);}
+    ov.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();const r=ov.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,M=window.BMAP;
+      if(typeof MAPSP!=='undefined'&&MAPSP.btn&&x>MAPSP.btn[0]&&x<MAPSP.btn[0]+MAPSP.btn[2]&&y>MAPSP.btn[1]&&y<MAPSP.btn[1]+MAPSP.btn[3]){mapSpawnDo();return;}
+      if(M&&x>M.x0&&x<M.x0+M.w&&y>M.y0&&y<M.y0+M.h&&MODE==='play'&&typeof MAPSP!=='undefined'){const wx=M.bx0+(x-M.x0)/M.s,wy=M.by0+(y-M.y0)/M.s;const q=snap(wx,wy);if(q&&mapSpawnOk(q[0],q[1])){MAPSP.t=q;sfx('blip');}else{MAPSP.t=null;MAPSP.err=60;}return;}
+      bigMap=false;if(typeof MAPSP!=='undefined')MAPSP.t=null;});document.body.appendChild(ov);}
   ov.style.display=bigMap?'block':'none';if(!bigMap)return;const c=document.getElementById('mapC');if(c.width!==Math.round(CW*DPR)||c.height!==Math.round(CH*DPR)){c.width=Math.round(CW*DPR);c.height=Math.round(CH*DPR);}
   const keep=ctx;ctx=c.getContext('2d');ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,CW,CH);drawBigMap();ctx=keep;}
 function drawBigMap(){
   const ub=WBOPEN&&WB?[Math.min(FORTBB[0],WB.bb[0]),WB.bb[1],Math.max(FORTBB[2],WB.bb[2]),FORTBB[3]]:FORTBB,bx0=ub[0]-250,by0=ub[1]-250,bw=ub[2]-ub[0]+500,bh=ub[3]-ub[1]+500,top=uiTop().bottom+34;
   const s=Math.min((CW-20)/bw,(CH-top-30)/bh),w=bw*s,h=bh*s,x0=(CW-w)/2,y0=top+(CH-top-30-h)/2;
   if(MAPC){ctx.imageSmoothingQuality='high';ctx.drawImage(MAPC,bx0*MAPS,by0*MAPS,bw*MAPS,bh*MAPS,x0,y0,w,h);}ctx.strokeStyle='rgba(255,255,255,.8)';ctx.lineWidth=2;ctx.strokeRect(x0,y0,w,h);
-  const mp=(x,y)=>[x0+(x-bx0)*s,y0+(y-by0)*s],fs=clamp(w/95,8.5,12);ctx.font=`700 ${fs}px Inter, sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
-  const placed=[];
+  window.BMAP={x0,y0,w,h,s,bx0,by0};const mp=(x,y)=>[x0+(x-bx0)*s,y0+(y-by0)*s],fs=clamp(w/95,8.5,12);ctx.font=`700 ${fs}px Inter, sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+  const placed=[];ctx.save();ctx.beginPath();ctx.rect(x0,y0,w,h);ctx.clip();
   for(const l of LANDMARKS.slice().sort((a,b)=>(a.shop?1:0)-(b.shop?1:0))){const [x,y]=mp(l.x,l.y);ctx.fillStyle=l.shop?(l.c||'#fff'):'#ffd166';ctx.beginPath();ctx.arc(x,y,l.shop?3:4.5,0,TAU);ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=1;ctx.stroke();
     const tw=ctx.measureText(l.n).width;let ly=y-fs;if(placed.some(q=>Math.abs(q[0]-x)<(q[2]+tw)/2+2&&Math.abs(q[1]-ly)<fs+1))ly=y+fs;if(placed.some(q=>Math.abs(q[0]-x)<(q[2]+tw)/2+2&&Math.abs(q[1]-ly)<fs+1))continue;placed.push([x,ly,tw]);
     ctx.lineWidth=3;ctx.strokeStyle='rgba(0,0,0,.75)';ctx.strokeText(l.n,x,ly);ctx.fillStyle='#fff';ctx.fillText(l.n,x,ly);}
   if(MIS.on&&!MIS.done){const [qx,qy]=mp(MIS.x,MIS.y),r=9+3*Math.sin(frameN*.15);ctx.strokeStyle='#ffd166';ctx.lineWidth=3;ctx.beginPath();ctx.arc(qx,qy,r,0,TAU);ctx.stroke();ctx.lineWidth=3;ctx.strokeStyle='rgba(0,0,0,.8)';ctx.strokeText('MISSIE',qx,qy-r-8);ctx.fillStyle='#ffd166';ctx.fillText('MISSIE',qx,qy-r-8);}
-  histBigMap(mp);jobBigMap(mp,fs);progBigMap(mp,fs);
+  histBigMap(mp);jobBigMap(mp,fs);progBigMap(mp,fs);ctx.restore();
   const [px,py]=mp(me().x,me().y);ctx.fillStyle=(frameN>>4)&1?'#fff':'#ff2e88';ctx.beginPath();ctx.arc(px,py,7,0,TAU);ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.stroke();
-  txt(WBOPEN?'KAART · ZALTBOMMEL & WAARDENBURG':'KAART · VESTING ZALTBOMMEL',CW/2,top-30,clamp(CW/22,16,22),'#ffd166','center');txt('tik ergens om te sluiten · ✕ rechtsboven',CW/2,top-10,11,'rgba(255,255,255,.7)','center','Inter, sans-serif');txt('Kaartdata © OpenStreetMap-bijdragers',x0+w,y0+h+4,10,'rgba(255,255,255,.6)','right','Inter, sans-serif');}
+  txt(WBOPEN?'KAART · ZALTBOMMEL & WAARDENBURG':'KAART · VESTING ZALTBOMMEL',CW/2,top-30,clamp(CW/22,16,22),'#ffd166','center');txt('tik buiten de kaart om te sluiten · ✕ rechtsboven',CW/2,top-10,11,'rgba(255,255,255,.7)','center','Inter, sans-serif');txt('Kaartdata © OpenStreetMap-bijdragers',x0+w,y0+h+4,10,'rgba(255,255,255,.6)','right','Inter, sans-serif');}
 
 // ---- WASTED / BUSTED in GTA-stijl (Pricedown als die er is, anders een vette fallback)
 const DEATH_FONT="'Pricedown','Pricedown Bl','Pricedown Black',Anton,Impact,sans-serif";
