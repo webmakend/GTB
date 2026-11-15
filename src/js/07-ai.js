@@ -5,7 +5,7 @@ function blockedAhead(c){const fx=Math.cos(c.a),fy=Math.sin(c.a),sp=Math.max(0,f
   for(const p of peds){if(p.state==='down')continue;const dx=p.x-c.x,dy=p.y-c.y;if(Math.abs(dx)>90||Math.abs(dy)>90)continue;const lx=dx*fx+dy*fy,ly=-dx*fy+dy*fx;if(lx>0&&lx<look&&Math.abs(ly)<14)return true;}
   if(!P.car&&!P.dead){const dx=P.x-c.x,dy=P.y-c.y,lx=dx*fx+dy*fy,ly=-dx*fy+dy*fx;if(lx>0&&lx<look&&Math.abs(ly)<14)return true;}
   return false;}
-function pickNext(ai,F){const opts=F.B.adj.filter(k=>k!==ai.e);if(!opts.length)return ai.e;
+function pickNext(ai,F){const opts=F.B.adj.filter(k=>k!==ai.e&&!(EDGES[k].lock&&!WBOPEN));if(!opts.length)return ai.e;
   // voorkeur voor rechtdoor-achtige keuzes
   const sc=opts.map(k=>{const e=EDGES[k],f=e.a===F.Bid?1:0,G2=edgeFrame(e,f);return{k,d:F.ux*G2.ux+F.uy*G2.uy};});
   if(Math.random()<.55){sc.sort((a,b)=>b.d-a.d);return sc[0].k;}return rpick(opts);}

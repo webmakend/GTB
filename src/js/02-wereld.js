@@ -5,6 +5,12 @@ const GRASS=0,ROAD=1,WALK=2,BUILD=3,WATER=4,PARK=5,PLAZA=6,PATH=7,SAND=8;
 const G=new Uint8Array(GW*GH),BRG=new Uint8Array(GW*GH);
 const FORT=WD.fort,FORTBB=bbox(FORT);let BRIDGE=null,LAMPS=[],KLIP=null;
 const inFort=(x,y)=>x>FORTBB[0]&&x<FORTBB[2]&&y>FORTBB[1]&&y<FORTBB[3]&&pip(x,y,FORT);
+// ---- Waardenburg: ten noorden van de Waal, rondom bos; bereikbaar over de Martinus Nijhoffbrug na de laatste missie
+const WB=WD.wb||null,WBF=340;let WBLAND=null,WBOPEN=false;
+if(WB){const [x0,y0,x1,y1]=WB.bb,s=[];for(let x=x1;x>=x0;x-=200)s.push([x,Math.round(y1+Math.sin(x*.0019)*55+Math.sin(x*.0071)*22)]);WBLAND=[[x0,y0],[x1,y0]].concat(s,[[x0,y1]]);WBLAND.bb=bbox(WBLAND);}
+const inWB=(x,y)=>!!WB&&x>WB.bb[0]&&x<WB.bb[2]&&y>WB.bb[1]&&y<WB.bb[3]+90;
+const inWBForest=(x,y)=>inWB(x,y)&&(x<WB.bb[0]+WBF||x>WB.bb[2]-WBF||y<WB.bb[1]+WBF);
+const LANDS=WBLAND?[FORT,WBLAND]:[FORT];
 // rivier: oever + afsluiting naar het noorden
 const WATERS=WD.water;
 function cellAt(x,y){const cx=Math.floor(x/T),cy=Math.floor(y/T);if(cx<0||cy<0||cx>=GW||cy>=GH)return BUILD;return G[cy*GW+cx];}
@@ -20,8 +26,10 @@ function stampLine(p,hw,fn){for(let i=0;i<p.length-1;i++)stampSeg(p[i][0],p[i][1
 
 (function addBridge(){let ne=null,bv=-1e9;for(const q of FORT){const v=q[0]-q[1]*1.1;if(v>bv){bv=v;ne=q;}}let A=null,jid=null,bd=1e18;
   for(const r of WD.roads){if(!(r.k==='tertiary'||r.k==='residential'||r.k==='unclassified'))continue;r.p.forEach((q,i)=>{if(!r.j[i])return;const d=Math.hypot(q[0]-ne[0],q[1]-ne[1]);if(d<bd){bd=d;A=q;jid=r.j[i];}});}
-  if(!A)return;const dx=W-90-A[0],dy=70-A[1],L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L;const B=[Math.round(A[0]+ux*L),Math.round(A[1]+uy*L)];
-  WD.roads.push({n:'Martinus Nijhoffbrug',k:'tertiary',w:110,bridge:1,p:[A,B],j:[jid,'brug_einde']});BRIDGE={A,B,ux,uy,L};})();
+  if(!A)return;let B=null,bj='brug_einde';
+  if(WB){let by=-1;for(const r of WD.roads){if(!r.wb||!/^motorway|trunk|primary|secondary/.test(r.k))continue;for(const i of [0,r.p.length-1]){const q=r.p[i];if(q[1]>by&&Math.abs(q[0]-A[0])<3500){by=q[1];B=q;bj=r.j[i];}}}}
+  if(!B)B=[W-90,70];const dx=B[0]-A[0],dy=B[1]-A[1],L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L;
+  WD.roads.push({n:'Martinus Nijhoffbrug',k:'tertiary',w:120,bridge:1,lock:WB?1:0,p:[A,B],j:[jid,bj]});BRIDGE={A,B,ux,uy,L};})();
 const ROADS=WD.roads.map(r=>{const m=r.p[r.p.length>>1];return{...r,fort:inFort(m[0],m[1]),bb:bbox(r.p)};});
 for(const r of ROADS)r.brick=r.k==='pedestrian'||(r.fort&&r.k!=='tertiary');
 const PATHS=WD.paths.map(p=>({...p,bb:bbox(p.p)}));
@@ -58,7 +66,7 @@ function makeBeach(){const n=FORT.length,cyT=FORTBB[1]+(FORTBB[3]-FORTBB[1])*.32
   const p=inner.concat(outer.reverse());p.bb=bbox(p);return p;}
 function genWorld(){
   BEACH=makeBeach();
-  G.fill(WATER);if(BEACH)polyFill(BEACH,i=>{G[i]=SAND;});polyFill(FORT,i=>{G[i]=GRASS;});
+  G.fill(WATER);if(BEACH)polyFill(BEACH,i=>{G[i]=SAND;});polyFill(FORT,i=>{G[i]=GRASS;});if(WBLAND)polyFill(WBLAND,i=>{G[i]=GRASS;});
   for(const p of WD.green)polyFill(p,i=>{if(G[i]!==WATER)G[i]=PARK;});
   for(const p of WD.sand)polyFill(p,i=>{if(G[i]!==WATER)G[i]=SAND;});
   for(const p of WATERS)polyFill(p,i=>{G[i]=WATER;});
@@ -70,6 +78,8 @@ function genWorld(){
   for(const p of [])stampLine(p.p,p.w/2+2,i=>{if(G[i]===WATER)BRG[i]=1;if(G[i]!==ROAD)G[i]=PATH;});
   for(const r of ROADS)stampLine(r.p,r.w/2+(r.fort?44:22),i=>{const t=G[i];if(t===WATER||t===ROAD||t===PLAZA)return;G[i]=WALK;});
   for(const r of ROADS)stampLine(r.p,r.w/2,i=>{if(G[i]===WATER)BRG[i]=1;G[i]=ROAD;});
+  // bosrand rond Waardenburg: niet doorheen te komen (ook niet over de wegen die de kaart uit lopen)
+  if(WB){const [x0,y0,x1,y1]=WB.bb;for(let cy=Math.floor(y0/T);cy<=Math.ceil((y1+120)/T)&&cy<GH;cy++)for(let cx=Math.max(0,Math.floor(x0/T)-2);cx<=Math.ceil(x1/T)+2&&cx<GW;cx++){const x=cx*T+8,y=cy*T+8;if(inWBForest(x,y))G[cy*GW+cx]=BUILD;}}
   // gebouwen
   // alleen hoofdstraten, kerken, winkels en horeca: overige huizen worden tuin en groen
   const MR=ROADS.filter(r=>MAIN.has(r.n)),AR=ROADS.filter(r=>r.k!=='service'),nearR=(L,x,y,lim)=>{for(const r of L){if(x<r.bb[0]-lim||x>r.bb[2]+lim||y<r.bb[1]-lim||y>r.bb[3]+lim)continue;for(let i=0;i<r.p.length-1;i++){const a=r.p[i],q=r.p[i+1],dx=q[0]-a[0],dy=q[1]-a[1],L2=dx*dx+dy*dy||1;let t=clamp(((x-a[0])*dx+(y-a[1])*dy)/L2,0,1);if(Math.hypot(a[0]+dx*t-x,a[1]+dy*t-y)<lim)return true;}}return false;},nearMain=(x,y,lim)=>nearR(MR,x,y,lim);
@@ -79,6 +89,7 @@ function genWorld(){
   const WSTR=ROADS.filter(r=>r.n==='Waterstraat'),BSTR=ROADS.filter(r=>r.n==='Boschstraat'),MSTR=ROADS.filter(r=>r.n==='Markt'||r.n==='Gamerschestraat'),segD=(x,y,A,B)=>{const dx=B[0]-A[0],dy=B[1]-A[1],t=clamp(((x-A[0])*dx+(y-A[1])*dy)/(dx*dx+dy*dy||1),0,1);return Math.hypot(x-A[0]-t*dx,y-A[1]-t*dy);},
     nearWS=(x,y,d,L)=>(L||WSTR).some(r=>{for(let i=0;i<r.p.length-1;i++)if(segD(x,y,r.p[i],r.p[i+1])<d)return true;return false;});
   WD.buildings.forEach((ob,k)=>{const c=centroid(ob.p),h0=hsh(ob.p[0][0],ob.p[0][1]);const front=nearR(AR,c[0],c[1],125),edge=edgeD(c[0],c[1]);ob.ws=nearWS(c[0],c[1],190);ob.bs=pip(c[0],c[1],FORT)&&nearWS(c[0],c[1],170,BSTR);ob.ms=pip(c[0],c[1],FORT)&&nearWS(c[0],c[1],190,MSTR);ob.keep=!!(ob.ws||ob.bs||ob.ms||bizB.has(k)||ob.n||ob.b==='church'||ob.b==='civic'||(front&&edge>300&&(nearMain(c[0],c[1],175)||h0%100<72)));});
+  WD.buildings.forEach(ob=>{if(!ob.wb)return;const c=centroid(ob.p);ob.keep=!inWBForest(c[0],c[1])&&!!(ob.n||ob.b==='church'||(polyArea(ob.p)>900&&nearR(AR,c[0],c[1],260)));});
   for(const ob of WD.buildings){
     if(!ob.keep)continue;
     const b={p:ob.p,n:ob.n,kind:ob.b,ws:ob.ws,ms:ob.ms};const a=polyArea(ob.p),h=hsh(ob.p[0][0],ob.p[0][1]);
@@ -88,6 +99,7 @@ function genWorld(){
     if(b.flat)b.roof=RP(['#5f6266','#55585c','#6b6d70','#4c4f53','#646668']);
     if(ob.b==='church'){b.roof='#5d636a';b.wall='#b8ab95';b.label=ob.n;}
     if(ob.b==='civic'){b.wall='#e1d7c2';b.roof='#3d4146';b.label='Stadhuis';}
+    if(ob.wb){b.wb=1;if(ob.n&&/kerk|molen|gasthuis|burcht|gemeente/i.test(ob.n)){b.label=ob.n.replace(/^Hervormde Gemeente.*/,'Hervormde kerk Waardenburg');if(ob.b==='church'||/kerk|gemeente/i.test(ob.n)){b.roof='#5d636a';b.wall='#c9bda6';}}if(/kasteel/i.test(ob.n||'')){b.castle=1;b.label=ob.n;b.wall='#9a7a5e';b.roof='#5b4a40';b.flat=true;b.ridge=false;b.ht=Math.max(b.ht,58);}}
     if(ob.n==='Gasthuiskapel')b.label=ob.n;if(ob.n==='Maarten van Rossumhuis'){b.castle=1;b.label='Stadskasteel Zaltbommel';b.wall='#a89a86';b.roof='#6d6a66';b.flat=true;b.ridge=false;b.ht=Math.max(b.ht,52);}
     if(b.flat)b.ridge=false;
     prepBuilding(b);
@@ -154,6 +166,10 @@ function genWorld(){
   const signOn=(name,x,y,cat,adr)=>{let best=null,bd=1e9;for(const b of BUILDINGS){if(b.pass||b.kind==='tower'||b.wt||used.has(b))continue;if(Math.abs(b.cx-x)>260||Math.abs(b.cy-y)>260)continue;const d=pip(x,y,b.p)?0:Math.hypot(b.cx-x,b.cy-y);if(d<bd){bd=d;best=b;}}
     if(best){used.add(best);SHOPS.push({b:best,n:name,c:cat,rob:0});best.sign=name;best.signC=signCol(name,cat);best.sa=nearestRoadDir(best.cx,best.cy);LANDMARKS.push({n:name,x:best.cx,y:best.cy,shop:1,c:best.signC[0],cat,adr});}};
   for(const z of WD.biz)signOn(z.n,z.x,z.y,z.c,z.adr);
+  for(const z of (WD.wbiz||[])){if(z.c==='Kasteel'){LANDMARKS.push({n:z.n,x:z.x,y:z.y});continue;}if(z.c==='Voetbal'){LANDMARKS.push({n:'Sportpark '+z.n,x:z.x,y:z.y});continue;}
+    signOn(z.n,z.x,z.y,z.c==='Scholen'?'School':'Winkel',z.adr+', Waardenburg');}
+  {const RC={pub:'Restaurant',restaurant:'Restaurant',fast_food:'Restaurant',ice_cream:'Restaurant',bakery:'Winkel',butcher:'Winkel',convenience:'Winkel',supermarket:'Winkel',florist:'Winkel',bicycle:'Winkel',fuel:'Winkel',interior_decoration:'Winkel',kitchen:'Winkel'};
+   for(const p of WD.pois){if(!p.wb||!RC[p.k]||(WD.wbiz||[]).some(z=>z.n===p.n))continue;signOn(p.n,p.x,p.y,RC[p.k],'Waardenburg');}}
   // terrassen
   for(const p of WD.seating){const b=bbox(p),col=RP(['#e9e2d0','#1d6b4a','#5a1622','#f2f2f2','#c43b2f']);for(let y=b[1]+16;y<b[3]-8;y+=34)for(let x=b[0]+16;x<b[2]-8;x+=34)if(pip(x,y,p))TERRACE.push({x,y,c:col});}
   // lantaarnpalen
@@ -174,6 +190,9 @@ function genWorld(){
       SWIMMERS.push({x0:x,y0:y,x,y,ph:R(0,6.28),hair:RP(HAIRS),cap:rnd()<.3?RP(['#ff4fa3','#ffe14d','#36d1ff']):null});}}
   // bomen
   for(let i=0;i<40000&&TREES.length<3400;i++){const x=R(0,W),y=R(0,H),t=cellAt(x,y);let pr=0;if(!inFort(x,y))continue;if(t===PARK)pr=.55;else if(t===GRASS)pr=.16;if(rnd()<pr){let ok=true;for(const q of TREES){if(Math.abs(q.x-x)<22&&Math.abs(q.y-y)<22){ok=false;break;}}if(ok)TREES.push({x,y,r:R(13,24),c:RP(['#3a6b2f','#41752f','#335f2a','#4a7d36','#2f5a28'])});}}
+  // Waardenburg: bomen in tuinen en parken + dichte bosrand
+  if(WB){const [x0,y0,x1,y1]=WB.bb;let n=0;for(let i=0;i<30000&&n<1400;i++){const x=R(x0,x1),y=R(y0,y1),t=cellAt(x,y);if(inWBForest(x,y))continue;const pr=t===PARK?.5:t===GRASS?.12:0;if(rnd()>=pr)continue;if(TREES.some(q=>Math.abs(q.x-x)<24&&Math.abs(q.y-y)<24))continue;TREES.push({x,y,r:R(13,24),c:RP(['#3a6b2f','#41752f','#335f2a','#4a7d36'])});n++;}
+    const fc=['#24461f','#2b5226','#2f5a28','#1f3d1b','#355f2c'];for(let y=y0+30;y<y1+40;y+=58)for(let x=x0+30;x<x1;x+=58){const jx=x+R(-22,22),jy=y+R(-22,22);if(!inWBForest(jx,jy))continue;TREES.push({x:jx,y:jy,r:R(24,36),h:rnd()<.5?R(46,80):0,c:RP(fc)});}}
   // hoge bomen (iepen, platanen, populieren) in parken, op de wallen en langs singels
   for(let i=0;i<60000&&TREES.filter(t=>t.h).length<420;i++){const x=R(FORTBB[0]-300,FORTBB[2]+300),y=R(FORTBB[1]-300,FORTBB[3]+300),t=cellAt(x,y);if(!(t===PARK||t===GRASS))continue;if(t===GRASS&&rnd()<.55)continue;
     const r=R(22,34);let ok=true;for(const [dx,dy] of [[r,0],[-r,0],[0,r],[0,-r]]){const tt=cellAt(x+dx,y+dy);if(tt===BUILD||tt===ROAD||tt===WATER){ok=false;break;}}if(!ok)continue;

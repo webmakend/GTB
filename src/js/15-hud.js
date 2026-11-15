@@ -73,7 +73,7 @@ function mapOverlay(){let ov=document.getElementById('mapOv');
   ov.style.display=bigMap?'block':'none';if(!bigMap)return;const c=document.getElementById('mapC');if(c.width!==Math.round(CW*DPR)||c.height!==Math.round(CH*DPR)){c.width=Math.round(CW*DPR);c.height=Math.round(CH*DPR);}
   const keep=ctx;ctx=c.getContext('2d');ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,CW,CH);drawBigMap();ctx=keep;}
 function drawBigMap(){
-  const bx0=FORTBB[0]-250,by0=FORTBB[1]-250,bw=FORTBB[2]-FORTBB[0]+500,bh=FORTBB[3]-FORTBB[1]+500,top=uiTop().bottom+34;
+  const ub=WBOPEN&&WB?[Math.min(FORTBB[0],WB.bb[0]),WB.bb[1],Math.max(FORTBB[2],WB.bb[2]),FORTBB[3]]:FORTBB,bx0=ub[0]-250,by0=ub[1]-250,bw=ub[2]-ub[0]+500,bh=ub[3]-ub[1]+500,top=uiTop().bottom+34;
   const s=Math.min((CW-20)/bw,(CH-top-30)/bh),w=bw*s,h=bh*s,x0=(CW-w)/2,y0=top+(CH-top-30-h)/2;
   if(MAPC){ctx.imageSmoothingQuality='high';ctx.drawImage(MAPC,bx0*MAPS,by0*MAPS,bw*MAPS,bh*MAPS,x0,y0,w,h);}ctx.strokeStyle='rgba(255,255,255,.8)';ctx.lineWidth=2;ctx.strokeRect(x0,y0,w,h);
   const mp=(x,y)=>[x0+(x-bx0)*s,y0+(y-by0)*s],fs=clamp(w/95,8.5,12);ctx.font=`700 ${fs}px Inter, sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
@@ -84,7 +84,7 @@ function drawBigMap(){
   if(MIS.on&&!MIS.done){const [qx,qy]=mp(MIS.x,MIS.y),r=9+3*Math.sin(frameN*.15);ctx.strokeStyle='#ffd166';ctx.lineWidth=3;ctx.beginPath();ctx.arc(qx,qy,r,0,TAU);ctx.stroke();ctx.lineWidth=3;ctx.strokeStyle='rgba(0,0,0,.8)';ctx.strokeText('MISSIE',qx,qy-r-8);ctx.fillStyle='#ffd166';ctx.fillText('MISSIE',qx,qy-r-8);}
   histBigMap(mp);jobBigMap(mp,fs);progBigMap(mp,fs);
   const [px,py]=mp(me().x,me().y);ctx.fillStyle=(frameN>>4)&1?'#fff':'#ff2e88';ctx.beginPath();ctx.arc(px,py,7,0,TAU);ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.stroke();
-  txt('KAART · VESTING ZALTBOMMEL',CW/2,top-30,clamp(CW/22,16,22),'#ffd166','center');txt('tik ergens om te sluiten · ✕ rechtsboven',CW/2,top-10,11,'rgba(255,255,255,.7)','center','Inter, sans-serif');txt('Kaartdata © OpenStreetMap-bijdragers',x0+w,y0+h+4,10,'rgba(255,255,255,.6)','right','Inter, sans-serif');}
+  txt(WBOPEN?'KAART · ZALTBOMMEL & WAARDENBURG':'KAART · VESTING ZALTBOMMEL',CW/2,top-30,clamp(CW/22,16,22),'#ffd166','center');txt('tik ergens om te sluiten · ✕ rechtsboven',CW/2,top-10,11,'rgba(255,255,255,.7)','center','Inter, sans-serif');txt('Kaartdata © OpenStreetMap-bijdragers',x0+w,y0+h+4,10,'rgba(255,255,255,.6)','right','Inter, sans-serif');}
 
 // ---- WASTED / BUSTED in GTA-stijl (Pricedown als die er is, anders een vette fallback)
 const DEATH_FONT="'Pricedown','Pricedown Bl','Pricedown Black',Anton,Impact,sans-serif";

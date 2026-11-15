@@ -14,7 +14,7 @@ function buildPats(){seed=77;
    sand:mkPat(48,48,(g,w,h)=>noise(g,w,h,'#d8c592',['#e0ce9c','#cdb985','#d3c08c'],300,2)),
    park2:null};
 }
-function pathPoly(g,p){g.beginPath();g.moveTo(p[0][0],p[0][1]);for(let i=1;i<p.length;i++)g.lineTo(p[i][0],p[i][1]);}
+function pathPoly(g,p,keep){if(!keep)g.beginPath();g.moveTo(p[0][0],p[0][1]);for(let i=1;i<p.length;i++)g.lineTo(p[i][0],p[i][1]);}
 function inBox(bb,x0,y0,x1,y1,m){return !(bb[2]+m<x0||bb[0]-m>x1||bb[3]+m<y0||bb[1]-m>y1);}
 function renderChunk(ci,cj){
   const c=document.createElement('canvas');c.width=c.height=CS;const g=c.getContext('2d');const ox=ci*CS,oy=cj*CS,X1=ox+CS,Y1=oy+CS;
@@ -22,7 +22,8 @@ function renderChunk(ci,cj){
   g.translate(-ox,-oy);g.lineCap='round';g.lineJoin='round';
   g.fillStyle=pat('water');g.fillRect(ox,oy,CS,CS);
   if(BEACH&&inBox(BEACH.bb,ox,oy,X1,Y1,40)){pathPoly(g,BEACH);g.closePath();g.strokeStyle='rgba(225,210,160,.55)';g.lineWidth=26;g.stroke();g.fillStyle=pat('sand');g.fill();g.strokeStyle='rgba(150,125,80,.35)';g.lineWidth=6;g.stroke();}
-  g.save();pathPoly(g,FORT);g.closePath();g.strokeStyle='#8f8a80';g.lineWidth=12;g.stroke();g.clip();g.fillStyle=pat('grass');g.fillRect(ox,oy,CS,CS);
+  g.save();g.beginPath();for(const L of LANDS){pathPoly(g,L,true);g.closePath();}g.strokeStyle='#8f8a80';g.lineWidth=12;g.stroke();g.clip();g.fillStyle=pat('grass');g.fillRect(ox,oy,CS,CS);
+  if(WB&&inBox(WB.bb,ox,oy,X1,Y1,WBF)){const [x0,y0,x1,y1]=WB.bb;g.fillStyle='#2c4a24';g.fillRect(x0,y0,WBF,y1-y0+120);g.fillRect(x1-WBF,y0,WBF,y1-y0+120);g.fillRect(x0,y0,x1-x0,WBF);g.fillStyle='rgba(0,0,0,.18)';g.fillRect(x0+WBF-30,y0+WBF-30,30,y1-y0);g.fillRect(x1-WBF,y0+WBF-30,30,y1-y0);g.fillRect(x0+WBF,y0+WBF-30,x1-x0-2*WBF,30);}
   const fillPolys=(list,style,stroke,lw)=>{for(const p of list){if(!p.bb)p.bb=bbox(p);if(!inBox(p.bb,ox,oy,X1,Y1,20))continue;pathPoly(g,p);g.closePath();g.fillStyle=style;g.fill();if(stroke){g.strokeStyle=stroke;g.lineWidth=lw;g.stroke();}}};
   fillPolys(WD.green,pat('park'));
   fillPolys(WD.sand,pat('sand'));
@@ -61,7 +62,7 @@ function renderChunk(ci,cj){
   g.fillStyle='#2a2730';for(const l of LAMPS){if(l.x<ox-6||l.x>X1+6||l.y<oy-6||l.y>Y1+6)continue;g.beginPath();g.arc(l.x,l.y,3.2,0,TAU);g.fill();}
   // waternamen
   g.textAlign='center';g.textBaseline='middle';g.font='italic 120px Anton, Impact, sans-serif';g.fillStyle='rgba(255,255,255,.13)';
-  for(const [t,x,y] of [['DE WAAL',W*.45,260],['STADSGRACHT',W*.5,H-200]])if(x>ox-800&&x<X1+800&&y>oy-200&&y<Y1+200)g.fillText(t,x,y);
+  for(const [t,x,y] of [['DE WAAL',WB?FORTBB[0]+1200:W*.45,WB?(WB.bb[3]+FORTBB[1])/2:260],['DE WAAL',WB?FORTBB[2]-600:-9e9,WB?(WB.bb[3]+FORTBB[1])/2+400:0],['STADSGRACHT',W*.5,H-200]])if(x>ox-800&&x<X1+800&&y>oy-200&&y<Y1+200)g.fillText(t,x,y);
   return c;
 }
 function getChunk(ci,cj){const k=ci+','+cj;let c=chunkCache.get(k);if(c){chunkCache.delete(k);chunkCache.set(k,c);return c;}c=renderChunk(ci,cj);chunkCache.set(k,c);if(chunkCache.size>Math.max(IS_TOUCH?42:70,Math.ceil(CW/viewZ()/CS+2)*Math.ceil(CH/viewZ()/CS+2)+10))chunkCache.delete(chunkCache.keys().next().value);return c;}

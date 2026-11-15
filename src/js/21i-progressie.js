@@ -11,7 +11,7 @@ const ACH={fiets:['Fietsendief','Steel je eerste fiets'],overval:['Handen omhoog
   kasteel:['Cultuursnuiver','Het Stadskasteel bezocht'],uitzicht:['Hoog en droog','Boven op de oude watertoren'],klus3:['Klusjesman','3 klussen gedaan'],race:['Bommel GP','Straatrace gewonnen'],rijk:['Binnen!','€500 op zak'],schat:['Schatzoeker','De schat van Maarten van Rossum'],schutter:['Scherpschutter','Alle flessen geraakt']};
 const COINS=[];
 function progLoad(){try{const s=JSON.parse(lsGet(PRG_KEY)||'null');if(s)Object.assign(PRG,s,{toasts:[],combo:0,comboT:0,dirty:false,dailyDone:false,reveal:0});}catch(e){}PRG.lvl=lvlOf(PRG.xp);P.inv=Array.isArray(PRG.inv)?PRG.inv.slice():(PRG.gun?['balloon','pistol']:['balloon']);syncWpn();applyLevelPerks();}
-function progSave(){const o={xp:PRG.xp,coins:PRG.coins,ach:PRG.ach,day:PRG.day,streak:PRG.streak,gun:P.gun,inv:P.inv,robs:PRG.robs,jobs:PRG.jobs,races:PRG.races,hist:PRG.hist};lsSet(PRG_KEY,JSON.stringify(o));PRG.dirty=false;}
+function progSave(){const o={xp:PRG.xp,coins:PRG.coins,ach:PRG.ach,day:PRG.day,streak:PRG.streak,gun:P.gun,inv:P.inv,wb:PRG.wb?1:0,robs:PRG.robs,jobs:PRG.jobs,races:PRG.races,hist:PRG.hist};lsSet(PRG_KEY,JSON.stringify(o));PRG.dirty=false;}
 function need(l){return Math.round(120*Math.pow(l,1.45));}
 function lvlOf(xp){let l=1,t=0;while(xp>=t+need(l)){t+=need(l);l++;}return l;}
 function lvlBase(l){let t=0;for(let i=1;i<l;i++)t+=need(i);return t;}

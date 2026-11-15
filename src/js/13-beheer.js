@@ -19,10 +19,10 @@ function manage(){
   if(frameN%140===0){const cand=cars.filter(c=>c.driver==='npc'&&(c.rider||c.boer)&&!offscreen(c.x,c.y,-40));if(cand.length){const c=rpick(cand);say(c,c.boer?rpick(SAY_BOER).replace('#',c.boer):rpick(SAY_FAT));}}
   if(frameN%15===0){let rn='';const ne=nearestEdge(o.x,o.y);if(ne&&ne.d<EDGES[ne.ei].w/2+24)rn=EDGES[ne.ei].n;
     let lm='';for(const l of LANDMARKS){if(Math.hypot(l.x-o.x,l.y-o.y)<(l.shop?90:200)){lm=l.n;break;}}
-    placeName=swimming()?(o.y<H*.25?'Zwemmen in de Waal':'Zwemmen in de stadsgracht'):[lm,rn].filter(Boolean).join(' · ')||(inFort(o.x,o.y)?'Vesting Zaltbommel':'Zaltbommel');}
+    placeName=swimming()?(o.y<FORTBB[1]+500?'Zwemmen in de Waal':'Zwemmen in de stadsgracht'):[lm,rn].filter(Boolean).join(' · ')||(inWB(o.x,o.y)?'Waardenburg':inFort(o.x,o.y)?'Vesting Zaltbommel':o.y<FORTBB[1]-200?'Martinus Nijhoffbrug':'Zaltbommel');}
 }
 function step(){
-  frameN++;playerStep();actStep();gunStep();if(typeof pvpStep==='function')pvpStep();radioStep();progStep();jobStep();netStep();
+  frameN++;playerStep();actStep();gunStep();if(typeof wbStep==='function')wbStep();if(typeof pvpStep==='function')pvpStep();radioStep();progStep();jobStep();netStep();
   for(const c of cars){if(c.dead)continue;if(c===P.car){}else if(c.driver==='npc'&&c.ai)c.ctl=aiCivil(c);else if(c.driver==='cop'&&c.ai)c.ctl=c.ai.mode==='pursuit'?aiCop(c):aiCivil(c);else c.ctl=[0,0,1];carStep(c);}
   carCollisions();carPedHits();for(const p of peds)pedStep(p);missionStep();balloonStep();bargeStep();wantedStep();manage();
   for(const m of msgs)m.life--;while(msgs.length&&msgs[0].life<=0)msgs.shift();
