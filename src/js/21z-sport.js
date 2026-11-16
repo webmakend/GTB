@@ -8,17 +8,18 @@ function spOv(){let ov=document.getElementById('spOv');if(!ov){ov=document.creat
     window.addEventListener('keydown',e=>{if(!SP.on)return;SP.keys[e.code]=1;if(e.code==='Escape')spEnd();if(e.code==='Space'||e.code==='Enter'){e.preventDefault();spInput('key');}},true);
     window.addEventListener('keyup',e=>{if(SP.on)SP.keys[e.code]=0;},true);}
   return ov;}
-function spStart(k){if(SP.on)return;Object.assign(SP,{on:true,k,t:0,keys:{},msg:'',done:0,down:null});const ov=spOv();ov.style.display='block';paused=true;try{radio.pause();}catch(e){}
-  if(k==='tennis')tnInit();else pkInit();requestAnimationFrame(spLoop);}
-function spEnd(){SP.on=false;const ov=document.getElementById('spOv');if(ov)ov.style.display='none';paused=false;if(AU.on)try{musicPlay();}catch(e){}}
-function spInput(t,x,y,drag){if(SP.k==='tennis')tnIn(t,x,y,drag);else pkIn(t,x,y);}
+function spStart(k){if(SP.on)return;Object.assign(SP,{on:true,k,t:0,keys:{},msg:'',done:0,down:null,over:0});const ov=spOv();ov.style.display='block';paused=true;try{radio.pause();}catch(e){}
+  if(SPM[k])SPM[k].init();else if(k==='tennis')tnInit();else pkInit();requestAnimationFrame(spLoop);}
+const SPM={};
+function spEnd(){if(SPM[SP.k]&&SPM[SP.k].end)SPM[SP.k].end();SP.on=false;const ov=document.getElementById('spOv');if(ov)ov.style.display='none';paused=false;if(AU.on)try{musicPlay();}catch(e){}}
+function spInput(t,x,y,drag){if(SPM[SP.k]){SPM[SP.k].input(t,x,y,drag);return;}if(SP.k==='tennis')tnIn(t,x,y,drag);else pkIn(t,x,y);}
 function spLoop(){if(!SP.on)return;requestAnimationFrame(spLoop);const ov=document.getElementById('spOv');if(ov.width!==Math.round(CW*DPR)||ov.height!==Math.round(CH*DPR)){ov.width=Math.round(CW*DPR);ov.height=Math.round(CH*DPR);}
-  const g=ov.getContext('2d');g.setTransform(DPR,0,0,DPR,0,0);const keep=ctx;ctx=g;SP.t++;if(SP.done&&--SP.done<=0){ctx=keep;spEnd();return;}
-  if(SP.k==='tennis'){tnTick();tnDraw(g);}else{pkTick();pkDraw(g);}
+  const g=ov.getContext('2d');g.setTransform(DPR,0,0,DPR,0,0);const keep=ctx;ctx=g;SP.t++;if(SP.done&&--SP.done<=0){ctx=keep;SP.over=1;spEnd();return;}
+  if(SPM[SP.k]){SPM[SP.k].tick();SPM[SP.k].draw(g);}else if(SP.k==='tennis'){tnTick();tnDraw(g);}else{pkTick();pkDraw(g);}
   g.fillStyle='rgba(26,10,44,.85)';rrect(g,CW-112,uiTop().top+6,100,36,12);g.fill();txt('✕ STOP',CW-62,uiTop().top+25,14,'#fff','center','Inter, sans-serif');
   if(SP.msg)txt(SP.msg,CW/2,CH*.5,24,'#fff','center');ctx=keep;}
 // veld: past in het scherm, staand
-function spField(ratio){const top=uiTop().top+60,bot=CH-40,ah=bot-top;let h=ah,w=h/ratio;if(w>CW-30){w=CW-30;h=w*ratio;}return{x:(CW-w)/2,y:top+(ah-h)/2,w,h};}
+function spField(ratio){const top=uiTop().top+(SP.k&&SP.k[0]==='d'?86:60),bot=CH-40,ah=bot-top;let h=ah,w=h/ratio;if(w>CW-30){w=CW-30;h=w*ratio;}return{x:(CW-w)/2,y:top+(ah-h)/2,w,h};}
 
 // ---------------- TENNIS ----------------
 // baan: x 0..1 (breedte), y 0..2 (lengte); jij onderaan, tegenstander bovenaan

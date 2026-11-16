@@ -29,6 +29,7 @@ try {
   $db->exec('CREATE TABLE IF NOT EXISTS houses (oid TEXT PRIMARY KEY, pid TEXT, nm TEXT, name TEXT, ts INT)');
   $db->exec('CREATE TABLE IF NOT EXISTS tags (id INTEGER PRIMARY KEY AUTOINCREMENT, oid TEXT, k TEXT, t TEXT, c TEXT, tid TEXT, ts INT)');
   $db->exec('CREATE INDEX IF NOT EXISTS i_tags ON tags(oid, id)');
+  $db->exec('CREATE TABLE IF NOT EXISTS saves (code TEXT PRIMARY KEY, data TEXT, ts INT)');
   $db->exec('CREATE TABLE IF NOT EXISTS pay (id INTEGER PRIMARY KEY AUTOINCREMENT, too TEXT, nm TEXT, name TEXT, amt INT, ts INT)');
 } catch (Exception $e) { http_response_code(500); echo json_encode(['ok' => false]); exit; }
 
@@ -46,6 +47,26 @@ if ($a === 'houses') {
   $q = $db->query('SELECT h.oid,h.pid,h.nm,h.name,(SELECT state FROM players p WHERE p.pub = h.pid ORDER BY seen DESC LIMIT 1) AS st FROM houses h LIMIT 5000'); $out = [];
   foreach ($q as $r) { $s = json_decode((string)$r['st'], true) ?: []; $out[] = ['oid' => $r['oid'], 'pid' => $r['pid'], 'nm' => $r['nm'], 'name' => $r['name'], 'sq' => (string)($s['sq'] ?? '')]; }
   echo json_encode(['ok' => true, 'houses' => $out]); exit;
+}
+// ---- online voortgang: opslaan en terughalen met een herstelcode (8 tekens, zonder verwarrende letters)
+if ($a === 'csave' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+  $raw = file_get_contents('php://input', false, null, 0, 600000); $in = json_decode($raw, true) ?: [];
+  $data = $in['data'] ?? null; if (!is_array($data)) { echo json_encode(['ok' => false]); exit; }
+  $clean = []; foreach ($data as $k => $v) { if (preg_match('/^gtb_[a-z0-9_]{1,24}$/', (string)$k) && is_string($v)) $clean[$k] = $v; }
+  $js = json_encode($clean); if (strlen($js) > 500000) { echo json_encode(['ok' => false, 'err' => 'groot']); exit; }
+  $code = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', (string)($in['code'] ?? '')));
+  if (!preg_match('/^[A-Z2-9]{8}$/', $code)) {
+    $abc = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    do { $code = ''; for ($i = 0; $i < 8; $i++) $code .= $abc[random_int(0, 31)]; $q = $db->prepare('SELECT 1 FROM saves WHERE code = ?'); $q->execute([$code]); } while ($q->fetch());
+  }
+  $db->prepare('INSERT INTO saves (code,data,ts) VALUES (?,?,?) ON CONFLICT(code) DO UPDATE SET data = excluded.data, ts = excluded.ts')->execute([$code, $js, time()]);
+  echo json_encode(['ok' => true, 'code' => $code, 'ts' => time()]); exit;
+}
+if ($a === 'cload') {
+  usleep(300000); // raden afremmen
+  $code = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', (string)($_GET['code'] ?? '')));
+  $q = $db->prepare('SELECT data,ts FROM saves WHERE code = ?'); $q->execute([$code]); $r = $q->fetch(PDO::FETCH_ASSOC);
+  echo json_encode($r ? ['ok' => true, 'data' => json_decode($r['data'], true), 'ts' => (int)$r['ts']] : ['ok' => false]); exit;
 }
 if ($a === 'tags') { $oid = preg_replace('/[^0-9]/', '', (string)($_GET['oid'] ?? '')); $q = $db->prepare('SELECT k,t,c,tid FROM tags WHERE oid = ? ORDER BY id DESC LIMIT 60'); $q->execute([$oid]); $out = []; foreach (array_reverse($q->fetchAll(PDO::FETCH_ASSOC)) as $r) $out[] = [$r['k'], $r['t'], $r['c'], $r['tid']]; echo json_encode(['ok' => true, 'tags' => $out]); exit; }
 if ($a === 'tag' && $_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -104,6 +125,7 @@ $st = [
   'eur' => $num('eur', -1000000, 100000000), 'dead' => $num('dead', 0, 1),
   'pid' => preg_match('/^[0-9a-f]{12}$/', (string)($in['pid'] ?? '')) ? $in['pid'] : '',
   'ev' => [],
+  'du' => (is_array($in['du'] ?? null) && count($in['du']) === 2) ? [max(0, min(1000, (int)$in['du'][0])), preg_replace('/[^a-z0-9]/', '', substr((string)$in['du'][1], 0, 8))] : null,
   'sq' => substr(preg_replace('/[^a-z_:,0-9]/', '', (string)($in['sq'] ?? '')), 0, 400),
   'cm' => null,
 ];
@@ -111,7 +133,7 @@ if (in_array($in['in'] ?? '', ['stadscafe', 'dorpshuis', 'intertoys'], true) || 
 if (is_array($in['cm'] ?? null) && trim((string)($in['cm']['t'] ?? '')) !== '') $st['cm'] = ['i' => max(0, min(1000000000, (int)($in['cm']['i'] ?? 0))), 't' => mb_substr(trim(preg_replace('/[\x00-\x1F<>]/u', '', (string)$in['cm']['t'])), 0, 80)];
 // gebeurtenissen tussen spelers (raak, neergeschoten, vriendschap): alleen bekende soorten, max 12
 foreach (array_slice(is_array($in['ev'] ?? null) ? $in['ev'] : [], 0, 12) as $e) {
-  if (!is_array($e) || !in_array($e['k'] ?? '', ['hit', 'kill', 'frq', 'fok', 'frm', 'dm', 'gift', 'hsold'], true)) continue;
+  if (!is_array($e) || !in_array($e['k'] ?? '', ['hit', 'kill', 'frq', 'fok', 'frm', 'dm', 'gift', 'hsold', 'chal', 'chacc', 'chno', 'dmv'], true)) continue;
   if (!preg_match('/^[0-9a-f]{12}$/', (string)($e['to'] ?? ''))) continue;
   $st['ev'][] = ['k' => $e['k'], 'to' => $e['to'], 'i' => max(0, min(1000000000, (int)($e['i'] ?? 0))), 'd' => max(0, min(100000, (int)($e['d'] ?? 0))), 'm' => mb_substr(trim(preg_replace('/[\x00-\x1F<>]/u', '', (string)($e['m'] ?? ''))), 0, 200)];
 }
