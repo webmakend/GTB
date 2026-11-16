@@ -116,7 +116,7 @@ function drawBuildings(vx0,vy0,vx1,vy1,cx,cy){
     else if(b.kind==='gate'){ctx.fillStyle='rgba(0,0,0,.22)';ctx.beginPath();ctx.moveTo(r[0][0]*.85+rcx*.15,r[0][1]*.85+rcy*.15);for(let i=1;i<n;i++)ctx.lineTo(r[i][0]*.85+rcx*.15,r[i][1]*.85+rcy*.15);ctx.fill();}
     else{ctx.strokeStyle='rgba(0,0,0,.18)';ctx.lineWidth=2;ctx.stroke();}
     if(b.castle)drawCastleTop(b,r,f,cx,cy);if(b.wbc)drawWbCastle(b,r,f,cx,cy);if(b.molen)drawMolen(b,r,f,cx,cy);if(b.wt)drawWaterTop(b,f,cx,cy);
-    if(b===HILITE)drawHilite(b,r,rcx,rcy);if(b.oid&&typeof HS!=='undefined'&&HS[b.oid])houseTag(b,rcx,rcy);
+    if(b===HILITE)drawHilite(b,r,rcx,rcy);if(b.velz)drawVelz(b,r,rcx,rcy);if(b.oid&&typeof HS!=='undefined'&&HS[b.oid])houseTag(b,rcx,rcy);
     if(b.sign){const sg=b.signC;let a=b.sa;if(a>Math.PI/2)a-=Math.PI;if(a<-Math.PI/2)a+=Math.PI;ctx.save();ctx.translate(rcx,rcy);ctx.rotate(a);ctx.font='800 13px Inter, sans-serif';const tw=ctx.measureText(b.sign).width+12;
       ctx.shadowColor=sg[0];ctx.shadowBlur=14;ctx.fillStyle=sg[0];ctx.fillRect(-tw/2,-10,tw,20);ctx.shadowBlur=0;ctx.strokeStyle='rgba(255,255,255,.7)';ctx.lineWidth=1.2;ctx.strokeRect(-tw/2+1.5,-8.5,tw-3,17);ctx.fillStyle=sg[1];ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(b.sign,0,1);ctx.restore();}}
 }
