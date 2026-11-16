@@ -59,19 +59,19 @@ B=[('Cambium College - De Waard','school','obw1',[(300,205),(355,185),(385,250),
  ('Gomarus scholengemeenschap','school','obw2',[(495,585),(565,520),(700,640),(735,690),(605,775),(560,700),(545,610),(520,615)]),
  ('De Brug','school','obw3',[(305,775),(370,700),(400,690),(480,760),(440,800),(430,835),(350,835),(305,790)]),
  ('','yes','obw4',[(262,690),(285,670),(312,705),(290,725)]),('','yes','obw5',[(313,640),(330,630),(362,680),(345,695)]),('','yes','obw6',[(217,650),(232,640),(250,660),(235,670)]),
- ('Personal Active','commercial','obw15',[(890,290),(945,240),(990,300),(935,345)]),('','office','obw13',[(800,340),(850,300),(895,350),(845,395)]),
- ('','office','obw11',[(710,410),(765,365),(805,420),(750,465)]),('','yes','obw1067',[(755,330),(775,320),(785,335),(765,345)]),
- ('Cagemax','commercial','obw9',[(780,505),(830,465),(875,520),(825,560)]),('','office','obw7',[(845,610),(900,560),(940,615),(890,660)]),
+ ('Personal Active','commercial','obw15',[(890,290),(945,240),(990,300),(935,345)]),('Edulance','office','obw13',[(800,340),(850,300),(895,350),(845,395)]),
+ ('Ferliner','office','obw11',[(710,410),(765,365),(805,420),(750,465)]),('','yes','obw1067',[(755,330),(775,320),(785,335),(765,345)]),
+ ('Cagemax','commercial','obw9',[(780,505),(830,465),(875,520),(825,560)]),('Elbuco','office','obw7',[(845,610),(900,560),(940,615),(890,660)]),
  ('Kentalis Compas College','school','obw20',[(170,730),(225,725),(262,780),(262,845),(175,850)]),('','yes','obw21',[(225,640),(245,628),(262,650),(242,664)]),('','yes','obw22',[(195,675),(212,664),(228,684),(210,696)]),
  ('','commercial','obw23',[(765,80),(850,78),(842,225),(770,228)]),
  ('Sporthal & Zwembad De Waluwe','civic','obw6',[(470,960),(610,890),(680,1000),(540,1030)]),
- ('VelzArt','office','obw5v',[(915,700),(965,665),(1005,705),(992,735),(985,768),(960,775),(935,745)]),('','yes','obw16',[(900,210),(950,205),(950,220),(902,222)])]
+ ('VelzArt','office','obw5v',[(905,690),(958,648),(1002,702),(950,745)]),('','yes','obw16',[(900,210),(950,205),(950,220),(902,222)])]
 for n,b,i,P in B:
     Q=TP(P);Q.append(Q[0]);g['buildings'].append({'p':Q,'b':b,'n':n,'id':i,'am':''})
 g['baddr'].update({'obw6':'Oude Bosscheweg 6','obw20':'Oude Bosscheweg 2b','obw5v':'Oude Bosscheweg 5','obw7':'Oude Bosscheweg 7','obw9':'Oude Bosscheweg 9','obw11':'Oude Bosscheweg 11','obw13':'Oude Bosscheweg 13','obw15':'Oude Bosscheweg 15','obw1':'Oude Bosscheweg 2','obw2':'Oude Bosscheweg 4','obw3':'Oude Bosscheweg 2a'})
 BI=lambda i:[q for n,b,j,q in B if j==i][0]
 c=lambda P:[sum(q[0] for q in P)//len(P),sum(q[1] for q in P)//len(P)]
-for n,cat,adr,P in [('Sporthal & Zwembad De Waluwe','Binnenzwembad','Oude Bosscheweg 6',[(470,960),(610,890),(680,1000),(540,1030)]),('VelzArt','ICT-bedrijf','Oude Bosscheweg 5',BI('obw5v')),('Personal Active','Sportschool','Oude Bosscheweg 15',BI('obw15')),('Cagemax','Bedrijf','Oude Bosscheweg 9',BI('obw9'))]:
+for n,cat,adr,P in [('Elbuco','Bedrijf','Oude Bosscheweg 7',BI('obw7')),('Ferliner','Bedrijf','Oude Bosscheweg 11',BI('obw11')),('Edulance','Bedrijf','Oude Bosscheweg 13',BI('obw13')),('Sporthal & Zwembad De Waluwe','Binnenzwembad','Oude Bosscheweg 6',[(470,960),(610,890),(680,1000),(540,1030)]),('VelzArt','ICT-bedrijf','Oude Bosscheweg 5',BI('obw5v')),('Personal Active','Sportschool','Oude Bosscheweg 15',BI('obw15')),('Cagemax','Bedrijf','Oude Bosscheweg 9',BI('obw9'))]:
     x,y=T(c(P));g['biz'].append({'n':n,'full':n,'c':cat,'cat':cat,'adr':adr,'x':x,'y':y})
 # ---- bestrating en parkeerplaatsen
 g['parking']+=[TP([(650,850),(740,800),(830,890),(760,960),(650,850)]),TP([(355,140),(405,125),(560,395),(510,430),(355,140)]),TP([(240,640),(590,430),(610,450),(260,662),(240,640)]),TP([(1010,600),(1040,590),(1045,740),(1010,745),(1010,600)])]
