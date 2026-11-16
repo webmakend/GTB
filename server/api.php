@@ -129,7 +129,7 @@ $st = [
   'sq' => substr(preg_replace('/[^a-z_:,0-9]/', '', (string)($in['sq'] ?? '')), 0, 400),
   'cm' => null,
 ];
-if (in_array($in['in'] ?? '', ['stadscafe', 'dorpshuis', 'intertoys'], true) || preg_match('/^h[0-9]{1,15}$/', (string)($in['in'] ?? ''))) { $st['in'] = $in['in']; $st['ix'] = round(max(0, min(40, (float)($in['ix'] ?? 0))), 2); $st['iz'] = round(max(0, min(40, (float)($in['iz'] ?? 0))), 2); }
+if (in_array($in['in'] ?? '', ['stadscafe', 'dorpshuis', 'intertoys', 'velzart'], true) || preg_match('/^h[0-9]{1,15}$/', (string)($in['in'] ?? ''))) { $st['in'] = $in['in']; $st['ix'] = round(max(0, min(40, (float)($in['ix'] ?? 0))), 2); $st['iz'] = round(max(0, min(40, (float)($in['iz'] ?? 0))), 2); }
 if (is_array($in['cm'] ?? null) && trim((string)($in['cm']['t'] ?? '')) !== '') $st['cm'] = ['i' => max(0, min(1000000000, (int)($in['cm']['i'] ?? 0))), 't' => mb_substr(trim(preg_replace('/[\x00-\x1F<>]/u', '', (string)$in['cm']['t'])), 0, 80)];
 // gebeurtenissen tussen spelers (raak, neergeschoten, vriendschap): alleen bekende soorten, max 12
 foreach (array_slice(is_array($in['ev'] ?? null) ? $in['ev'] : [], 0, 12) as $e) {
