@@ -10,6 +10,7 @@ init();
 let last=performance.now(),acc=0;
 function frame(now){requestAnimationFrame(frame);const dt=Math.min(100,now-last);last=now;
   if(MODE==='play'&&FPV.on){acc+=dt;let n=0;while(acc>=16.667&&n<4){fpvStep();acc-=16.667;n++;}if(n>=4)acc=0;if(FPV.on)drawFpv();else renderWorld();return;}
+  if(MODE==='play'&&typeof ST3!=='undefined'&&ST3.on){st3Frame(dt);return;}
   if(MODE==='play'&&typeof SC!=='undefined'&&SC.on){acc+=dt;let n=0;while(acc>=16.667&&n<4){scStep();acc-=16.667;n++;}if(n>=4)acc=0;if(SC.on)drawSC();return;}
   if(MODE==='play'&&CLUB.on){acc+=dt;let n=0;while(acc>=16.667&&n<4){clubStep();acc-=16.667;n++;}if(n>=4)acc=0;if(CLUB.on)drawClub();return;}
   if(MODE==='play'){if(!paused&&!bigMap){acc+=dt;let n=0;while(acc>=16.667&&n<4){if(MG.on)mgStep();else if(hitStop>0){hitStop--;frameN++;}else step();acc-=16.667;n++;}if(n>=4)acc=0;}renderWorld();}
